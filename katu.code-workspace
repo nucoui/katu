@@ -37,8 +37,16 @@
       "path": "packages/reactivity"
     },
     {
+      "name": "📦 runtime",
+      "path": "packages/runtime"
+    },
+    {
       "name": "========= 🎮 =",
       "path": "🎮"
+    },
+    {
+      "name": "🎮 vanilla",
+      "path": "playgrounds/vanilla"
     },
   ],
   "settings": {
@@ -136,7 +144,7 @@
     "cSpell.words": [
       "antfu",
       "Nuco",
-      "Catto"
+      "katu"
     ],
 
     "terminal.integrated.cwd": "${workspaceFolder}",

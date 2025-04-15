@@ -4,7 +4,10 @@
   "scripts": {
     "p:core": "pnpm -C packages/core",
     "p:parser": "pnpm -C packages/parser",
-    "p:reactivity": "pnpm -C packages/reactivity"
+    "p:reactivity": "pnpm -C packages/reactivity",
+    "p:rt": "pnpm -C packages/runtime",
+
+    "pg:vanilla": "pnpm -C playgrounds/vanilla"
   },
   "devDependencies": {
     "pnpm": "10.8.1"
