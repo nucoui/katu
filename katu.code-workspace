@@ -1,0 +1,153 @@
+{
+  "folders": [
+    {
+      "name": "<root>",
+      "path": "."
+    },
+    {
+      "name": "========= ⚙️ =",
+      "path": "⚙️"
+    },
+    {
+      "name": "⚙️ config",
+      "path": "./config",
+    },
+    {
+      "name": "========= 📃 =",
+      "path": "📃"
+    },
+    {
+      "name": "📃 docs",
+      "path": "./docs"
+    },
+    {
+      "name": "========= 📦 =",
+      "path": "📦"
+    },
+    {
+      "name": "📦 core",
+      "path": "packages/core"
+    },
+    {
+      "name": "📦 parser",
+      "path": "packages/parser"
+    },
+    {
+      "name": "📦 reactivity",
+      "path": "packages/reactivity"
+    },
+    {
+      "name": "========= 🎮 =",
+      "path": "🎮"
+    },
+  ],
+  "settings": {
+    "prettier.enable": false,
+    "biome.enabled": false,
+    "stylelint.enable": true,
+
+    "editor.formatOnSave": false,
+
+    // Auto fix
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit",
+      "source.fixAll.stylelint": "explicit",
+      "source.organizeImports": "never"
+    },
+
+    "[javascript]": {
+      "editor.codeActionsOnSave": {
+        "source.addMissingImports": "explicit",
+      }
+    },
+    "[typescript]": {
+      "editor.codeActionsOnSave": {
+        "source.addMissingImports": "explicit",
+      }
+    },
+    "[vue]": {
+      "editor.codeActionsOnSave": {
+        "source.addMissingImports": "explicit",
+      }
+    },
+
+    "eslint.options": {
+      "flags": ["unstable_ts_config"]
+    },
+
+    "eslint.runtime": "node",
+
+    // Silent the stylistic rules in you IDE, but still auto fix them
+    "eslint.rules.customizations": [
+      { "rule": "style/*", "severity": "off", "fixable": true },
+      { "rule": "*-indent", "severity": "off", "fixable": true },
+      { "rule": "*-spacing", "severity": "off", "fixable": true },
+      { "rule": "*-spaces", "severity": "off", "fixable": true },
+      { "rule": "*-order", "severity": "off", "fixable": true },
+      { "rule": "*-dangle", "severity": "off", "fixable": true },
+      { "rule": "*-newline", "severity": "off", "fixable": true },
+      { "rule": "*quotes", "severity": "off", "fixable": true },
+      { "rule": "*semi", "severity": "off", "fixable": true }
+    ],
+
+    // Enable eslint for all supported languages
+    "eslint.validate": [
+      "javascript",
+      "javascriptreact",
+      "typescript",
+      "typescriptreact",
+      "vue",
+      "html",
+      "markdown",
+      "json",
+      "jsonc",
+      "yaml",
+      "toml",
+      "xml",
+      "gql",
+      "graphql",
+      "astro",
+      "svelte",
+      "css",
+      "less",
+      "scss",
+      "pcss",
+      "postcss"
+    ],
+
+    "stylelint.configFile": "./config/stylelint/main.mjs",
+    "stylelint.validate": [
+      "css",
+      "scss",
+      "vue"
+    ],
+
+    "pair-diff.patterns": [
+      {
+        "source": "./fixtures/output/**/*.*",
+        "target": "./fixtures/input/<base>"
+      }
+    ],
+
+    "typescript.preferences.importModuleSpecifier": "non-relative",
+    "javascript.preferences.importModuleSpecifier": "non-relative",
+    "emmet.triggerExpansionOnTab": true,
+
+    "cSpell.words": [
+      "antfu",
+      "Nuco",
+      "Catto"
+    ],
+
+    "terminal.integrated.cwd": "${workspaceFolder}",
+    "github.gitProtocol": "ssh",
+    "liveServer.settings.multiRootWorkspaceName": "root"
+  },
+  "extensions": {
+    "unwantedRecommendations": []
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": []
+  }
+}
