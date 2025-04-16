@@ -1,20 +1,19 @@
 {
-  "name": "vanilla",
-  "version": "1.0.0",
-  "description": "",
+  "name": "vite-vanilla",
+  "private": true,
+  "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/src/index.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "packageManager": "pnpm@10.8.1",
-  "dependencies": {
-    "@katu/runtime": "workspace:*"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
   },
   "devDependencies": {
-    "typescript": "catalog:"
+    "@katu/runtime": "workspace:*",
+    "typescript": "~5.7.2",
+    "vite": "^6.2.0"
+  },
+  "dependencies": {
+    "alien-signals": "^1.0.13"
   }
 }

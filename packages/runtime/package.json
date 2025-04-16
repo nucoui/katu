@@ -9,25 +9,33 @@
       "require": "./dist/main.js"
     },
     "./jsx-runtime": {
-      "types": "./dist/jsx-runtime.d.ts",
-      "import": "./dist/jsx-runtime.mjs",
-      "require": "./dist/jsx-runtime.js"
+      "types": "./dist/jsx-runtime/jsx-runtime.d.ts",
+      "import": "./dist/jsx-runtime/jsx-runtime.mjs",
+      "require": "./dist/jsx-runtime/jsx-runtime.js"
+    },
+    "./jsx-dev-runtime": {
+      "types": "./dist/jsx-runtime/jsx-dev-runtime.d.ts",
+      "import": "./dist/jsx-runtime/jsx-dev-runtime.mjs",
+      "require": "./dist/jsx-runtime/jsx-dev-runtime.js"
     },
     "./elements": {
-      "types": "./types/JSX.namespace.d.ts"
+      "types": "./dist/types/JSX.namespace.d.d.ts"
     }
   },
   "files": [
-    "dist",
-    "types"
+    "dist"
   ],
   "scripts": {
     "build": "tsup",
     "watch": "tsup --watch",
     "lint": "eslint ."
   },
+  "dependencies": {
+    "alien-signals": "^1.0.13"
+  },
   "devDependencies": {
     "@katu/config": "workspace:*",
+    "@types/hast": "^3.0.4",
     "eslint": "catalog:",
     "tsup": "^8.4.0"
   }

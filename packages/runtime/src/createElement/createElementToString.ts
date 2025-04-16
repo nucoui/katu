@@ -1,8 +1,8 @@
 import type { KatuNode } from "@/types/KatuNode";
 
-export async function render(katuNode: KatuNode): Promise<string> {
+export async function createElementToString(katuNode: KatuNode): Promise<string> {
   if (Array.isArray(katuNode)) {
-    const renderedChildren = await Promise.all(katuNode.map(render));
+    const renderedChildren = await Promise.all(katuNode.map(createElementToString));
     return renderedChildren.join("");
   }
   if (typeof katuNode === "string") {
@@ -12,16 +12,15 @@ export async function render(katuNode: KatuNode): Promise<string> {
     return "";
   }
   const { tag, props } = katuNode;
-  const repeat = typeof props.repeat === "number" ? props.repeat : 1;
 
   if (typeof tag === "function") {
-    return (await render(await tag(props))).repeat(repeat);
+    return (await createElementToString(await tag(props)));
   }
 
   const { children, ...rest } = props;
   const attributes = Object.entries(rest)
     .map(([key, value]) => ` ${key}="${value}"`)
     .join("");
-  const innerHTML = await render(children as KatuNode);
-  return `<${tag}${attributes}>${innerHTML}</${tag}>`.repeat(repeat);
+  const innerHTML = await createElementToString(children as KatuNode);
+  return `<${tag}${attributes}>${innerHTML}</${tag}>`;
 }

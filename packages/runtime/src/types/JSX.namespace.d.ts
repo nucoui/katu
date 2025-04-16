@@ -1,12 +1,10 @@
 import type {
   FunctionComponentResult,
   KatuJSXElement,
-} from "../src/types/KatuJSXElement";
-import type { KatuNode } from "../src/types/KatuNode";
+} from "@/types/KatuJSXElement";
+import type { KatuNode } from "@/types/KatuNode";
 
-interface PropsForAnyJSXElement {
-  repeat?: number;
-}
+interface PropsForAnyJSXElement {}
 
 interface PropsForAnyIntrinsicElement extends PropsForAnyJSXElement {
   children?: KatuNode;
