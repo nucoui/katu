@@ -9,11 +9,11 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@katu/reactivity": "workspace:*",
     "@katu/runtime": "workspace:*",
     "typescript": "~5.7.2",
     "vite": "^6.2.0"
   },
   "dependencies": {
-    "alien-signals": "^1.0.13"
   }
 }

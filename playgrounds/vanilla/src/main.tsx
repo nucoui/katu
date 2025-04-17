@@ -1,34 +1,24 @@
-import { createCustomElement, createElement, createElementToHast, resisterElement } from "@katu/runtime";
-import { signal } from "alien-signals";
+import { signal } from "@katu/reactivity"
 
-const Time = (props: { text: string }) => {
-  const time = signal(new Date().getTime());
+const Count = () => {
+  const [count, setCount] = signal(1)
 
   setInterval(() => {
-    time(new Date().getTime());
-  }, 5000);
+    setCount((prev) => prev + 1)
+  }, 1000)
 
-  return (
+  return defineRenderer(() => (
     <div>
-      <h1>{props.text}</h1>
-      <p>Now: {String(time())}</p>
+      <h1>Count: {String(count())}</h1>
     </div>
-  );
-};
-
-
-resisterElement("ce-time", createCustomElement(Time));
+  ))
+}
 
 const element = (
   <div>
-    <Time text="Test" />
-    {/* <Title text="Hello, world!" /> */}
-    {/* <p>Goodbye, world!</p> */}
-    <ce-time text="Test" />
+    <Count />
   </div>
-);
+)
 
 const app = document.getElementById("app");
 app?.appendChild(await createElement(element));
-
-console.log(await createElementToHast(element));

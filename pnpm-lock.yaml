@@ -55,7 +55,7 @@ importers:
         specifier: ^36.0.1
         version: 36.0.1(stylelint@16.18.0(typescript@5.8.3))
 
-  packages/runtime:
+  packages/old-runtime:
     dependencies:
       alien-signals:
         specifier: ^1.0.13
@@ -74,24 +74,49 @@ importers:
         specifier: ^8.4.0
         version: 8.4.0(postcss@8.5.3)(typescript@5.8.3)(yaml@2.7.1)
 
-  playgrounds/vanilla:
+  packages/reactivity:
     dependencies:
       alien-signals:
         specifier: ^1.0.13
         version: 1.0.13
     devDependencies:
-      '@katu/runtime':
+      '@katu/config':
         specifier: workspace:*
-        version: link:../../packages/runtime
-      typescript:
-        specifier: ~5.7.2
-        version: 5.7.3
-      vite:
-        specifier: ^6.2.0
-        version: 6.2.6(yaml@2.7.1)
+        version: link:../../config
+      eslint:
+        specifier: 'catalog:'
+        version: 9.24.0
+      tsup:
+        specifier: ^8.4.0
+        version: 8.4.0(postcss@8.5.3)(typescript@5.8.3)(yaml@2.7.1)
+      vitest:
+        specifier: ^3.1.1
+        version: 3.1.1(@types/debug@4.1.12)(yaml@2.7.1)
 
-  playgrounds/vite-vanilla:
+  packages/runtime:
+    dependencies:
+      '@katu/reactivity':
+        specifier: workspace:*
+        version: link:../reactivity
     devDependencies:
+      '@katu/config':
+        specifier: workspace:*
+        version: link:../../config
+      '@types/hast':
+        specifier: ^3.0.4
+        version: 3.0.4
+      eslint:
+        specifier: 'catalog:'
+        version: 9.24.0
+      tsup:
+        specifier: ^8.4.0
+        version: 8.4.0(postcss@8.5.3)(typescript@5.8.3)(yaml@2.7.1)
+
+  playgrounds/vanilla:
+    devDependencies:
+      '@katu/reactivity':
+        specifier: workspace:*
+        version: link:../../packages/reactivity
       '@katu/runtime':
         specifier: workspace:*
         version: link:../../packages/runtime

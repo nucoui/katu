@@ -5,19 +5,18 @@
   "packageManager": "pnpm@10.8.1",
   "exports": {
     ".": {
-      "types": "./dist/main.d.ts",
       "import": "./dist/main.mjs",
       "require": "./dist/main.js"
     },
     "./jsx-runtime": {
-      "types": "./dist/jsx-runtime.d.ts",
-      "import": "./dist/jsx-runtime.mjs",
-      "require": "./dist/jsx-runtime.js"
+      "types": "./dist/jsx-runtime/jsx-runtime.d.ts",
+      "import": "./dist/jsx-runtime/jsx-runtime.mjs",
+      "require": "./dist/jsx-runtime/jsx-runtime.js"
     },
     "./jsx-dev-runtime": {
-      "types": "./dist/jsx-dev-runtime.d.ts",
-      "import": "./dist/jsx-dev-runtime.mjs",
-      "require": "./dist/jsx-dev-runtime.js"
+      "types": "./dist/jsx-runtime/jsx-dev-runtime.d.ts",
+      "import": "./dist/jsx-runtime/jsx-dev-runtime.mjs",
+      "require": "./dist/jsx-runtime/jsx-dev-runtime.js"
     },
     "./elements": {
       "types": "./dist/types/JSX.namespace.d.d.ts"
@@ -32,7 +31,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@katu/reactivity": "workspace:*"
+    "alien-signals": "^1.0.13"
   },
   "devDependencies": {
     "@katu/config": "workspace:*",
