@@ -1,0 +1,28 @@
+{
+  "name": "@katu/reactivity",
+  "private": false,
+  "version": "1.0.0",
+  "description": "",
+  "exports": {
+    ".": {
+      "types": "./dist/main.d.ts",
+      "import": "./dist/main.mjs",
+      "require": "./dist/main.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "watch": "tsup --watch",
+    "lint": "eslint ."
+  },
+  "packageManager": "pnpm@10.8.1",
+  "dependencies": {
+    "alien-signals": "^1.0.13"
+  },
+  "devDependencies": {
+    "@katu/config": "workspace:*",
+    "eslint": "catalog:",
+    "tsup": "^8.4.0",
+    "vitest": "^3.1.1"
+  }
+}

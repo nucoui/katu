@@ -29,10 +29,6 @@
       "path": "packages/core"
     },
     {
-      "name": "📦 parser",
-      "path": "packages/parser"
-    },
-    {
       "name": "📦 reactivity",
       "path": "packages/reactivity"
     },

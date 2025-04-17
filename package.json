@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "p:core": "pnpm -C packages/core",
-    "p:parser": "pnpm -C packages/parser",
-    "p:reactivity": "pnpm -C packages/reactivity",
+    "p:rtv": "pnpm -C packages/reactivity",
     "p:rt": "pnpm -C packages/runtime",
 
     "pg:vanilla": "pnpm -C playgrounds/vanilla"
