@@ -1,15 +1,7 @@
-import type { KatuJSXElement } from "@/types/KatuJSXElement";
-import type { KatuNode } from "@/types/KatuNode";
+import type { JSXElement } from "@/types/JSXElement";
 
-export function jsx(
-  tag: KatuJSXElement["tag"],
-  props: KatuJSXElement["props"],
-): KatuJSXElement {
-  return { tag, props };
-}
+export function jsx(tag: JSXElement["tag"], props: JSXElement["tag"]) {}
 
 export { jsx as jsxs };
 
-export function Fragment({ children }: { children?: KatuNode }): KatuNode {
-  return children;
-}
+export function Fragment(tag: JSXElement["tag"], props: JSXElement["tag"]) {}
