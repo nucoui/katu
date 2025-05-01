@@ -1,24 +1,34 @@
-import { signal } from "@katu/reactivity"
+const Hoge = defineCustomElement<{id: string}>(({ onAttributeChanged }) => {
+  // const id = props.id
 
-const Count = () => {
-  const [count, setCount] = signal(1)
+  onAttributeChanged((name, oldValue, newValue) => {
+    switch (name) {
+      case "id":
+        console.log("id changed", oldValue, newValue);
+        break;
+      default:
+        console.log("other changed", name, oldValue, newValue);
+        break;
+    }
+  });
 
-  setInterval(() => {
-    setCount((prev) => prev + 1)
-  }, 1000)
-
-  return defineRenderer(() => (
+  return (
     <div>
-      <h1>Count: {String(count())}</h1>
+      <h1>Hello World</h1>
+      <p>{"Hoge"}</p>
     </div>
-  ))
-}
+  );
+}, {
+  shadowRoot: true,
+  shadowRootMode: 'open'
+});
 
-const element = (
-  <div>
-    <Count />
-  </div>
-)
+
+customElements.define("hoge-element", Hoge);
 
 const app = document.getElementById("app");
-app?.appendChild(await createElement(element));
+if (app) {
+  const element = document.createElement("hoge-element");
+  app.appendChild(element);
+}
+

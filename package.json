@@ -5,6 +5,7 @@
     "p:core": "pnpm -C packages/core",
     "p:rtv": "pnpm -C packages/reactivity",
     "p:rt": "pnpm -C packages/runtime",
+    "p:ts": "pnpm -C packages/transpiler",
 
     "pg:vanilla": "pnpm -C playgrounds/vanilla"
   },

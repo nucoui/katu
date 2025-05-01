@@ -1,2 +1,3 @@
 /// <reference types="vite/client" />
-/// <reference types="@katu/runtime/elements" />
+/// <reference types="@katu/transpiler/JSX" />
+/// <reference types="@katu/transpiler/DefineCustomElement" />
