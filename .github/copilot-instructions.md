@@ -73,6 +73,7 @@ Github Coplot、あなたは以下のコード規約に必ず従ってくださ�
       pnpm pg:<project-name> <command>
       ```
 - このプロジェクトはpnpmを使用して管理されています。
+- ターミナルを開くときはworkspaceのルートディレクトリを開いてください。
 
 
 # 達成目標

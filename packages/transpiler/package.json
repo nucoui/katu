@@ -28,7 +28,7 @@
     "build": "tsup",
     "watch": "tsup --watch",
     "lint": "eslint .",
-    "test": "vitest"
+    "test": "tsup && vitest"
   },
   "dependencies": {
     "@babel/generator": "^7.27.0",

@@ -10,8 +10,9 @@ const babelTraverse = _traverse.default;
  * @param ast - parseToAstで生成されたAST
  * @returns トラバース結果としての情報オブジェクト
  */
-const traverse = (ast: ReturnType<typeof parse>): { className: string; elements: any[]; options: Record<string, any>; remainingCode: string; defineCustomElementCode: string; orderedNodes: { type: "defineCustomElement" | "customElementsDefine" | "other"; node: t.Statement }[] } => {
-  const result: { className: string; elements: any[]; options: Record<string, any>; remainingCode: string; defineCustomElementCode: string; orderedNodes: { type: "defineCustomElement" | "customElementsDefine" | "other"; node: t.Statement }[] } = { className: "", elements: [], options: {}, remainingCode: "", defineCustomElementCode: "", orderedNodes: [] };
+// 修正: elementsの型を適切に変更し、processJSXElementの戻り値を正しく扱う
+const traverse = (ast: ReturnType<typeof parse>): { className: string; elements: { statements: t.Statement[]; elements: t.JSXElement[] }[]; options: Record<string, any>; remainingCode: string; defineCustomElementCode: string; orderedNodes: { type: "defineCustomElement" | "customElementsDefine" | "other"; node: t.Statement }[] } => {
+  const result: { className: string; elements: { statements: t.Statement[]; elements: t.JSXElement[] }[]; options: Record<string, any>; remainingCode: string; defineCustomElementCode: string; orderedNodes: { type: "defineCustomElement" | "customElementsDefine" | "other"; node: t.Statement }[] } = { className: "", elements: [], options: {}, remainingCode: "", defineCustomElementCode: "", orderedNodes: [] };
 
   babelTraverse(ast, {
     Program(path: NodePath<t.Program>) {
@@ -50,7 +51,10 @@ const traverse = (ast: ReturnType<typeof parse>): { className: string; elements:
         path.traverse({
           JSXElement(innerPath: NodePath<t.JSXElement>) {
             if (innerPath.node.type === "JSXElement") {
-              result.elements.push(innerPath.node);
+              // 修正: processJSXElementの戻り値を直接JSXElement型として扱わない
+              result.elements.push(
+                { statements: processJSXElement(innerPath.node, "shadow", { count: 0 }).statements, elements: [] }
+              );
             }
           },
         });
@@ -66,7 +70,10 @@ const traverse = (ast: ReturnType<typeof parse>): { className: string; elements:
           if (declaration.init.body.type === "BlockStatement") {
             declaration.init.body.body.forEach((statement: t.Statement) => {
               if (statement.type === "ReturnStatement" && statement.argument?.type === "JSXElement") {
-                result.elements.push(statement.argument);
+                // 修正: processJSXElementの戻り値を直接JSXElement型として扱わない
+                result.elements.push(
+                  { statements: processJSXElement(statement.argument, "shadow", { count: 0 }).statements, elements: [] }
+                );
               }
             });
           }
@@ -94,12 +101,18 @@ const traverse = (ast: ReturnType<typeof parse>): { className: string; elements:
           if (args[0].body.type === "BlockStatement") {
             args[0].body.body.forEach((statement) => {
               if (statement.type === "ReturnStatement" && statement.argument?.type === "JSXElement") {
-                result.elements.push(statement.argument);
+                // 修正: processJSXElementの戻り値を直接JSXElement型として扱わない
+                result.elements.push(
+                  { statements: processJSXElement(statement.argument, "shadow", { count: 0 }).statements, elements: [] }
+                );
               }
             });
           }
           else if (args[0].body.type === "JSXElement") {
-            result.elements.push(args[0].body);
+            // 修正: processJSXElementの戻り値を直接JSXElement型として扱わない
+            result.elements.push(
+              { statements: processJSXElement(args[0].body, "shadow", { count: 0 }).statements, elements: [] }
+            );
           }
 
           // Extract options from the second argument
@@ -114,7 +127,141 @@ const traverse = (ast: ReturnType<typeof parse>): { className: string; elements:
     },
   });
 
+  // 修正: processJSXElementの戻り値を適切に扱うように変更
+  result.elements = result.elements.map(({ statements, elements }) => ({ statements, elements }));
+
   return result;
 };
 
-export { traverse };
+/**
+ * JSX要素を再帰的に処理して必要な情報を収集します。
+ * @param jsxElement - 処理するJSX要素
+ * @param parentVar - 親要素の変数名
+ * @param elementCounter - 要素のカウンターオブジェクト
+ * @param elementCounter.count - 現在の要素のカウント値
+ * @returns 収集された情報
+ */
+function processJSXElement(jsxElement: t.JSXElement, parentVar: string, elementCounter: { count: number }): { statements: t.Statement[]; elements: t.JSXElement[] } {
+  const statements: t.Statement[] = [];
+  const elements: t.JSXElement[] = [];
+
+  const elementVar = `el${elementCounter.count++}`;
+
+  // 要素の作成
+  statements.push({
+    type: "VariableDeclaration",
+    kind: "const",
+    declarations: [
+      {
+        type: "VariableDeclarator",
+        id: { type: "Identifier", name: elementVar },
+        init: {
+          type: "CallExpression",
+          callee: {
+            type: "MemberExpression",
+            object: { type: "Identifier", name: "document" },
+            property: { type: "Identifier", name: "createElement" },
+            computed: false,
+          },
+          arguments: [
+            { type: "StringLiteral", value: (jsxElement.openingElement.name as t.JSXIdentifier).name },
+          ],
+        },
+      },
+    ],
+  });
+
+  // 属性の設定
+  jsxElement.openingElement.attributes.forEach((attr) => {
+    if (attr.type === "JSXAttribute" && attr.name.type === "JSXIdentifier") {
+      statements.push({
+        type: "ExpressionStatement",
+        expression: {
+          type: "CallExpression",
+          callee: {
+            type: "MemberExpression",
+            object: { type: "Identifier", name: elementVar },
+            property: { type: "Identifier", name: "setAttribute" },
+            computed: false,
+          },
+          arguments: [
+            { type: "StringLiteral", value: attr.name.name },
+            { type: "StringLiteral", value: attr.value?.type === "StringLiteral" ? attr.value.value : "" },
+          ],
+        },
+      });
+    }
+  });
+
+  // 子要素の処理
+  jsxElement.children.forEach((child) => {
+    if (child.type === "JSXText") {
+      const textVar = `text${elementCounter.count++}`;
+      statements.push(
+        {
+          type: "VariableDeclaration",
+          kind: "const",
+          declarations: [
+            {
+              type: "VariableDeclarator",
+              id: { type: "Identifier", name: textVar },
+              init: {
+                type: "CallExpression",
+                callee: {
+                  type: "MemberExpression",
+                  object: { type: "Identifier", name: "document" },
+                  property: { type: "Identifier", name: "createTextNode" },
+                  computed: false,
+                },
+                arguments: [
+                  { type: "StringLiteral", value: child.value.trim() },
+                ],
+              },
+            },
+          ],
+        },
+        {
+          type: "ExpressionStatement",
+          expression: {
+            type: "CallExpression",
+            callee: {
+              type: "MemberExpression",
+              object: { type: "Identifier", name: elementVar },
+              property: { type: "Identifier", name: "appendChild" },
+              computed: false,
+            },
+            arguments: [
+              { type: "Identifier", name: textVar },
+            ],
+          },
+        },
+      );
+    }
+    else if (child.type === "JSXElement") {
+      const childResult = processJSXElement(child, elementVar, elementCounter);
+      statements.push(...childResult.statements);
+      elements.push(...childResult.elements);
+    }
+  });
+
+  // 親要素に追加
+  statements.push({
+    type: "ExpressionStatement",
+    expression: {
+      type: "CallExpression",
+      callee: {
+        type: "MemberExpression",
+        object: { type: "Identifier", name: parentVar },
+        property: { type: "Identifier", name: "appendChild" },
+        computed: false,
+      },
+      arguments: [
+        { type: "Identifier", name: elementVar },
+      ],
+    },
+  });
+
+  return { statements, elements };
+}
+
+export { processJSXElement, traverse };
