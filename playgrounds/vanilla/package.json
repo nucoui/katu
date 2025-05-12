@@ -13,5 +13,8 @@
     "@katu/transpiler": "workspace:*",
     "typescript": "~5.7.2",
     "vite": "^6.2.0"
+  },
+  "dependencies": {
+    "consola": "^3.4.2"
   }
 }

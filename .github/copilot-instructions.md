@@ -29,9 +29,8 @@
 │   │   プロジェクトのコアとなるパッケージを格納するディレクトリ。利用者はこのパッケージを利用することになる。
 │   ├── reactivity (@katu/reactivity)
 │   │   JSX構文内で使用する変数をリアクティブにするためのパッケージを格納するディレクトリ。
-│   ├── runtime (@katu/runtime)
-│   │   JSX構文を custom element class に変換するためのパッケージを格納するディレクトリ。@katu/reactivityを使用して、DOM自体もリアクティブにする。
-│   │   また、SSR用に静的HTMLコード文字列を生成するための機能も提供する。
+│   ├── transpiler (@katu/transpiler)
+│   │   JSX構文を custom element class に変換するためのパッケージを格納するディレクトリ。babelを使用して、JSX構文を custom element class に変換する。
 └── playgrounds
     プロジェクトのサンプルコードを格納するディレクトリ。@katu/coreを使用して、実際に動作するサンプルコードを格納する。
 ```
@@ -49,7 +48,7 @@ Github Coplot、あなたは以下のコード規約に必ず従ってくださ�
 - コメントやドキュメントは日本語で記述してください。英語も日本語の次に書いてください。
 - packagesディレクトリ内のコードは全て編集可能です。copilotの意思のみで編集して問題です。しかし、指示者が編集を禁止した項目については、指示者の意思を尊重してください。
 
-# その他補足情報
+# その他命令情報
 - このプロジェクトはMonorepoで管理されています。
   - 各packageにアクセスするためには、プロジェクトルートから以下のコマンドを使用してください
     - @katu/core
@@ -60,10 +59,6 @@ Github Coplot、あなたは以下のコード規約に必ず従ってくださ�
       ```bash
       pnpm p:reactivity <command>
       ```
-    - @katu/runtime
-      ```bash
-      pnpm p:rt <command>
-      ```
     - @katu/transpiler
       ```bash
       pnpm p:ts <command>
@@ -73,21 +68,11 @@ Github Coplot、あなたは以下のコード規約に必ず従ってくださ�
       pnpm pg:<project-name> <command>
       ```
 - このプロジェクトはpnpmを使用して管理されています。
-- ターミナルを開くときはworkspaceのルートディレクトリを開いてください。
-
+- ターミナルを開くときはworkspaceのルートディレクトリを開いてください。（コマンドを実行する前に必ずワークスペースルートであるかどうかを確認してください）
+- テストはVitestを使用しています。テストの実行は `pnpm p:<任意のワークスペース> test` で実行できます。VSCode拡張機能は使用しないでください。
 
 # 達成目標
-- @katu/coreのパッケージを作成する。
-  このパッケージでは、@katu/reactivity, @katu/runtimeの機能を全て包括して提供できること。
 - @katu/reactivityのパッケージを作成する。
   このパッケージでは、JSX構文内で使用する変数をリアクティブにすることができること。
   具体的には、alien-signalsを使用する。signalとcomputed、effectの3つの関数を提供する。
   各関数の動作はalien-signalsに準拠すること。
-- @katu/runtimeのパッケージを作成する。
-  このパッケージでは、JSX構文を custom element class に変換することができること。
-  また、SSR用に静的HTMLコード文字列を生成することができること。
-  具体的には、@katu/reactivityのsignalとcomputedを使用して、DOM自体もリアクティブにすることができること。
-  また、SSR用に静的HTMLコード文字列を生成することができること。
-  仮想DOMは使用せず、SvelteやSolid、Vue Vaporなどのように、DOMを直接操作することができること。
-  runtimeが処理するコードは、tsconfig.jsonのcompilerOptionsのjsxをreact-jsxに設定している前提 かつ jsxImportSourceを@katu/runtimeに設定している前提であること。
-  そのため、@katu/runtime/jsx-runtime と @katu/runtime/jsx-dev-runtimeの2つのモジュールの提供は必須。

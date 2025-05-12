@@ -1,6 +1,7 @@
 declare function defineCustomElement<Props extends Record<string, unknown>>(
   render: (helpers: {
     props: Props;
+    constructor: (callback: () => void) => void;
     onConnected: (callback: () => void) => void;
     onDisconnected: (callback: () => void) => void;
     onAttributeChanged: (callback: <Prop extends keyof Props>(name: Prop, oldValue: Props[Prop] | null, newValue: Props[Prop]) => void) => void;

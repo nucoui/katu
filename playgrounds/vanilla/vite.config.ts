@@ -1,9 +1,18 @@
 import { defineConfig } from "vite"
 import { transpile } from "@katu/transpiler";
+import { consola } from "consola";
+
+let _katuTranspilerLogged = false;
 
 function katuTranspilerPlugin() {
   return {
     name: 'vite-plugin-katu-transpiler',
+    async buildStart() {
+      if (!_katuTranspilerLogged) {
+        consola.info("Using @katu/transpiler@0.0.0");
+        _katuTranspilerLogged = true;
+      }
+    },
     async transform(code, id) {
       if (id.endsWith('.tsx') || id.endsWith('.jsx')) {
         return await transpile(code);
