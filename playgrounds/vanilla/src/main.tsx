@@ -18,14 +18,11 @@ const App = defineCustomElement<{name: string}>(({ props, onAttributeChanged, re
   constructor(() => {
     setInterval(() => { setTime((t) => t + 1); }, 1000);
     setClickCount(0);
-    effect(() => {
-      console.log("time", time());
-    });
   });
 
   render(() => {
     if (!props.name) {
-      return <p>Count: {time()}</p>
+      return <h1>Loading...</h1>;
     }
 
     return (
@@ -39,7 +36,7 @@ const App = defineCustomElement<{name: string}>(({ props, onAttributeChanged, re
         <p>{props.name}</p>
         <hr />
         <input onChange={handleChange} type="text" />
-        <p>{text() || "--nul--"}</p>
+        <p>{text() || "--null--"}</p>
         <hr />
         <button onClick={handleClick}>Click : {clickCount()}</button>
         <button onClick={handleClick2}>Click +2 : {clickCount()}</button>

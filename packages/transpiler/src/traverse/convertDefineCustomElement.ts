@@ -19,6 +19,59 @@ function capitalize(str: string) {
 export function convertDefineCustomElement(varDecl: t.VariableDeclarator): t.ClassDeclaration | t.VariableDeclarator {
   let className = "";
   if (varDecl.init && varDecl.init.type === "CallExpression" && varDecl.init.callee.type === "Identifier" && varDecl.init.callee.name === "defineCustomElement") {
+    // --- 追加: _renderHtmlで参照されるsignal getterを抽出する ---
+    /**
+     * _renderHtmlのASTからthis.#xxx[0]()形式のsignal getter呼び出しを全て抽出する
+     * @param node ASTノード
+     * @returns signal getter呼び出し式の配列
+     */
+    function extractSignalGetters(node: t.Node): t.Expression[] {
+      const getters: t.Expression[] = [];
+      const seen = new Set<string>();
+      function astToKey(n: t.CallExpression): string {
+        // 例: this.#clickCount[0]() → 'this.#clickCount[0]()'
+        if (
+          n.callee.type === "MemberExpression" &&
+          n.callee.object.type === "MemberExpression" &&
+          n.callee.object.object.type === "ThisExpression" &&
+          n.callee.object.property.type === "PrivateName" &&
+          n.callee.object.property.id.type === "Identifier" &&
+          n.callee.property.type === "NumericLiteral"
+        ) {
+          return `this.#${n.callee.object.property.id.name}[${n.callee.property.value}]()`;
+        }
+        return JSON.stringify(n);
+      }
+      function walk(n: any) {
+        if (!n || typeof n !== "object") return;
+        if (
+          n.type === "CallExpression" &&
+          n.callee.type === "MemberExpression" &&
+          n.callee.object.type === "MemberExpression" &&
+          n.callee.object.object.type === "ThisExpression" &&
+          n.callee.object.property.type === "PrivateName" &&
+          n.callee.object.property.id.type === "Identifier" &&
+          n.callee.property.type === "NumericLiteral" &&
+          n.callee.property.value === 0 &&
+          n.arguments.length === 0
+        ) {
+          const key = astToKey(n);
+          if (!seen.has(key)) {
+            seen.add(key);
+            getters.push(n);
+          }
+        }
+        for (const key in n) {
+          if (Array.isArray(n[key])) {
+            n[key].forEach(walk);
+          } else if (n[key] && typeof n[key] === "object" && n[key].type) {
+            walk(n[key]);
+          }
+        }
+      }
+      walk(node);
+      return getters;
+    }
     className = (varDecl.id.type === "Identifier") ? varDecl.id.name : "CustomElement";
     const callExpr = varDecl.init;
     const [fn, options] = callExpr.arguments;
@@ -257,6 +310,12 @@ export function convertDefineCustomElement(varDecl: t.VariableDeclarator): t.Cla
     if (_jsxReturn)
       extractEventHandlersAndMark(_jsxReturn, eventBindings, eventIdx);
     const uniqueEventBindings = Array.from(new Map(eventBindings.map(e => [`${e.selector}|${e.event}|${e.handler}`, e])).values());
+    // effect依存に全signal getterを参照させる
+    // signalGetterExprsはconnectedCallback生成直前で定義
+    let signalGetterExprs: t.Expression[] = [];
+    if (_renderHtmlBody) {
+      signalGetterExprs = extractSignalGetters(_renderHtmlBody);
+    }
     const classBody: t.ClassBody = babelTypes.classBody([
       ...signals.map(sig =>
         babelTypes.classPrivateProperty(
@@ -306,12 +365,16 @@ export function convertDefineCustomElement(varDecl: t.VariableDeclarator): t.Cla
               [babelTypes.callExpression(babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("_renderHtml")), [])],
             ),
           ),
+          // effect: 依存signal getterを全て参照する
           babelTypes.expressionStatement(
             babelTypes.callExpression(
               babelTypes.identifier("effect"),
               [babelTypes.arrowFunctionExpression(
                 [],
                 babelTypes.blockStatement([
+                  // 依存getter参照
+                  ...signalGetterExprs.map((expr: t.Expression) => babelTypes.expressionStatement(expr)),
+                  // 本来のパッチ処理
                   babelTypes.expressionStatement(
                     babelTypes.callExpression(
                       babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("_patchDom")),
