@@ -62,9 +62,9 @@ describe("traverse", () => {
     const ast = parse(code);
     const result = traverse(ast);
     const out = generate(result);
-    // if分岐のreturn JSXがHTML文字列に変換されていること
+    // if分岐のreturn JSXがjsxDom関数呼び出し形式に変換されていることを確認
     expect(out).toMatch(/if \(!this\.getAttribute\(['"]name['"]\)\)/);
-    expect(out).toMatch(/return [^;]*this\.getAttribute\(['"]name['"]\)/);
-    expect(out).toMatch(/return\s+"<h1>" \+ \(\["Loading\.\.\."\]\.join\(""\) \+ "<\/h1>"\)/);
+    expect(out).toMatch(/return jsxDom\(["']h1["'],\s*\{\s*children: ["']Loading\.\.\.["']\s*\}\)/);
+    expect(out).toMatch(/return jsxDom\(["']div["'],\s*\{\s*children: String\(this\.getAttribute\(['"]name['"]\)\)\s*\}\)/);
   });
 });

@@ -4,148 +4,209 @@ import * as babelTypes from "@babel/types";
 import { replaceSignalCalls } from "./replaceSignalCalls";
 
 /**
- * JSXノードや式ノードをHTML文字列に変換する関数
+ * JSXノードや式ノードをjsx関数呼び出し式に変換する関数
  * @param node Babel ASTノード（JSXElement, JSXFragment, JSXExpressionContainer, Expression, ConditionalExpressionなど）
  * @param signals signal情報
  * @returns Babel Expressionノード
  * @description
- * JSX/TSXのASTノードを静的HTML文字列へ変換するためのBabel式ノードを生成します。
- * 三項演算子の条件式(test)にはString()を適用せず、Boolean評価を維持します。
+ * JSX/TSXのASTノードをjsx('tag', { ...props, children })形式のBabel式ノードに変換します。
  *
- * Converts JSX/TSX AST nodes to Babel Expression nodes for static HTML string generation.
- * The test part of ConditionalExpression is not wrapped with String(), preserving boolean evaluation.
+ * Converts JSX/TSX AST nodes to Babel Expression nodes for jsx('tag', { ... }) call.
  */
 export function jsxToHtmlAst(node: t.Expression | t.JSXElement | t.JSXFragment, signals: SignalInfo[]): t.Expression {
-  if (!node) return babelTypes.stringLiteral("");
+  if (!node)
+    return babelTypes.stringLiteral("");
+  // JSXFragment → jsxDom(Fragment, { children: [...] })
   if (node.type === "JSXFragment") {
-    return babelTypes.callExpression(
-      babelTypes.memberExpression(
-        babelTypes.arrayExpression(node.children.filter(Boolean).map(child => {
-          if (child.type === "JSXElement" || child.type === "JSXFragment") {
-            return jsxToHtmlAst(child, signals);
-          } else if (child.type === "JSXText") {
-            return babelTypes.stringLiteral(child.value);
-          } else if (child.type === "JSXExpressionContainer") {
-            if (child.expression.type === "JSXEmptyExpression") {
-              return babelTypes.stringLiteral("");
-            } else {
-              return jsxToHtmlAst(child.expression, signals);
-            }
-          } else {
-            return babelTypes.stringLiteral("");
-          }
-        })),
-        babelTypes.identifier("join"),
-      ),
-      [babelTypes.stringLiteral("")],
-    );
-  }
-  if (node.type === "JSXElement") {
-    const tag = node.openingElement.name.type === "JSXIdentifier" ? node.openingElement.name.name : "div";
-    const children = node.children.filter(Boolean);
-    const attrs = node.openingElement.attributes.map((attr) => {
-      if (attr.type === "JSXAttribute") {
-        const name = typeof attr.name.name === "string" ? attr.name.name : "";
-        if (attr.value && attr.value.type === "StringLiteral") {
-          return `${name}='${attr.value.value}'`;
+    const childrenExprs = node.children.filter(Boolean).map((child) => {
+      if (child.type === "JSXElement" || child.type === "JSXFragment") {
+        return jsxToHtmlAst(child, signals);
+      }
+      else if (child.type === "JSXText") {
+        // 空白・タブ・改行のみのテキスト（インデント含む）は無視
+        if (/^[\t\r\n ]*$/.test(child.value))
+          return null;
+        return babelTypes.stringLiteral(child.value);
+      }
+      else if (child.type === "JSXExpressionContainer") {
+        if (child.expression.type === "JSXEmptyExpression") {
+          return null;
+        }
+        else {
+          return jsxToHtmlAst(child.expression, signals);
         }
       }
-      return null;
-    }).filter(Boolean).join(" ");
-    return babelTypes.binaryExpression(
-      "+",
-      babelTypes.stringLiteral(`<${tag}${attrs ? ` ${attrs}` : ""}>`),
-      children.length === 0
-        ? babelTypes.stringLiteral(`</${tag}>`)
-        : babelTypes.binaryExpression(
-            "+",
-            babelTypes.callExpression(
-              babelTypes.memberExpression(
-                babelTypes.arrayExpression(children.map((child) => {
-                  if (child.type === "JSXElement" || child.type === "JSXFragment") {
-                    return jsxToHtmlAst(child, signals);
-                  } else if (child.type === "JSXText") {
-                    return babelTypes.stringLiteral(child.value);
-                  } else if (child.type === "JSXExpressionContainer") {
-                    if (child.expression.type === "JSXEmptyExpression") {
-                      return babelTypes.stringLiteral("");
-                    } else {
-                      return jsxToHtmlAst(child.expression, signals);
-                    }
-                  } else {
-                    return babelTypes.stringLiteral("");
-                  }
-                })),
-                babelTypes.identifier("join"),
-              ),
-              [babelTypes.stringLiteral("")],
-            ),
-            babelTypes.stringLiteral(`</${tag}>`),
+      else {
+        return null;
+      }
+    }).filter((v): v is t.Expression => v !== null);
+    return babelTypes.callExpression(
+      babelTypes.identifier("jsxDom"),
+      [
+        babelTypes.identifier("Fragment"),
+        babelTypes.objectExpression([
+          babelTypes.objectProperty(
+            babelTypes.identifier("children"),
+            babelTypes.arrayExpression(childrenExprs as t.Expression[]),
           ),
+        ]),
+      ],
     );
+  }
+  // JSXElement → jsxDom('tag', { ...props, children })
+  if (node.type === "JSXElement") {
+    const tag = node.openingElement.name.type === "JSXIdentifier"
+      ? babelTypes.stringLiteral(node.openingElement.name.name)
+      : babelTypes.stringLiteral("div");
+    // props
+    const propsObjProps: t.ObjectProperty[] = [];
+    node.openingElement.attributes.forEach((attr) => {
+      if (attr.type === "JSXAttribute") {
+        const name = typeof attr.name.name === "string" ? attr.name.name : "";
+        if (attr.value) {
+          if (attr.value.type === "StringLiteral") {
+            propsObjProps.push(
+              babelTypes.objectProperty(babelTypes.identifier(name), babelTypes.stringLiteral(attr.value.value)),
+            );
+          }
+          else if (attr.value.type === "JSXExpressionContainer") {
+            if (attr.value.expression.type === "JSXEmptyExpression") {
+              propsObjProps.push(
+                babelTypes.objectProperty(babelTypes.identifier(name), babelTypes.stringLiteral("")),
+              );
+            }
+            else {
+              // onXXX属性で関数名（Identifier）の場合はthis.を付与
+              if (/^on[A-Z]/.test(name) && attr.value.expression.type === "Identifier") {
+                propsObjProps.push(
+                  babelTypes.objectProperty(
+                    babelTypes.identifier(name),
+                    babelTypes.memberExpression(babelTypes.thisExpression(), attr.value.expression),
+                  ),
+                );
+              // onXXX属性で関数リテラルの場合はそのまま
+              }
+              else if (/^on[A-Z]/.test(name) && (attr.value.expression.type === "ArrowFunctionExpression" || attr.value.expression.type === "FunctionExpression")) {
+                propsObjProps.push(
+                  babelTypes.objectProperty(babelTypes.identifier(name), attr.value.expression),
+                );
+              }
+              else {
+                propsObjProps.push(
+                  babelTypes.objectProperty(babelTypes.identifier(name), jsxToHtmlAst(attr.value.expression, signals)),
+                );
+              }
+            }
+          }
+        }
+        else {
+          // boolean属性
+          propsObjProps.push(
+            babelTypes.objectProperty(babelTypes.identifier(name), babelTypes.booleanLiteral(true)),
+          );
+        }
+      }
+    });
+    // children
+    const childrenExprs = node.children.filter(Boolean).map((child) => {
+      if (child.type === "JSXElement" || child.type === "JSXFragment") {
+        return jsxToHtmlAst(child, signals);
+      }
+      else if (child.type === "JSXText") {
+        // 空白・タブ・改行のみのテキスト（インデント含む）は無視
+        if (/^[\t\r\n ]*$/.test(child.value))
+          return null;
+        return babelTypes.stringLiteral(child.value);
+      }
+      else if (child.type === "JSXExpressionContainer") {
+        if (child.expression.type === "JSXEmptyExpression") {
+          return null;
+        }
+        else {
+          return jsxToHtmlAst(child.expression, signals);
+        }
+      }
+      else {
+        return null;
+      }
+    }).filter((v): v is t.Expression => v !== null);
+    if (childrenExprs.length > 0) {
+      propsObjProps.push(
+        babelTypes.objectProperty(
+          babelTypes.identifier("children"),
+          childrenExprs.length === 1 ? childrenExprs[0] : babelTypes.arrayExpression(childrenExprs as t.Expression[]),
+        ),
+      );
+    }
+    return babelTypes.callExpression(
+      babelTypes.identifier("jsxDom"),
+      [tag, babelTypes.objectExpression(propsObjProps)],
+    );
+  }
+  // JSXText → 文字列
+  if ((node as any).type === "JSXText") {
+    return babelTypes.stringLiteral((node as any).value);
+  }
+  // JSXExpressionContainer → 中身を再帰
+  if ((node as any).type === "JSXExpressionContainer") {
+    if ((node as any).expression.type === "JSXEmptyExpression") {
+      return babelTypes.stringLiteral("");
+    }
+    return jsxToHtmlAst((node as any).expression, signals);
   }
   // mapなどのCallExpressionで返り値がJSXを含む場合も対応
   if (
-    node.type === "CallExpression" &&
-    node.callee.type === "MemberExpression" &&
-    node.callee.property.type === "Identifier" &&
-    node.callee.property.name === "map"
+    node.type === "CallExpression"
+    && node.callee.type === "MemberExpression"
+    && node.callee.property.type === "Identifier"
+    && node.callee.property.name === "map"
   ) {
     const callback = node.arguments[0];
     if (
-      callback &&
-      (callback.type === "ArrowFunctionExpression" || callback.type === "FunctionExpression")
+      callback
+      && (callback.type === "ArrowFunctionExpression" || callback.type === "FunctionExpression")
     ) {
       const body = callback.body;
       // アロー関数のbodyがJSXなら変換
       if (body.type === "JSXElement" || body.type === "JSXFragment") {
-        // mapの返り値を変換してjoin
         const newCallback = babelTypes.arrowFunctionExpression(
           callback.params,
-          jsxToHtmlAst(body, signals)
+          jsxToHtmlAst(body, signals),
         );
         const mapped = babelTypes.callExpression(
           babelTypes.memberExpression(node.callee.object, babelTypes.identifier("map")),
-          [newCallback]
+          [newCallback],
         );
-        return babelTypes.callExpression(
-          babelTypes.memberExpression(mapped, babelTypes.identifier("join")),
-          [babelTypes.stringLiteral("")]
-        );
+        return mapped;
       }
       // ブロックの場合はreturn文のargumentがJSXか判定
       if (body.type === "BlockStatement" && body.body.length > 0) {
         const ret = body.body.find(
-          (s): s is t.ReturnStatement => s.type === "ReturnStatement" && !!s.argument
+          (s): s is t.ReturnStatement => s.type === "ReturnStatement" && !!s.argument,
         );
         if (
-          ret &&
-          ret.argument &&
-          (ret.argument.type === "JSXElement" || ret.argument.type === "JSXFragment")
+          ret
+          && ret.argument
+          && (ret.argument.type === "JSXElement" || ret.argument.type === "JSXFragment")
         ) {
           const newCallback = babelTypes.arrowFunctionExpression(
             callback.params,
-            jsxToHtmlAst(ret.argument, signals)
+            jsxToHtmlAst(ret.argument, signals),
           );
           const mapped = babelTypes.callExpression(
             babelTypes.memberExpression(node.callee.object, babelTypes.identifier("map")),
-            [newCallback]
+            [newCallback],
           );
-          return babelTypes.callExpression(
-            babelTypes.memberExpression(mapped, babelTypes.identifier("join")),
-            [babelTypes.stringLiteral("")]
-          );
+          return mapped;
         }
       }
     }
-    // それ以外は従来通り
   }
   // 三項演算子（ConditionalExpression）は各部分を再帰的に変換
   if (node.type === "ConditionalExpression") {
     const replaced = replaceSignalCalls(node, signals) as t.ConditionalExpression;
-    // test部分はBoolean評価のためString()でラップしない
     return babelTypes.conditionalExpression(
-      replaced.test, // ここはreplaceSignalCallsのみ適用
+      replaced.test,
       jsxToHtmlAst(replaced.consequent, signals),
       jsxToHtmlAst(replaced.alternate, signals),
     );
@@ -154,10 +215,10 @@ export function jsxToHtmlAst(node: t.Expression | t.JSXElement | t.JSXFragment, 
   const replaced = replaceSignalCalls(node, signals);
   // signal呼び出しはそのまま返す
   if (
-    replaced.type === "CallExpression" &&
-    replaced.callee.type === "MemberExpression" &&
-    replaced.callee.object.type === "MemberExpression" &&
-    replaced.callee.object.object.type === "ThisExpression"
+    replaced.type === "CallExpression"
+    && replaced.callee.type === "MemberExpression"
+    && replaced.callee.object.type === "MemberExpression"
+    && replaced.callee.object.object.type === "ThisExpression"
   ) {
     return replaced;
   }

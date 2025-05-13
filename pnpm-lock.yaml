@@ -9,6 +9,9 @@ catalogs:
     eslint:
       specifier: 9.24.0
       version: 9.24.0
+    typescript:
+      specifier: 5.8.3
+      version: 5.8.3
 
 importers:
 
@@ -74,6 +77,27 @@ importers:
         specifier: ^3.1.1
         version: 3.1.1(@types/debug@4.1.12)(@types/node@22.15.3)(@vitest/browser@3.1.1)(jsdom@26.1.0)(yaml@2.7.1)
 
+  packages/runtime:
+    devDependencies:
+      '@katu/config':
+        specifier: workspace:*
+        version: link:../../config
+      '@vitest/coverage-v8':
+        specifier: 3.1.1
+        version: 3.1.1(@vitest/browser@3.1.1)(vitest@3.1.1)
+      eslint:
+        specifier: 'catalog:'
+        version: 9.24.0
+      tsup:
+        specifier: ^8.4.0
+        version: 8.4.0(postcss@8.5.3)(typescript@5.8.3)(yaml@2.7.1)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.8.3
+      vitest:
+        specifier: ^3.1.1
+        version: 3.1.1(@types/debug@4.1.12)(@types/node@22.15.3)(@vitest/browser@3.1.1)(jsdom@26.1.0)(yaml@2.7.1)
+
   packages/transpiler:
     dependencies:
       '@babel/generator':
@@ -123,6 +147,9 @@ importers:
       '@katu/reactivity':
         specifier: workspace:*
         version: link:../../packages/reactivity
+      '@katu/runtime':
+        specifier: workspace:*
+        version: link:../../packages/runtime
       '@katu/transpiler':
         specifier: workspace:*
         version: link:../../packages/transpiler

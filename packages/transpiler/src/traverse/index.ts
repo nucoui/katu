@@ -44,6 +44,22 @@ const traverse = (ast: ReturnType<typeof parse>): t.Node => {
       );
       ast.program.body.unshift(importEffect);
     }
+    // 先頭にjsx, Fragment importを追加（なければ）
+    const hasJsxImport = ast.program.body.some(
+      (stmt: any) => stmt.type === "ImportDeclaration"
+        && stmt.source.value === "@katu/runtime"
+        && stmt.specifiers.some((s: any) => s.imported?.name === "jsxDom"),
+    );
+    if (!hasJsxImport) {
+      const importJsx = babelTypes.importDeclaration(
+        [
+          babelTypes.importSpecifier(babelTypes.identifier("jsxDom"), babelTypes.identifier("jsxDom")),
+          babelTypes.importSpecifier(babelTypes.identifier("Fragment"), babelTypes.identifier("Fragment")),
+        ],
+        babelTypes.stringLiteral("@katu/runtime"),
+      );
+      ast.program.body.unshift(importJsx);
+    }
     return ast;
   }
   // それ以外は従来通り（単一ノード変換）

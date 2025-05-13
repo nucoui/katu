@@ -291,6 +291,22 @@ export function convertDefineCustomElement(varDecl: t.VariableDeclarator): t.Cla
         false,
       ),
     );
+    // handlerMapに登録された関数をクラスのメンバとして追加
+    const handlerProps = Object.entries(handlerMap).map(([name, fn]) =>
+      babelTypes.classProperty(
+        babelTypes.identifier(name),
+        // signal参照やsetterもthis.#xxx[0]()/[1]()に変換
+        (fn.type === "ArrowFunctionExpression" || fn.type === "FunctionExpression")
+          ? babelTypes.arrowFunctionExpression(
+              fn.params,
+              replaceSignalCalls(replaceVarToThis(fn.body), signals),
+            )
+          : fn,
+        undefined,
+        undefined,
+        false,
+      ),
+    );
     if (constructorBody && (constructorBody as t.BlockStatement).body) {
       const first = (constructorBody as t.BlockStatement).body[0];
       const isSuper = first && first.type === "ExpressionStatement" && first.expression.type === "CallExpression" && first.expression.callee.type === "Super";
@@ -326,6 +342,7 @@ export function convertDefineCustomElement(varDecl: t.VariableDeclarator): t.Cla
         ),
       ),
       ...renderVarProps,
+      ...handlerProps,
       babelTypes.classProperty(
         babelTypes.identifier("observedAttributes"),
         babelTypes.arrayExpression(observedAttributes.map(attr => babelTypes.stringLiteral(attr))),
@@ -403,273 +420,118 @@ export function convertDefineCustomElement(varDecl: t.VariableDeclarator): t.Cla
           ),
         ]),
       ),
-      // _patchDom: 指定の差分パッチロジック
+      // _patchDom: Node/Node[]ベースの差し替えロジック
       babelTypes.classMethod(
         "method",
         babelTypes.identifier("_patchDom"),
-        [babelTypes.identifier("newHtml")],
+        [babelTypes.identifier("newDom")],
         babelTypes.blockStatement([
           babelTypes.ifStatement(
             babelTypes.unaryExpression("!", babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("shadowRoot"))),
             babelTypes.blockStatement([babelTypes.returnStatement()]),
           ),
-          babelTypes.ifStatement(
-            babelTypes.binaryExpression(
-              "===",
-              babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("_prevHtml")),
-              babelTypes.stringLiteral(""),
-            ),
-            babelTypes.blockStatement([
-              babelTypes.expressionStatement(
-                babelTypes.assignmentExpression(
-                  "=",
-                  babelTypes.memberExpression(babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("shadowRoot")), babelTypes.identifier("innerHTML")),
-                  babelTypes.identifier("newHtml"),
-                ),
-              ),
-              babelTypes.expressionStatement(
+          // newDomが配列でなければ配列化し、stringならTextノード化
+          babelTypes.variableDeclaration("const", [
+            babelTypes.variableDeclarator(
+              babelTypes.identifier("nodes"),
+              babelTypes.conditionalExpression(
                 babelTypes.callExpression(
-                  babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("_attachEvents")),
-                  [],
-                ),
-              ),
-              babelTypes.expressionStatement(
-                babelTypes.assignmentExpression(
-                  "=",
-                  babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("_prevHtml")),
-                  babelTypes.identifier("newHtml"),
-                ),
-              ),
-              babelTypes.returnStatement(),
-            ]),
-          ),
-          babelTypes.ifStatement(
-            babelTypes.binaryExpression(
-              "===",
-              babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("_prevHtml")),
-              babelTypes.identifier("newHtml"),
-            ),
-            babelTypes.blockStatement([babelTypes.returnStatement()]),
-          ),
-          babelTypes.variableDeclaration("const", [
-            babelTypes.variableDeclarator(
-              babelTypes.identifier("prev"),
-              babelTypes.callExpression(
-                babelTypes.memberExpression(babelTypes.identifier("document"), babelTypes.identifier("createElement")),
-                [babelTypes.stringLiteral("div")],
-              ),
-            ),
-          ]),
-          babelTypes.expressionStatement(
-            babelTypes.assignmentExpression(
-              "=",
-              babelTypes.memberExpression(babelTypes.identifier("prev"), babelTypes.identifier("innerHTML")),
-              babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("_prevHtml")),
-            ),
-          ),
-          babelTypes.variableDeclaration("const", [
-            babelTypes.variableDeclarator(
-              babelTypes.identifier("next"),
-              babelTypes.callExpression(
-                babelTypes.memberExpression(babelTypes.identifier("document"), babelTypes.identifier("createElement")),
-                [babelTypes.stringLiteral("div")],
-              ),
-            ),
-          ]),
-          babelTypes.expressionStatement(
-            babelTypes.assignmentExpression(
-              "=",
-              babelTypes.memberExpression(babelTypes.identifier("next"), babelTypes.identifier("innerHTML")),
-              babelTypes.identifier("newHtml"),
-            ),
-          ),
-          babelTypes.variableDeclaration("const", [
-            babelTypes.variableDeclarator(
-              babelTypes.identifier("prevNodes"),
-              babelTypes.callExpression(
-                babelTypes.memberExpression(babelTypes.identifier("Array"), babelTypes.identifier("from")),
-                [babelTypes.memberExpression(babelTypes.identifier("prev"), babelTypes.identifier("childNodes"))],
-              ),
-            ),
-          ]),
-          babelTypes.variableDeclaration("const", [
-            babelTypes.variableDeclarator(
-              babelTypes.identifier("nextNodes"),
-              babelTypes.callExpression(
-                babelTypes.memberExpression(babelTypes.identifier("Array"), babelTypes.identifier("from")),
-                [babelTypes.memberExpression(babelTypes.identifier("next"), babelTypes.identifier("childNodes"))],
-              ),
-            ),
-          ]),
-          babelTypes.variableDeclaration("const", [
-            babelTypes.variableDeclarator(
-              babelTypes.identifier("root"),
-              babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("shadowRoot")),
-            ),
-          ]),
-          babelTypes.ifStatement(
-            babelTypes.binaryExpression(
-              "!==",
-              babelTypes.memberExpression(babelTypes.identifier("prevNodes"), babelTypes.identifier("length")),
-              babelTypes.memberExpression(babelTypes.identifier("nextNodes"), babelTypes.identifier("length")),
-            ),
-            babelTypes.blockStatement([
-              babelTypes.expressionStatement(
-                babelTypes.assignmentExpression(
-                  "=",
-                  babelTypes.memberExpression(babelTypes.identifier("root"), babelTypes.identifier("innerHTML")),
-                  babelTypes.identifier("newHtml"),
-                ),
-              ),
-              babelTypes.expressionStatement(
-                babelTypes.callExpression(
-                  babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("_attachEvents")),
-                  [],
-                ),
-              ),
-              babelTypes.expressionStatement(
-                babelTypes.assignmentExpression(
-                  "=",
-                  babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("_prevHtml")),
-                  babelTypes.identifier("newHtml"),
-                ),
-              ),
-              babelTypes.returnStatement(),
-            ]),
-          ),
-          babelTypes.expressionStatement(
-            babelTypes.callExpression(
-              babelTypes.memberExpression(babelTypes.identifier("prevNodes"), babelTypes.identifier("forEach")),
-              [babelTypes.arrowFunctionExpression([
-                babelTypes.identifier("node"),
-                babelTypes.identifier("i"),
-              ], babelTypes.blockStatement([
-                babelTypes.ifStatement(
-                  babelTypes.unaryExpression("!", babelTypes.memberExpression(
-                    babelTypes.memberExpression(babelTypes.identifier("root"), babelTypes.identifier("childNodes")),
-                    babelTypes.identifier("i"),
-                    true,
-                  )),
-                  babelTypes.blockStatement([babelTypes.returnStatement()]),
-                ),
-                babelTypes.ifStatement(
-                  babelTypes.callExpression(
-                    babelTypes.memberExpression(
-                      babelTypes.identifier("node"),
-                      babelTypes.identifier("isEqualNode"),
-                    ),
-                    [
-                      babelTypes.memberExpression(babelTypes.identifier("nextNodes"), babelTypes.identifier("i"), true),
-                    ],
+                  babelTypes.memberExpression(
+                    babelTypes.identifier("Array"),
+                    babelTypes.identifier("isArray"),
                   ),
-                  babelTypes.blockStatement([babelTypes.returnStatement()]),
+                  [babelTypes.identifier("newDom")],
                 ),
-                babelTypes.expressionStatement(
-                  babelTypes.callExpression(
-                    babelTypes.memberExpression(
-                      babelTypes.identifier("root"),
-                      babelTypes.identifier("replaceChild"),
-                    ),
-                    [
+                babelTypes.callExpression(
+                  babelTypes.memberExpression(
+                    babelTypes.identifier("newDom"),
+                    babelTypes.identifier("map"),
+                  ),
+                  [
+                    babelTypes.arrowFunctionExpression([
+                      babelTypes.identifier("n"),
+                    ], babelTypes.conditionalExpression(
+                      babelTypes.binaryExpression("===", babelTypes.unaryExpression("typeof", babelTypes.identifier("n")), babelTypes.stringLiteral("string")),
                       babelTypes.callExpression(
                         babelTypes.memberExpression(
-                          babelTypes.memberExpression(babelTypes.identifier("nextNodes"), babelTypes.identifier("i"), true),
-                          babelTypes.identifier("cloneNode"),
+                          babelTypes.identifier("document"),
+                          babelTypes.identifier("createTextNode"),
                         ),
-                        [babelTypes.booleanLiteral(true)],
+                        [babelTypes.identifier("n")],
                       ),
-                      babelTypes.memberExpression(
-                        babelTypes.memberExpression(babelTypes.identifier("root"), babelTypes.identifier("childNodes")),
-                        babelTypes.identifier("i"),
-                        true,
-                      ),
-                    ],
-                  ),
+                      babelTypes.identifier("n"),
+                    )),
+                  ],
                 ),
-              ]))],
-            ),
-          ),
-          babelTypes.expressionStatement(
-            babelTypes.callExpression(
-              babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("_attachEvents")),
-              [],
-            ),
-          ),
-          babelTypes.expressionStatement(
-            babelTypes.assignmentExpression(
-              "=",
-              babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("_prevHtml")),
-              babelTypes.identifier("newHtml"),
-            ),
-          ),
-        ]),
-      ),
-      uniqueEventBindings.length > 0
-        ? babelTypes.classMethod(
-            "method",
-            babelTypes.identifier("_attachEvents"),
-            [],
-            babelTypes.blockStatement([
-              ...uniqueEventBindings.map((binding: any) =>
-                babelTypes.blockStatement([
-                  babelTypes.variableDeclaration("const", [
-                    babelTypes.variableDeclarator(
-                      babelTypes.identifier("elList"),
-                      babelTypes.callExpression(
-                        babelTypes.memberExpression(
-                          babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("shadowRoot")),
-                          babelTypes.identifier("querySelectorAll"),
-                        ),
-                        [babelTypes.stringLiteral(binding.selector)],
-                      ),
-                    ),
-                  ]),
-                  babelTypes.expressionStatement(
+                babelTypes.arrayExpression([
+                  babelTypes.conditionalExpression(
+                    babelTypes.binaryExpression("===", babelTypes.unaryExpression("typeof", babelTypes.identifier("newDom")), babelTypes.stringLiteral("string")),
                     babelTypes.callExpression(
                       babelTypes.memberExpression(
-                        babelTypes.identifier("elList"),
-                        babelTypes.identifier("forEach"),
+                        babelTypes.identifier("document"),
+                        babelTypes.identifier("createTextNode"),
                       ),
-                      [babelTypes.arrowFunctionExpression([
-                        babelTypes.identifier("el"),
-                      ], babelTypes.blockStatement([
-                        babelTypes.expressionStatement(
-                          babelTypes.callExpression(
-                            babelTypes.memberExpression(
-                              babelTypes.identifier("el"),
-                              babelTypes.identifier("removeEventListener"),
-                            ),
-                            [
-                              babelTypes.stringLiteral(binding.event),
-                              babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier(`_on${capitalize(binding.handler)}`)),
-                            ],
-                          ),
-                        ),
-                        babelTypes.expressionStatement(
-                          babelTypes.callExpression(
-                            babelTypes.memberExpression(
-                              babelTypes.identifier("el"),
-                              babelTypes.identifier("addEventListener"),
-                            ),
-                            [
-                              babelTypes.stringLiteral(binding.event),
-                              babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier(`_on${capitalize(binding.handler)}`)),
-                            ],
-                          ),
-                        ),
-                      ]))],
+                      [babelTypes.identifier("newDom")],
+                    ),
+                    babelTypes.identifier("newDom"),
+                  ),
+                ]),
+              ),
+            ),
+          ]),
+          babelTypes.variableDeclaration("const", [
+            babelTypes.variableDeclarator(
+              babelTypes.identifier("current"),
+              babelTypes.callExpression(
+                babelTypes.memberExpression(
+                  babelTypes.callExpression(
+                    babelTypes.memberExpression(babelTypes.identifier("Array"), babelTypes.identifier("from")),
+                    [babelTypes.memberExpression(babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("shadowRoot")), babelTypes.identifier("childNodes"))],
+                  ),
+                  babelTypes.identifier("slice"),
+                ),
+                [],
+              ),
+            ),
+          ]),
+          babelTypes.ifStatement(
+            babelTypes.binaryExpression("!==", babelTypes.memberExpression(babelTypes.identifier("current"), babelTypes.identifier("length")), babelTypes.memberExpression(babelTypes.identifier("nodes"), babelTypes.identifier("length"))),
+            babelTypes.blockStatement([
+              babelTypes.expressionStatement(
+                babelTypes.callExpression(
+                  babelTypes.memberExpression(babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("shadowRoot")), babelTypes.identifier("replaceChildren")),
+                  [babelTypes.spreadElement(babelTypes.identifier("nodes"))],
+                ),
+              ),
+              babelTypes.returnStatement(),
+            ]),
+          ),
+          babelTypes.forStatement(
+            babelTypes.variableDeclaration("let", [babelTypes.variableDeclarator(babelTypes.identifier("i"), babelTypes.numericLiteral(0))]),
+            babelTypes.binaryExpression("<", babelTypes.identifier("i"), babelTypes.memberExpression(babelTypes.identifier("nodes"), babelTypes.identifier("length"))),
+            babelTypes.updateExpression("++", babelTypes.identifier("i")),
+            babelTypes.blockStatement([
+              babelTypes.ifStatement(
+                babelTypes.unaryExpression("!", babelTypes.callExpression(
+                  babelTypes.memberExpression(babelTypes.memberExpression(babelTypes.identifier("current"), babelTypes.identifier("i"), true), babelTypes.identifier("isEqualNode")),
+                  [babelTypes.memberExpression(babelTypes.identifier("nodes"), babelTypes.identifier("i"), true)],
+                )),
+                babelTypes.blockStatement([
+                  babelTypes.expressionStatement(
+                    babelTypes.callExpression(
+                      babelTypes.memberExpression(babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("shadowRoot")), babelTypes.identifier("replaceChild")),
+                      [
+                        babelTypes.memberExpression(babelTypes.identifier("nodes"), babelTypes.identifier("i"), true),
+                        babelTypes.memberExpression(babelTypes.identifier("current"), babelTypes.identifier("i"), true),
+                      ],
                     ),
                   ),
                 ]),
               ),
-            ].flat()),
-          )
-        : babelTypes.classMethod(
-            "method",
-            babelTypes.identifier("_attachEvents"),
-            [],
-            babelTypes.blockStatement([]),
+            ]),
           ),
+        ]),
+      ),
       ...uniqueEventBindings.map((binding: any) =>
         babelTypes.classProperty(
           babelTypes.identifier(`_on${capitalize(binding.handler)}`),
@@ -683,10 +545,6 @@ export function convertDefineCustomElement(varDecl: t.VariableDeclarator): t.Cla
           undefined,
           false,
         ),
-      ),
-      babelTypes.classProperty(
-        babelTypes.identifier("_prevHtml"),
-        babelTypes.stringLiteral(""),
       ),
       _renderHtmlBody
         ? babelTypes.classMethod(
