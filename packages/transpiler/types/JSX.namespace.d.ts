@@ -8,6 +8,10 @@ export type KatuNode =
 
 export type FunctionComponentResult = KatuNode | Promise<KatuNode>;
 
+export interface HTMLElementEvent<T extends EventTarget> extends Event {
+  target: T;
+}
+
 export interface KatuJSXElement {
   tag: string | ((props: Record<string, unknown>) => FunctionComponentResult);
   props: Record<string, unknown>;
@@ -20,6 +24,7 @@ interface PropsForAnyJSXElement {
 interface PropsForAnyIntrinsicElement extends PropsForAnyJSXElement {
   children?: KatuNode;
   onClick?: (event: MouseEvent) => void;
+  onChange?: (event: HTMLElementEvent) => void;
 }
 
 declare global {

@@ -1,49 +1,45 @@
-import { describe, it } from "vitest";
+import { describe, it, expect } from "vitest";
 // eslint-disable-next-line antfu/no-import-dist
 import { generate, traverse } from "../dist/main.cjs";
 import { parse } from "../src/parser";
 
-/**
- * smapla.tsx相当のコードをAST化し、traverseでCustomElement情報が正しく抽出できるかテスト
- */
 describe("traverse", () => {
-  it("should extract CustomElement info from defineCustomElement call", () => {
+  it("should convert props.name to this.getAttribute('name')", () => {
     const code = `
       import { signal } from "@katu/reactivity";
-
-      const Hoge = defineCustomElement(({ props, onAttributeChanged, constructor }) => {
-        const [time, setTime] = signal(0);
-        const [clickCount, setClickCount] = signal(0);
-        const handleClick = () => { setClickCount((count) => count + 1); };
-        const hogeConst = "hoge";
-
-        constructor(() => {
-          setInterval(() => { setTime((t) => t + 1); }, 1000);
-          setClickCount(0);
-        });
-
-        return (
-          <>
-            <h1>Hello World</h1>
-            <p>{hogeConst}</p>
-            <p>{[1,2,3,4].map(i => <span>{i}</span>)}</p>
-            <p>{time()}</p>
-            <ul>
-              <li>hoge</li>
-              <li>fuga</li>
-              <li>100</li>
-            </ul>
-            {/* <p>{props.name}</p> */}
-            <button onClick={handleClick}>Click : {clickCount()}</button>
-          </>
-        );
+      const Fuga = defineCustomElement(({ props }) => {
+        return <div>{props.name}</div>;
       }, { shadowRoot: true, shadowRootMode: 'open' });
-
-      customElements.define("hoge-element", Hoge);
+      customElements.define("fuga-element", Fuga);
     `;
     const ast = parse(code);
     const result = traverse(ast) as any;
+    const out = generate(result);
+    // props.nameがthis.getAttribute('name')に変換されていることを確認
+    expect(out).toMatch(/this\.getAttribute\(['"]name['"]\)/);
+  });
 
-    console.log(generate(result));
+  it("should convert signal call in ternary (ConditionalExpression) to this.#signal[0]()", () => {
+    const code = `
+      import { signal } from "@katu/reactivity";
+      const Comp = defineCustomElement(() => {
+        const [text, setText] = signal("");
+        return (
+          <>
+            <p>{text()}</p>
+            <p>{text() === "" ? "--null--" : text()}</p>
+          </>
+        );
+      }, { shadowRoot: true, shadowRootMode: 'open' });
+      customElements.define("ternary-element", Comp);
+    `;
+    const ast = parse(code);
+    const result = traverse(ast);
+    const out = generate(result);
+
+    // text()がthis.#text[0]()に変換されていることを確認
+    expect(out).toMatch(/this\.\#text\[0\]\(\) === "" \? String\("--null--"\) : this\.\#text\[0\]\(\)/);
+    // test部分(this.#text[0]() === "")にString()がラップされていないことを確認
+    expect(out).not.toMatch(/String\(this\.\#text\[0\]\(\) === ""/);
   });
 });

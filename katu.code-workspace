@@ -33,10 +33,6 @@
       "path": "packages/reactivity"
     },
     {
-      "name": "📦 runtime",
-      "path": "packages/runtime"
-    },
-    {
       "name": "📦 transpiler",
       "path": "packages/transpiler"
     },
