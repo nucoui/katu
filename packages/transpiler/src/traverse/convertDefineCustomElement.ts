@@ -31,29 +31,30 @@ export function convertDefineCustomElement(varDecl: t.VariableDeclarator): t.Cla
       function astToKey(n: t.CallExpression): string {
         // 例: this.#clickCount[0]() → 'this.#clickCount[0]()'
         if (
-          n.callee.type === "MemberExpression" &&
-          n.callee.object.type === "MemberExpression" &&
-          n.callee.object.object.type === "ThisExpression" &&
-          n.callee.object.property.type === "PrivateName" &&
-          n.callee.object.property.id.type === "Identifier" &&
-          n.callee.property.type === "NumericLiteral"
+          n.callee.type === "MemberExpression"
+          && n.callee.object.type === "MemberExpression"
+          && n.callee.object.object.type === "ThisExpression"
+          && n.callee.object.property.type === "PrivateName"
+          && n.callee.object.property.id.type === "Identifier"
+          && n.callee.property.type === "NumericLiteral"
         ) {
           return `this.#${n.callee.object.property.id.name}[${n.callee.property.value}]()`;
         }
         return JSON.stringify(n);
       }
       function walk(n: any) {
-        if (!n || typeof n !== "object") return;
+        if (!n || typeof n !== "object")
+          return;
         if (
-          n.type === "CallExpression" &&
-          n.callee.type === "MemberExpression" &&
-          n.callee.object.type === "MemberExpression" &&
-          n.callee.object.object.type === "ThisExpression" &&
-          n.callee.object.property.type === "PrivateName" &&
-          n.callee.object.property.id.type === "Identifier" &&
-          n.callee.property.type === "NumericLiteral" &&
-          n.callee.property.value === 0 &&
-          n.arguments.length === 0
+          n.type === "CallExpression"
+          && n.callee.type === "MemberExpression"
+          && n.callee.object.type === "MemberExpression"
+          && n.callee.object.object.type === "ThisExpression"
+          && n.callee.object.property.type === "PrivateName"
+          && n.callee.object.property.id.type === "Identifier"
+          && n.callee.property.type === "NumericLiteral"
+          && n.callee.property.value === 0
+          && n.arguments.length === 0
         ) {
           const key = astToKey(n);
           if (!seen.has(key)) {
@@ -64,7 +65,8 @@ export function convertDefineCustomElement(varDecl: t.VariableDeclarator): t.Cla
         for (const key in n) {
           if (Array.isArray(n[key])) {
             n[key].forEach(walk);
-          } else if (n[key] && typeof n[key] === "object" && n[key].type) {
+          }
+          else if (n[key] && typeof n[key] === "object" && n[key].type) {
             walk(n[key]);
           }
         }
