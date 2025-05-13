@@ -25,13 +25,13 @@ export function convertDefineCustomElement(varDecl: t.VariableDeclarator): t.Cla
     let propsDef: Record<string, any> = {};
     if (options && options.type === "ObjectExpression") {
       const propsProp = options.properties.find(
-        (p: any) => p.type === "ObjectProperty" && ((p.key.type === "Identifier" && p.key.name === "props") || (p.key.type === "StringLiteral" && p.key.value === "props"))
+        (p: any) => p.type === "ObjectProperty" && ((p.key.type === "Identifier" && p.key.name === "props") || (p.key.type === "StringLiteral" && p.key.value === "props")),
       );
       if (propsProp && propsProp.type === "ObjectProperty" && propsProp.value.type === "ObjectExpression") {
         propsDef = Object.fromEntries(
           propsProp.value.properties
             .filter((p: any) => p.type === "ObjectProperty" && ((p.key.type === "Identifier") || (p.key.type === "StringLiteral")))
-            .map((p: any) => [p.key.type === "Identifier" ? p.key.name : p.key.value, p])
+            .map((p: any) => [p.key.type === "Identifier" ? p.key.name : p.key.value, p]),
         );
       }
     }
@@ -129,9 +129,10 @@ export function convertDefineCustomElement(varDecl: t.VariableDeclarator): t.Cla
             const attrName = propToAttr[n.property.name] || n.property.name;
             return babelTypes.callExpression(
               babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("getAttribute")),
-              [babelTypes.stringLiteral(attrName)]
+              [babelTypes.stringLiteral(attrName)],
             );
-          } else {
+          }
+          else {
             return n;
           }
         }
@@ -151,6 +152,75 @@ export function convertDefineCustomElement(varDecl: t.VariableDeclarator): t.Cla
       }
       return walk(babelTypes.cloneNode(node, true));
     }
+
+    /**
+     * BlockStatement内のノードを再帰的に変換するユーティリティ
+     * Utility to recursively transform nodes in a BlockStatement
+     * @param statements BlockStatementのbody配列
+     * @returns 変換後のStatement配列
+     */
+    function transformBlockStatements(statements: t.Statement[]): t.Statement[] {
+      return statements.map((stmt) => {
+        if (stmt.type === "IfStatement") {
+          // 条件式もthis変換
+          const test = replaceVarToThis(stmt.test);
+          const consequent = stmt.consequent.type === "BlockStatement"
+            ? babelTypes.blockStatement(transformBlockStatements(stmt.consequent.body))
+            : replaceVarToThis(stmt.consequent);
+          const alternate = stmt.alternate
+            ? (stmt.alternate.type === "BlockStatement"
+                ? babelTypes.blockStatement(transformBlockStatements(stmt.alternate.body))
+                : stmt.alternate.type
+                  ? transformBlockStatements([stmt.alternate])[0]
+                  : null)
+            : null;
+          return babelTypes.ifStatement(test, consequent, alternate || null);
+        }
+        if (stmt.type === "ReturnStatement" && stmt.argument) {
+          if (stmt.argument.type === "JSXElement" || stmt.argument.type === "JSXFragment") {
+            return babelTypes.returnStatement(
+              jsxToHtmlAst(replaceVarToThis(stmt.argument), signals),
+            );
+          }
+          else {
+            // return式もthis変換
+            return babelTypes.returnStatement(replaceVarToThis(stmt.argument));
+          }
+        }
+        // その他の文もthis変換
+        return replaceVarToThis(stmt);
+      });
+    }
+
+    // renderコールバックのBlockStatement全体を_renderHtmlのbodyに移植し、return JSX/JSXFragmentのみHTML変換
+    let _renderHtmlBody: t.BlockStatement | null = null;
+    if (fn && (fn.type === "ArrowFunctionExpression" || fn.type === "FunctionExpression") && fn.body.type === "BlockStatement") {
+      // BlockStatement内のrender呼び出しを探す
+      const renderCall = fn.body.body.find(
+        (stmt): stmt is t.ExpressionStatement & { expression: t.CallExpression } => stmt.type === "ExpressionStatement"
+          && stmt.expression.type === "CallExpression"
+          && stmt.expression.callee.type === "Identifier"
+          && stmt.expression.callee.name === "render"
+          && stmt.expression.arguments.length > 0,
+      );
+      if (renderCall) {
+        const cb = renderCall.expression.arguments[0];
+        if ((cb.type === "ArrowFunctionExpression" || cb.type === "FunctionExpression") && cb.body.type === "BlockStatement") {
+          _renderHtmlBody = babelTypes.blockStatement(transformBlockStatements(cb.body.body));
+        }
+        else if ((cb.type === "ArrowFunctionExpression" || cb.type === "FunctionExpression") && (cb.body.type === "JSXElement" || cb.body.type === "JSXFragment")) {
+          _renderHtmlBody = babelTypes.blockStatement([
+            babelTypes.returnStatement(jsxToHtmlAst(replaceVarToThis(cb.body), signals)),
+          ]);
+        }
+      }
+    }
+    else if (fn && (fn.type === "ArrowFunctionExpression" || fn.type === "FunctionExpression") && (fn.body.type === "JSXElement" || fn.body.type === "JSXFragment")) {
+      _renderHtmlBody = babelTypes.blockStatement([
+        babelTypes.returnStatement(jsxToHtmlAst(replaceVarToThis(fn.body), signals)),
+      ]);
+    }
+
     if (constructorBody) {
       constructorBody = replaceVarToThis(constructorBody);
     }
@@ -282,7 +352,7 @@ export function convertDefineCustomElement(varDecl: t.VariableDeclarator): t.Cla
             babelTypes.binaryExpression(
               "===",
               babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("_prevHtml")),
-              babelTypes.stringLiteral("")
+              babelTypes.stringLiteral(""),
             ),
             babelTypes.blockStatement([
               babelTypes.expressionStatement(
@@ -551,16 +621,14 @@ export function convertDefineCustomElement(varDecl: t.VariableDeclarator): t.Cla
       ),
       babelTypes.classProperty(
         babelTypes.identifier("_prevHtml"),
-        babelTypes.stringLiteral("")
+        babelTypes.stringLiteral(""),
       ),
-      _jsxReturn
+      _renderHtmlBody
         ? babelTypes.classMethod(
             "method",
             babelTypes.identifier("_renderHtml"),
             [],
-            babelTypes.blockStatement([
-              babelTypes.returnStatement(jsxToHtmlAst(_jsxReturn, signals)),
-            ]),
+            _renderHtmlBody,
           )
         : babelTypes.classMethod(
             "method",

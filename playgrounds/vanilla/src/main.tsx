@@ -1,9 +1,9 @@
 import { HTMLElementEvent } from "@katu/transpiler/JSX";
-import { signal } from "@katu/reactivity";
+import { effect, signal } from "@katu/reactivity";
 
 import "./main.css"
 
-const App = defineCustomElement<{name: string}>(({ props, onAttributeChanged, constructor }) => {
+const App = defineCustomElement<{name: string}>(({ props, onAttributeChanged, render }) => {
   const [time, setTime] = signal(0);
   const [clickCount, setClickCount] = signal(0);
   const [text, setText] = signal("");
@@ -18,26 +18,35 @@ const App = defineCustomElement<{name: string}>(({ props, onAttributeChanged, co
   constructor(() => {
     setInterval(() => { setTime((t) => t + 1); }, 1000);
     setClickCount(0);
+    effect(() => {
+      console.log("time", time());
+    });
   });
 
-  return (
-    <>
-      <h1>Hello World, {a}</h1>
-      <hr />
-      <ul>{["foo","bar","baz"].map(i => (<li>{i}</li>))}</ul>
-      <hr />
-      <p>Count: {time()}</p>
-      <hr />
-      <p>{props.name}</p>
-      <hr />
-      <input onChange={handleChange} type="text" />
-      <p>{text() || "--nul--"}</p>
-      <hr />
-      <button onClick={handleClick}>Click : {clickCount()}</button>
-      <button onClick={handleClick2}>Click +2 : {clickCount()}</button>
-      <button onClick={handleClick3}>Click +3 : {clickCount()}</button>
-    </>
-  );
+  render(() => {
+    if (!props.name) {
+      return <p>Count: {time()}</p>
+    }
+
+    return (
+      <>
+        <h1>Hello World, {a}</h1>
+        <hr />
+        <ul>{["foo","bar","baz"].map(i => (<li>{i}</li>))}</ul>
+        <hr />
+        <p>Count: {time()}</p>
+        <hr />
+        <p>{props.name}</p>
+        <hr />
+        <input onChange={handleChange} type="text" />
+        <p>{text() || "--nul--"}</p>
+        <hr />
+        <button onClick={handleClick}>Click : {clickCount()}</button>
+        <button onClick={handleClick2}>Click +2 : {clickCount()}</button>
+        <button onClick={handleClick3}>Click +3 : {clickCount()}</button>
+      </>
+    );
+  });
 }, {
   shadowRoot: true,
   shadowRootMode: 'open'
@@ -47,7 +56,7 @@ customElements.define("katu-app", App);
 
 const app = document.getElementById("app");
 const element = document.createElement("katu-app");
-element.setAttribute("name", "name1");
+// element.setAttribute("name", "name1");
 app!.appendChild(element);
 setTimeout(() => {
   element.setAttribute("name", "name2");
