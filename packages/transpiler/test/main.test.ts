@@ -19,7 +19,7 @@ describe("traverse", () => {
     expect(out).toMatch(/this\.getAttribute\(['"]name['"]\)/);
   });
 
-  it("should convert signal call in ternary (ConditionalExpression) to this.#signal[0]()", () => {
+  it("should convert signal call in ternary (ConditionalExpression) to text()", () => {
     const code = `
       import { signal } from "@katu/reactivity";
       const Comp = defineCustomElement(({ render }) => {
@@ -40,10 +40,10 @@ describe("traverse", () => {
     const result = traverse(ast);
     const out = generate(result);
 
-    // text()がthis.#text[0]()に変換されていることを確認
-    expect(out).toMatch(/this\.#text\[0\]\(\) === "" \? String\("--null--"\) : this\.#text\[0\]\(\)/);
-    // test部分(this.#text[0]() === "")にString()がラップされていないことを確認
-    expect(out).not.toMatch(/String\(this\.#text\[0\]\(\) === ""/);
+    // text()がそのまま出力されていることを確認
+    expect(out).toMatch(/text\(\) === "" \? String\("--null--"\) : String\(text\(\)\)/);
+    // 不要なthis.#text[0]()変換が含まれていないことを確認
+    expect(out).not.toMatch(/this.#\w+\[0\]\(\)/);
   });
 
   it("should support if statement and multiple return in render callback", () => {

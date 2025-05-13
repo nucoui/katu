@@ -90,6 +90,12 @@ export function jsxToHtmlAst(node: t.Expression | t.JSXElement | t.JSXFragment, 
                 propsObjProps.push(
                   babelTypes.objectProperty(babelTypes.identifier(name), attr.value.expression),
                 );
+              // onXXX属性でthis.xxx参照（MemberExpression）の場合もそのまま
+              }
+              else if (/^on[A-Z]/.test(name) && attr.value.expression.type === "MemberExpression") {
+                propsObjProps.push(
+                  babelTypes.objectProperty(babelTypes.identifier(name), attr.value.expression),
+                );
               }
               else {
                 propsObjProps.push(

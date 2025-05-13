@@ -1,13 +1,6 @@
 import type * as t from "@babel/types";
-import type { EventBinding, SignalInfo } from "./types";
 import * as babelTypes from "@babel/types";
-import { extractEventHandlersAndMark } from "./extractEventHandlers.js";
 import { jsxToHtmlAst } from "./jsxToHtmlAst.js";
-import { replaceSignalCalls } from "./replaceSignalCalls.js";
-
-function capitalize(str: string) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
 
 /**
  * defineCustomElementのprops参照(props.xxx)をthis.getAttribute('kebab-case')に変換する
@@ -19,61 +12,6 @@ function capitalize(str: string) {
 export function convertDefineCustomElement(varDecl: t.VariableDeclarator): t.ClassDeclaration | t.VariableDeclarator {
   let className = "";
   if (varDecl.init && varDecl.init.type === "CallExpression" && varDecl.init.callee.type === "Identifier" && varDecl.init.callee.name === "defineCustomElement") {
-    // --- 追加: _renderHtmlで参照されるsignal getterを抽出する ---
-    /**
-     * _renderHtmlのASTからthis.#xxx[0]()形式のsignal getter呼び出しを全て抽出する
-     * @param node ASTノード
-     * @returns signal getter呼び出し式の配列
-     */
-    function extractSignalGetters(node: t.Node): t.Expression[] {
-      const getters: t.Expression[] = [];
-      const seen = new Set<string>();
-      function astToKey(n: t.CallExpression): string {
-        // 例: this.#clickCount[0]() → 'this.#clickCount[0]()'
-        if (
-          n.callee.type === "MemberExpression"
-          && n.callee.object.type === "MemberExpression"
-          && n.callee.object.object.type === "ThisExpression"
-          && n.callee.object.property.type === "PrivateName"
-          && n.callee.object.property.id.type === "Identifier"
-          && n.callee.property.type === "NumericLiteral"
-        ) {
-          return `this.#${n.callee.object.property.id.name}[${n.callee.property.value}]()`;
-        }
-        return JSON.stringify(n);
-      }
-      function walk(n: any) {
-        if (!n || typeof n !== "object")
-          return;
-        if (
-          n.type === "CallExpression"
-          && n.callee.type === "MemberExpression"
-          && n.callee.object.type === "MemberExpression"
-          && n.callee.object.object.type === "ThisExpression"
-          && n.callee.object.property.type === "PrivateName"
-          && n.callee.object.property.id.type === "Identifier"
-          && n.callee.property.type === "NumericLiteral"
-          && n.callee.property.value === 0
-          && n.arguments.length === 0
-        ) {
-          const key = astToKey(n);
-          if (!seen.has(key)) {
-            seen.add(key);
-            getters.push(n);
-          }
-        }
-        for (const key in n) {
-          if (Array.isArray(n[key])) {
-            n[key].forEach(walk);
-          }
-          else if (n[key] && typeof n[key] === "object" && n[key].type) {
-            walk(n[key]);
-          }
-        }
-      }
-      walk(node);
-      return getters;
-    }
     className = (varDecl.id.type === "Identifier") ? varDecl.id.name : "CustomElement";
     const callExpr = varDecl.init;
     const [fn, options] = callExpr.arguments;
@@ -96,80 +34,115 @@ export function convertDefineCustomElement(varDecl: t.VariableDeclarator): t.Cla
     propNames.forEach((p) => {
       propToAttr[p] = toKebab(p);
     });
-    const signals: SignalInfo[] = [];
-    let constructorBody: t.BlockStatement | null = null;
-    let _jsxReturn: t.JSXElement | t.JSXFragment | null = null;
-    let observedAttributes: string[] = [];
-    const handlerMap: Record<string, t.FunctionExpression | t.ArrowFunctionExpression> = {};
-    const renderVars: t.VariableDeclarator[] = [];
-    const filteredBody: t.Statement[] = [];
-    const renderVarNames: string[] = [];
+    // --- ここから新ロジック ---
+    // fn.body.bodyからrenderコールバックを探し、その直前までの全ての宣言・副作用文をconstructorに集約
+    const constructorStmts: t.Statement[] = [];
+    let renderCallback: t.Function | t.ArrowFunctionExpression | null = null;
     if (fn && (fn.type === "ArrowFunctionExpression" || fn.type === "FunctionExpression") && fn.body.type === "BlockStatement") {
-      (fn.body.body as t.Statement[]).forEach((stmt: t.Statement) => {
+      for (const stmt of fn.body.body) {
         if (
-          stmt.type === "VariableDeclaration"
-          && ["let", "const"].includes(stmt.kind)
-          && stmt.declarations.length === 1
-          && stmt.declarations[0].id.type === "Identifier"
-          && stmt.declarations[0].init
-          && stmt.declarations[0].init.type !== "ArrowFunctionExpression"
-          && stmt.declarations[0].init.type !== "FunctionExpression"
-          && !(stmt.declarations[0].init.type === "CallExpression" && stmt.declarations[0].init.callee.type === "Identifier" && stmt.declarations[0].init.callee.name === "signal")
+          stmt.type === "ExpressionStatement" && stmt.expression.type === "CallExpression" && stmt.expression.callee.type === "Identifier" && stmt.expression.callee.name === "render"
         ) {
-          renderVars.push(stmt.declarations[0]);
-          renderVarNames.push(stmt.declarations[0].id.name);
-          return;
-        }
-        if (
-          stmt.type === "VariableDeclaration"
-          && stmt.declarations[0].id.type === "Identifier"
-          && stmt.declarations[0].init
-          && (stmt.declarations[0].init.type === "ArrowFunctionExpression" || stmt.declarations[0].init.type === "FunctionExpression")
-        ) {
-          handlerMap[stmt.declarations[0].id.name] = stmt.declarations[0].init;
-        }
-        if (
-          stmt.type === "VariableDeclaration"
-          && stmt.declarations[0].init
-          && stmt.declarations[0].init.type === "CallExpression"
-          && stmt.declarations[0].init.callee.type === "Identifier"
-          && stmt.declarations[0].init.callee.name === "signal"
-        ) {
-          const arrPat = stmt.declarations[0].id;
-          if (arrPat.type === "ArrayPattern") {
-            const name = arrPat.elements[0];
-            const setter = arrPat.elements[1];
-            const arg0 = stmt.declarations[0].init.arguments[0];
-            if (name && name.type === "Identifier" && setter && setter.type === "Identifier" && arg0 && arg0.type !== "SpreadElement" && arg0.type !== "ArgumentPlaceholder") {
-              signals.push({ name: name.name, setter: setter.name, init: arg0 });
-            }
-          }
-        }
-        if (
-          stmt.type === "ExpressionStatement"
-          && stmt.expression.type === "CallExpression"
-          && stmt.expression.callee.type === "Identifier"
-          && stmt.expression.callee.name === "constructor"
-        ) {
+          // render(() => ...) のコールバックを抽出
           const cb = stmt.expression.arguments[0];
           if (cb && (cb.type === "ArrowFunctionExpression" || cb.type === "FunctionExpression")) {
-            constructorBody = cb.body.type === "BlockStatement" ? cb.body : babelTypes.blockStatement([babelTypes.expressionStatement(cb.body)]);
+            renderCallback = cb;
           }
+          break;
         }
-        if (stmt.type === "ReturnStatement" && stmt.argument && (stmt.argument.type === "JSXElement" || stmt.argument.type === "JSXFragment")) {
-          _jsxReturn = replaceVarToThis(stmt.argument);
-        }
-        filteredBody.push(stmt);
-      });
+        // それ以外はconstructorに集約
+        constructorStmts.push(stmt);
+      }
     }
-    // 変数参照をthis.に置換するユーティリティ
-    function replaceVarToThis<T extends t.Node>(node: T): T {
+    // signal分割代入情報を収集
+    type SignalDecl = { getter: string; setter: string; init: t.Expression };
+    const signalDecls: SignalDecl[] = [];
+    const signalGetters: string[] = [];
+    const signalSetters: string[] = [];
+    constructorStmts.forEach((stmt) => {
+      if (stmt.type === "VariableDeclaration") {
+        stmt.declarations.forEach((decl) => {
+          if (
+            decl.id.type === "ArrayPattern"
+            && decl.init
+            && decl.init.type === "CallExpression"
+            && decl.init.callee.type === "Identifier"
+            && decl.init.callee.name === "signal"
+          ) {
+            const [getter, setter] = decl.id.elements;
+            if (getter && getter.type === "Identifier" && setter && setter.type === "Identifier") {
+              // SpreadElementやArgumentPlaceholderは無視
+              const arg = decl.init.arguments[0] ?? babelTypes.identifier("undefined");
+              signalDecls.push({
+                getter: getter.name,
+                setter: setter.name,
+                init: arg as t.Expression,
+              });
+              signalGetters.push(getter.name);
+              signalSetters.push(setter.name);
+            }
+          }
+        });
+      }
+    });
+    // constructorStmts内のsignal/変数/ハンドラ宣言は全てthis.xxxで初期化する形に変換
+    const constructorBody = babelTypes.blockStatement([
+      babelTypes.expressionStatement(babelTypes.callExpression(babelTypes.super(), [])),
+      // signalの初期化と分割代入をペアで出力
+      ...signalDecls.flatMap(({ getter, setter, init }) => [
+        babelTypes.expressionStatement(
+          babelTypes.assignmentExpression(
+            "=",
+            babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier(getter)),
+            babelTypes.callExpression(babelTypes.identifier("signal"), [init]),
+          ),
+        ),
+        babelTypes.variableDeclaration("const", [
+          babelTypes.variableDeclarator(
+            babelTypes.arrayPattern([
+              babelTypes.identifier(getter),
+              babelTypes.identifier(setter),
+            ]),
+            babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier(getter)),
+          ),
+        ]),
+      ]),
+      // signal以外の変数・ハンドラ・副作用
+      ...constructorStmts.flatMap((stmt) => {
+        if (stmt.type === "VariableDeclaration") {
+          return stmt.declarations.flatMap((decl) => {
+            if (
+              decl.id.type === "Identifier"
+              && !(decl.init && decl.init.type === "CallExpression" && decl.init.callee.type === "Identifier" && decl.init.callee.name === "signal")
+            ) {
+              // 通常変数, ハンドラ
+              return [babelTypes.expressionStatement(
+                babelTypes.assignmentExpression(
+                  "=",
+                  babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier(decl.id.name)),
+                  decl.init || babelTypes.identifier("undefined"),
+                ),
+              )];
+            }
+            return [];
+          });
+        }
+        // その他の副作用文（setInterval等）はそのまま
+        return [stmt];
+      }),
+    ]);
+    // constructorBodyにもsignal分割代入を挿入
+    // super();はconstructorの一番最初に一度だけ出力し、injectSignalDestructuresToBodyでは絶対にsuper()を挿入しない
+    const constructorBodyWithSignals = constructorBody;
+    // setTime等の参照をthis.setTimeに置換
+    function replaceVarToThisInRender<T extends t.Node>(node: T): T {
       function walk(n: any, parent: any = null): any {
         if (!n || typeof n !== "object")
           return n;
         if (
           n.type === "Identifier"
-          && renderVarNames.includes(n.name)
+          && !(signalGetters.includes(n.name) || signalSetters.includes(n.name)) // signal getter/setterはローカル参照のまま
+          && constructorStmts.some(stmt => stmt.type === "VariableDeclaration" && stmt.declarations.some(d => d.id.type === "Identifier" && d.id.name === n.name))
           && !(parent && parent.type === "MemberExpression" && parent.object === n)
           && !(parent && parent.type === "VariableDeclarator" && parent.id === n)
         ) {
@@ -207,145 +180,261 @@ export function convertDefineCustomElement(varDecl: t.VariableDeclarator): t.Cla
       }
       return walk(babelTypes.cloneNode(node, true));
     }
-
-    /**
-     * BlockStatement内のノードを再帰的に変換するユーティリティ
-     * Utility to recursively transform nodes in a BlockStatement
-     * @param statements BlockStatementのbody配列
-     * @returns 変換後のStatement配列
-     */
-    function transformBlockStatements(statements: t.Statement[]): t.Statement[] {
-      return statements.map((stmt) => {
-        if (stmt.type === "IfStatement") {
-          // 条件式もthis変換
-          const test = replaceVarToThis(stmt.test);
-          const consequent = stmt.consequent.type === "BlockStatement"
-            ? babelTypes.blockStatement(transformBlockStatements(stmt.consequent.body))
-            : replaceVarToThis(stmt.consequent);
-          const alternate = stmt.alternate
-            ? (stmt.alternate.type === "BlockStatement"
-                ? babelTypes.blockStatement(transformBlockStatements(stmt.alternate.body))
-                : stmt.alternate.type
-                  ? transformBlockStatements([stmt.alternate])[0]
-                  : null)
-            : null;
-          return babelTypes.ifStatement(test, consequent, alternate || null);
-        }
-        if (stmt.type === "ReturnStatement" && stmt.argument) {
-          if (stmt.argument.type === "JSXElement" || stmt.argument.type === "JSXFragment") {
+    // BlockStatement内のreturn JSX/JSXFragmentをjsxDom呼び出しに変換
+    function transformBlockReturnJSX(block: t.BlockStatement): t.BlockStatement {
+      function walkStmts(stmts: t.Statement[]): t.Statement[] {
+        return stmts.map((stmt) => {
+          if (stmt.type === "ReturnStatement" && stmt.argument && (stmt.argument.type === "JSXElement" || stmt.argument.type === "JSXFragment")) {
             return babelTypes.returnStatement(
-              jsxToHtmlAst(replaceVarToThis(stmt.argument), signals),
+              jsxToHtmlAst(replaceVarToThisInRender(stmt.argument), []),
             );
           }
-          else {
-            // return式もthis変換
-            return babelTypes.returnStatement(replaceVarToThis(stmt.argument));
+          else if (stmt.type === "IfStatement") {
+            return babelTypes.ifStatement(
+              stmt.test,
+              stmt.consequent.type === "BlockStatement"
+                ? transformBlockReturnJSX(stmt.consequent)
+                : stmt.consequent,
+              stmt.alternate && stmt.alternate.type === "BlockStatement"
+                ? transformBlockReturnJSX(stmt.alternate)
+                : stmt.alternate,
+            );
           }
-        }
-        // その他の文もthis変換
-        return replaceVarToThis(stmt);
-      });
-    }
-
-    // renderコールバックのBlockStatement全体を_renderHtmlのbodyに移植し、return JSX/JSXFragmentのみHTML変換
-    let _renderHtmlBody: t.BlockStatement | null = null;
-    if (fn && (fn.type === "ArrowFunctionExpression" || fn.type === "FunctionExpression") && fn.body.type === "BlockStatement") {
-      // BlockStatement内のrender呼び出しを探す
-      const renderCall = fn.body.body.find(
-        (stmt): stmt is t.ExpressionStatement & { expression: t.CallExpression } => stmt.type === "ExpressionStatement"
-          && stmt.expression.type === "CallExpression"
-          && stmt.expression.callee.type === "Identifier"
-          && stmt.expression.callee.name === "render"
-          && stmt.expression.arguments.length > 0,
-      );
-      if (renderCall) {
-        const cb = renderCall.expression.arguments[0];
-        if ((cb.type === "ArrowFunctionExpression" || cb.type === "FunctionExpression") && cb.body.type === "BlockStatement") {
-          _renderHtmlBody = babelTypes.blockStatement(transformBlockStatements(cb.body.body));
-        }
-        else if ((cb.type === "ArrowFunctionExpression" || cb.type === "FunctionExpression") && (cb.body.type === "JSXElement" || cb.body.type === "JSXFragment")) {
-          _renderHtmlBody = babelTypes.blockStatement([
-            babelTypes.returnStatement(jsxToHtmlAst(replaceVarToThis(cb.body), signals)),
-          ]);
-        }
+          return stmt;
+        });
       }
+      return babelTypes.blockStatement(walkStmts(block.body));
     }
-    else if (fn && (fn.type === "ArrowFunctionExpression" || fn.type === "FunctionExpression") && (fn.body.type === "JSXElement" || fn.body.type === "JSXFragment")) {
-      _renderHtmlBody = babelTypes.blockStatement([
-        babelTypes.returnStatement(jsxToHtmlAst(replaceVarToThis(fn.body), signals)),
+    // _renderHtml, connectedCallback, 各ハンドラの先頭にsignal分割代入を挿入
+    function injectSignalDestructuresToBody(body: t.BlockStatement): t.BlockStatement {
+      if (signalDecls.length === 0)
+        return body;
+      // 既に同じ分割代入がある場合は重複挿入しない
+      const first = body.body[0];
+      if (
+        first
+        && first.type === "VariableDeclaration"
+        && first.declarations[0].id.type === "ArrayPattern"
+        && first.declarations[0].id.elements[0]
+        && first.declarations[0].id.elements[0].type === "Identifier"
+        && signalGetters.includes(first.declarations[0].id.elements[0].name)
+      ) {
+        return body;
+      }
+      // signal分割代入＋残り
+      return babelTypes.blockStatement([
+        ...signalDecls.map(({ getter, setter }) =>
+          babelTypes.variableDeclaration("const", [
+            babelTypes.variableDeclarator(
+              babelTypes.arrayPattern([
+                babelTypes.identifier(getter),
+                babelTypes.identifier(setter),
+              ]),
+              babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier(getter)),
+            ),
+          ]),
+        ),
+        ...body.body,
       ]);
     }
-
-    if (constructorBody) {
-      constructorBody = replaceVarToThis(constructorBody);
-    }
-    if (_jsxReturn) {
-      _jsxReturn = replaceVarToThis(_jsxReturn);
-    }
-    const renderVarProps = renderVars.map(vd =>
-      babelTypes.classProperty(
-        babelTypes.identifier((vd.id as t.Identifier).name),
-        vd.init || null,
-        undefined,
-        undefined,
-        false,
-      ),
+    // クラス本体生成
+    const renderMethodBody = renderCallback && renderCallback.body.type === "BlockStatement"
+      ? injectSignalDestructuresToBody(transformBlockReturnJSX(replaceVarToThisInRender(renderCallback.body) as t.BlockStatement))
+      : (renderCallback && (renderCallback.body.type === "JSXElement" || renderCallback.body.type === "JSXFragment"))
+          ? babelTypes.blockStatement([
+              ...signalDecls.map(({ getter, setter }) =>
+                babelTypes.variableDeclaration("const", [
+                  babelTypes.variableDeclarator(
+                    babelTypes.arrayPattern([
+                      babelTypes.identifier(getter),
+                      babelTypes.identifier(setter),
+                    ]),
+                    babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier(getter)),
+                  ),
+                ]),
+              ),
+              babelTypes.returnStatement(
+                jsxToHtmlAst(replaceVarToThisInRender(renderCallback.body), []),
+              ),
+            ])
+          : renderCallback
+            ? babelTypes.blockStatement([
+                ...signalDecls.map(({ getter, setter }) =>
+                  babelTypes.variableDeclaration("const", [
+                    babelTypes.variableDeclarator(
+                      babelTypes.arrayPattern([
+                        babelTypes.identifier(getter),
+                        babelTypes.identifier(setter),
+                      ]),
+                      babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier(getter)),
+                    ),
+                  ]),
+                ),
+                babelTypes.returnStatement(replaceVarToThisInRender(renderCallback.body) as t.Expression),
+              ])
+            : babelTypes.blockStatement([
+                babelTypes.returnStatement(babelTypes.stringLiteral("<div>JSX変換未実装</div>")),
+              ]);
+    const connectedCallbackBody = injectSignalDestructuresToBody(
+      babelTypes.blockStatement([
+        // shadowRoot生成
+        babelTypes.ifStatement(
+          babelTypes.unaryExpression("!", babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("shadowRoot"))),
+          babelTypes.blockStatement([
+            babelTypes.expressionStatement(
+              babelTypes.callExpression(
+                babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("attachShadow")),
+                [babelTypes.objectExpression([
+                  babelTypes.objectProperty(babelTypes.identifier("mode"), babelTypes.stringLiteral("open")),
+                ])],
+              ),
+            ),
+          ]),
+        ),
+        // 初回描画
+        babelTypes.expressionStatement(
+          babelTypes.callExpression(
+            babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("_patchDom")),
+            [babelTypes.callExpression(babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("_renderHtml")), [])],
+          ),
+        ),
+        // effect
+        babelTypes.expressionStatement(
+          babelTypes.callExpression(
+            babelTypes.identifier("effect"),
+            [babelTypes.arrowFunctionExpression(
+              [],
+              babelTypes.blockStatement([
+                ...signalGetters.map(name => babelTypes.expressionStatement(babelTypes.callExpression(babelTypes.identifier(name), []))),
+                babelTypes.expressionStatement(
+                  babelTypes.callExpression(
+                    babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("_patchDom")),
+                    [babelTypes.callExpression(babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("_renderHtml")), [])],
+                  ),
+                ),
+              ]),
+            )],
+          ),
+        ),
+      ]),
     );
-    // handlerMapに登録された関数をクラスのメンバとして追加
-    const handlerProps = Object.entries(handlerMap).map(([name, fn]) =>
-      babelTypes.classProperty(
-        babelTypes.identifier(name),
-        // signal参照やsetterもthis.#xxx[0]()/[1]()に変換
-        (fn.type === "ArrowFunctionExpression" || fn.type === "FunctionExpression")
-          ? babelTypes.arrowFunctionExpression(
-              fn.params,
-              replaceSignalCalls(replaceVarToThis(fn.body), signals),
-            )
-          : fn,
-        undefined,
-        undefined,
-        false,
-      ),
-    );
-    if (constructorBody && (constructorBody as t.BlockStatement).body) {
-      const first = (constructorBody as t.BlockStatement).body[0];
-      const isSuper = first && first.type === "ExpressionStatement" && first.expression.type === "CallExpression" && first.expression.callee.type === "Super";
-      if (!isSuper) {
-        (constructorBody as t.BlockStatement).body.unshift(
-          babelTypes.expressionStatement(babelTypes.callExpression(babelTypes.super(), [])),
-        );
-      }
-      constructorBody = replaceSignalCalls(constructorBody, signals) as t.BlockStatement;
-    }
-    else {
-      constructorBody = babelTypes.blockStatement([
-        babelTypes.expressionStatement(babelTypes.callExpression(babelTypes.super(), [])),
-      ]);
-    }
-    observedAttributes = ["name"];
-    const eventIdx = { current: 0 };
-    const eventBindings: EventBinding[] = [];
-    if (_jsxReturn)
-      extractEventHandlersAndMark(_jsxReturn, eventBindings, eventIdx);
-    const uniqueEventBindings = Array.from(new Map(eventBindings.map(e => [`${e.selector}|${e.event}|${e.handler}`, e])).values());
-    // effect依存に全signal getterを参照させる
-    // signalGetterExprsはconnectedCallback生成直前で定義
-    let signalGetterExprs: t.Expression[] = [];
-    if (_renderHtmlBody) {
-      signalGetterExprs = extractSignalGetters(_renderHtmlBody);
-    }
-    const classBody: t.ClassBody = babelTypes.classBody([
-      ...signals.map(sig =>
-        babelTypes.classPrivateProperty(
-          babelTypes.privateName(babelTypes.identifier(sig.name)),
-          babelTypes.callExpression(babelTypes.identifier("signal"), [sig.init]),
+    const attributeChangedCallbackBody = babelTypes.blockStatement([
+      babelTypes.expressionStatement(
+        babelTypes.callExpression(
+          babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("_patchDom")),
+          [babelTypes.callExpression(babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("_renderHtml")), [])],
         ),
       ),
-      ...renderVarProps,
-      ...handlerProps,
+    ]);
+    const patchDomBody = babelTypes.blockStatement([
+      babelTypes.ifStatement(
+        babelTypes.unaryExpression("!", babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("shadowRoot"))),
+        babelTypes.blockStatement([babelTypes.returnStatement()]),
+      ),
+      babelTypes.variableDeclaration("const", [
+        babelTypes.variableDeclarator(
+          babelTypes.identifier("nodes"),
+          babelTypes.conditionalExpression(
+            babelTypes.callExpression(
+              babelTypes.memberExpression(
+                babelTypes.identifier("Array"),
+                babelTypes.identifier("isArray"),
+              ),
+              [babelTypes.identifier("newDom")],
+            ),
+            babelTypes.callExpression(
+              babelTypes.memberExpression(
+                babelTypes.identifier("newDom"),
+                babelTypes.identifier("map"),
+              ),
+              [
+                babelTypes.arrowFunctionExpression([
+                  babelTypes.identifier("n"),
+                ], babelTypes.conditionalExpression(
+                  babelTypes.binaryExpression("===", babelTypes.unaryExpression("typeof", babelTypes.identifier("n")), babelTypes.stringLiteral("string")),
+                  babelTypes.callExpression(
+                    babelTypes.memberExpression(
+                      babelTypes.identifier("document"),
+                      babelTypes.identifier("createTextNode"),
+                    ),
+                    [babelTypes.identifier("n")],
+                  ),
+                  babelTypes.identifier("n"),
+                )),
+              ],
+            ),
+            babelTypes.arrayExpression([
+              babelTypes.conditionalExpression(
+                babelTypes.binaryExpression("===", babelTypes.unaryExpression("typeof", babelTypes.identifier("newDom")), babelTypes.stringLiteral("string")),
+                babelTypes.callExpression(
+                  babelTypes.memberExpression(
+                    babelTypes.identifier("document"),
+                    babelTypes.identifier("createTextNode"),
+                  ),
+                  [babelTypes.identifier("newDom")],
+                ),
+                babelTypes.identifier("newDom"),
+              ),
+            ]),
+          ),
+        ),
+      ]),
+      babelTypes.variableDeclaration("const", [
+        babelTypes.variableDeclarator(
+          babelTypes.identifier("current"),
+          babelTypes.callExpression(
+            babelTypes.memberExpression(
+              babelTypes.callExpression(
+                babelTypes.memberExpression(babelTypes.identifier("Array"), babelTypes.identifier("from")),
+                [babelTypes.memberExpression(babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("shadowRoot")), babelTypes.identifier("childNodes"))],
+              ),
+              babelTypes.identifier("slice"),
+            ),
+            [],
+          ),
+        ),
+      ]),
+      babelTypes.ifStatement(
+        babelTypes.binaryExpression("!==", babelTypes.memberExpression(babelTypes.identifier("current"), babelTypes.identifier("length")), babelTypes.memberExpression(babelTypes.identifier("nodes"), babelTypes.identifier("length"))),
+        babelTypes.blockStatement([
+          babelTypes.expressionStatement(
+            babelTypes.callExpression(
+              babelTypes.memberExpression(babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("shadowRoot")), babelTypes.identifier("replaceChildren")),
+              [babelTypes.spreadElement(babelTypes.identifier("nodes"))],
+            ),
+          ),
+          babelTypes.returnStatement(),
+        ]),
+      ),
+      babelTypes.forStatement(
+        babelTypes.variableDeclaration("let", [babelTypes.variableDeclarator(babelTypes.identifier("i"), babelTypes.numericLiteral(0))]),
+        babelTypes.binaryExpression("<", babelTypes.identifier("i"), babelTypes.memberExpression(babelTypes.identifier("nodes"), babelTypes.identifier("length"))),
+        babelTypes.updateExpression("++", babelTypes.identifier("i")),
+        babelTypes.blockStatement([
+          babelTypes.ifStatement(
+            babelTypes.unaryExpression("!", babelTypes.callExpression(
+              babelTypes.memberExpression(babelTypes.memberExpression(babelTypes.identifier("current"), babelTypes.identifier("i"), true), babelTypes.identifier("isEqualNode")),
+              [babelTypes.memberExpression(babelTypes.identifier("nodes"), babelTypes.identifier("i"), true)],
+            )),
+            babelTypes.blockStatement([
+              babelTypes.expressionStatement(
+                babelTypes.callExpression(
+                  babelTypes.memberExpression(babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("shadowRoot")), babelTypes.identifier("replaceChild")),
+                  [
+                    babelTypes.memberExpression(babelTypes.identifier("nodes"), babelTypes.identifier("i"), true),
+                    babelTypes.memberExpression(babelTypes.identifier("current"), babelTypes.identifier("i"), true),
+                  ],
+                ),
+              ),
+            ]),
+          ),
+        ]),
+      ),
+    ]);
+    const classBody: t.ClassBody = babelTypes.classBody([
       babelTypes.classProperty(
         babelTypes.identifier("observedAttributes"),
-        babelTypes.arrayExpression(observedAttributes.map(attr => babelTypes.stringLiteral(attr))),
+        babelTypes.arrayExpression([babelTypes.stringLiteral("name")]),
         undefined,
         undefined,
         false,
@@ -355,212 +444,32 @@ export function convertDefineCustomElement(varDecl: t.VariableDeclarator): t.Cla
         "constructor",
         babelTypes.identifier("constructor"),
         [],
-        constructorBody || babelTypes.blockStatement([
-          babelTypes.expressionStatement(babelTypes.callExpression(babelTypes.super(), [])),
-        ]),
+        constructorBodyWithSignals,
       ),
-      // connectedCallback: shadowRoot生成・初回描画・effect設定
       babelTypes.classMethod(
         "method",
         babelTypes.identifier("connectedCallback"),
         [],
-        babelTypes.blockStatement([
-          babelTypes.ifStatement(
-            babelTypes.unaryExpression("!", babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("shadowRoot"))),
-            babelTypes.blockStatement([
-              babelTypes.expressionStatement(
-                babelTypes.callExpression(
-                  babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("attachShadow")),
-                  [babelTypes.objectExpression([
-                    babelTypes.objectProperty(babelTypes.identifier("mode"), babelTypes.stringLiteral("open")),
-                  ])],
-                ),
-              ),
-            ]),
-          ),
-          babelTypes.expressionStatement(
-            babelTypes.callExpression(
-              babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("_patchDom")),
-              [babelTypes.callExpression(babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("_renderHtml")), [])],
-            ),
-          ),
-          // effect: 依存signal getterを全て参照する
-          babelTypes.expressionStatement(
-            babelTypes.callExpression(
-              babelTypes.identifier("effect"),
-              [babelTypes.arrowFunctionExpression(
-                [],
-                babelTypes.blockStatement([
-                  // 依存getter参照
-                  ...signalGetterExprs.map((expr: t.Expression) => babelTypes.expressionStatement(expr)),
-                  // 本来のパッチ処理
-                  babelTypes.expressionStatement(
-                    babelTypes.callExpression(
-                      babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("_patchDom")),
-                      [babelTypes.callExpression(babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("_renderHtml")), [])],
-                    ),
-                  ),
-                ]),
-              )],
-            ),
-          ),
-        ]),
+        connectedCallbackBody,
       ),
-      // attributeChangedCallback: _patchDom呼び出し
       babelTypes.classMethod(
         "method",
         babelTypes.identifier("attributeChangedCallback"),
         [],
-        babelTypes.blockStatement([
-          babelTypes.expressionStatement(
-            babelTypes.callExpression(
-              babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("_patchDom")),
-              [babelTypes.callExpression(babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("_renderHtml")), [])],
-            ),
-          ),
-        ]),
+        attributeChangedCallbackBody,
       ),
-      // _patchDom: Node/Node[]ベースの差し替えロジック
       babelTypes.classMethod(
         "method",
         babelTypes.identifier("_patchDom"),
         [babelTypes.identifier("newDom")],
-        babelTypes.blockStatement([
-          babelTypes.ifStatement(
-            babelTypes.unaryExpression("!", babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("shadowRoot"))),
-            babelTypes.blockStatement([babelTypes.returnStatement()]),
-          ),
-          // newDomが配列でなければ配列化し、stringならTextノード化
-          babelTypes.variableDeclaration("const", [
-            babelTypes.variableDeclarator(
-              babelTypes.identifier("nodes"),
-              babelTypes.conditionalExpression(
-                babelTypes.callExpression(
-                  babelTypes.memberExpression(
-                    babelTypes.identifier("Array"),
-                    babelTypes.identifier("isArray"),
-                  ),
-                  [babelTypes.identifier("newDom")],
-                ),
-                babelTypes.callExpression(
-                  babelTypes.memberExpression(
-                    babelTypes.identifier("newDom"),
-                    babelTypes.identifier("map"),
-                  ),
-                  [
-                    babelTypes.arrowFunctionExpression([
-                      babelTypes.identifier("n"),
-                    ], babelTypes.conditionalExpression(
-                      babelTypes.binaryExpression("===", babelTypes.unaryExpression("typeof", babelTypes.identifier("n")), babelTypes.stringLiteral("string")),
-                      babelTypes.callExpression(
-                        babelTypes.memberExpression(
-                          babelTypes.identifier("document"),
-                          babelTypes.identifier("createTextNode"),
-                        ),
-                        [babelTypes.identifier("n")],
-                      ),
-                      babelTypes.identifier("n"),
-                    )),
-                  ],
-                ),
-                babelTypes.arrayExpression([
-                  babelTypes.conditionalExpression(
-                    babelTypes.binaryExpression("===", babelTypes.unaryExpression("typeof", babelTypes.identifier("newDom")), babelTypes.stringLiteral("string")),
-                    babelTypes.callExpression(
-                      babelTypes.memberExpression(
-                        babelTypes.identifier("document"),
-                        babelTypes.identifier("createTextNode"),
-                      ),
-                      [babelTypes.identifier("newDom")],
-                    ),
-                    babelTypes.identifier("newDom"),
-                  ),
-                ]),
-              ),
-            ),
-          ]),
-          babelTypes.variableDeclaration("const", [
-            babelTypes.variableDeclarator(
-              babelTypes.identifier("current"),
-              babelTypes.callExpression(
-                babelTypes.memberExpression(
-                  babelTypes.callExpression(
-                    babelTypes.memberExpression(babelTypes.identifier("Array"), babelTypes.identifier("from")),
-                    [babelTypes.memberExpression(babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("shadowRoot")), babelTypes.identifier("childNodes"))],
-                  ),
-                  babelTypes.identifier("slice"),
-                ),
-                [],
-              ),
-            ),
-          ]),
-          babelTypes.ifStatement(
-            babelTypes.binaryExpression("!==", babelTypes.memberExpression(babelTypes.identifier("current"), babelTypes.identifier("length")), babelTypes.memberExpression(babelTypes.identifier("nodes"), babelTypes.identifier("length"))),
-            babelTypes.blockStatement([
-              babelTypes.expressionStatement(
-                babelTypes.callExpression(
-                  babelTypes.memberExpression(babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("shadowRoot")), babelTypes.identifier("replaceChildren")),
-                  [babelTypes.spreadElement(babelTypes.identifier("nodes"))],
-                ),
-              ),
-              babelTypes.returnStatement(),
-            ]),
-          ),
-          babelTypes.forStatement(
-            babelTypes.variableDeclaration("let", [babelTypes.variableDeclarator(babelTypes.identifier("i"), babelTypes.numericLiteral(0))]),
-            babelTypes.binaryExpression("<", babelTypes.identifier("i"), babelTypes.memberExpression(babelTypes.identifier("nodes"), babelTypes.identifier("length"))),
-            babelTypes.updateExpression("++", babelTypes.identifier("i")),
-            babelTypes.blockStatement([
-              babelTypes.ifStatement(
-                babelTypes.unaryExpression("!", babelTypes.callExpression(
-                  babelTypes.memberExpression(babelTypes.memberExpression(babelTypes.identifier("current"), babelTypes.identifier("i"), true), babelTypes.identifier("isEqualNode")),
-                  [babelTypes.memberExpression(babelTypes.identifier("nodes"), babelTypes.identifier("i"), true)],
-                )),
-                babelTypes.blockStatement([
-                  babelTypes.expressionStatement(
-                    babelTypes.callExpression(
-                      babelTypes.memberExpression(babelTypes.memberExpression(babelTypes.thisExpression(), babelTypes.identifier("shadowRoot")), babelTypes.identifier("replaceChild")),
-                      [
-                        babelTypes.memberExpression(babelTypes.identifier("nodes"), babelTypes.identifier("i"), true),
-                        babelTypes.memberExpression(babelTypes.identifier("current"), babelTypes.identifier("i"), true),
-                      ],
-                    ),
-                  ),
-                ]),
-              ),
-            ]),
-          ),
-        ]),
+        patchDomBody,
       ),
-      ...uniqueEventBindings.map((binding: any) =>
-        babelTypes.classProperty(
-          babelTypes.identifier(`_on${capitalize(binding.handler)}`),
-          handlerMap[binding.handler]
-            ? babelTypes.arrowFunctionExpression(
-                handlerMap[binding.handler].params,
-                replaceSignalCalls(handlerMap[binding.handler].body, signals),
-              )
-            : babelTypes.arrowFunctionExpression([], babelTypes.blockStatement([])),
-          undefined,
-          undefined,
-          false,
-        ),
+      babelTypes.classMethod(
+        "method",
+        babelTypes.identifier("_renderHtml"),
+        [],
+        renderMethodBody,
       ),
-      _renderHtmlBody
-        ? babelTypes.classMethod(
-            "method",
-            babelTypes.identifier("_renderHtml"),
-            [],
-            _renderHtmlBody,
-          )
-        : babelTypes.classMethod(
-            "method",
-            babelTypes.identifier("_renderHtml"),
-            [],
-            babelTypes.blockStatement([
-              babelTypes.returnStatement(babelTypes.stringLiteral("<div>JSX変換未実装</div>")),
-            ]),
-          ),
     ]);
     return babelTypes.classDeclaration(
       babelTypes.identifier(className),

@@ -1,28 +1,33 @@
 import { HTMLElementEvent } from "@katu/transpiler/JSX";
-import { signal } from "@katu/reactivity";
+import {  effect, signal } from "@katu/reactivity";
 
 import "./main.css"
 
-const App = defineCustomElement<{name: string}>(({ props, constructor, render }) => {
+const App = defineCustomElement<{name: string}>(({ props, render }) => {
   const [time, setTime] = signal(0);
   const [clickCount, setClickCount] = signal(0);
   const [text, setText] = signal("");
 
-  const handleClick = () => { setClickCount((count) => count + 1); };
+  const handleClick = () => {
+    console.log("clickCount", clickCount());
+    setClickCount((count) => count + 1);
+  };
   const handleClick2 = () => { setClickCount((count) => count + 2); };
   const handleClick3 = () => { setClickCount((count) => count + 3); };
   const handleChange = (e: HTMLElementEvent<HTMLInputElement>) => { setText(e.target.value); };
 
   const a = "katu"
 
-  constructor(() => {
-    setInterval(() => { setTime((t) => t + 1); }, 1000);
-    setClickCount(0);
-  });
+  setInterval(() => { setTime((t) => t + 1); }, 1000);
+  setClickCount(0);
 
   render(() => {
     if (!props.name) {
       return <h1>Loading...</h1>;
+    }
+
+    if (clickCount() < 10) {
+      return <button onClick={handleClick}>Click : {clickCount()}</button>
     }
 
     return (
