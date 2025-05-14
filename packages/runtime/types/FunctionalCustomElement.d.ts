@@ -14,9 +14,7 @@
  * @returns CustomElement class
  */
 
-import type { effect } from "@katu/reactivity";
-import type { VNode } from "../src/functionalCustomElement/vNode";
-import type { KatuJSXElement } from "./JSX.namespace";
+import type { KatuNode } from "./JSX.namespace";
 
 export type FunctionalCustomElementOptions<Props extends string[]> = {
   /**
@@ -29,7 +27,16 @@ export type FunctionalCustomElementOptions<Props extends string[]> = {
    * Whether to associate as a form element or not
    */
   isFormAssociated?: boolean;
+  /**
+   * 属性名リスト
+   * List of attribute names
+   */
   propsNames?: Props;
+  /**
+   * ShadowRoot用のスタイル（CSSコード）
+   * Style for ShadowRoot (CSS code)
+   */
+  style?: string;
 } & ({
   shadowRoot: true;
   /**
@@ -39,6 +46,9 @@ export type FunctionalCustomElementOptions<Props extends string[]> = {
    */
   shadowRootMode?: "open" | "closed";
 } | {
+  /**
+   * @deprecated 未サポート
+   */
   shadowRoot?: false;
   shadowRootMode?: never;
 });
@@ -47,7 +57,13 @@ export type FunctionalCustomElement<Props extends string[]> = (
   callback: (params: {
     reactivity: {
       signal: typeof import("@katu/reactivity").signal;
+      computed: typeof import("@katu/reactivity").computed;
       effect: typeof import("@katu/reactivity").effect;
+      startBatch: typeof import("@katu/reactivity").startBatch;
+      endBatch: typeof import("@katu/reactivity").endBatch;
+      Signal: typeof import("@katu/reactivity").Signal;
+      Computed: typeof import("@katu/reactivity").Computed;
+      Effect: typeof import("@katu/reactivity").Effect;
     };
     /**
      * propsNamesで指定した属性名の値を返すリアクティブなオブジェクト
@@ -78,20 +94,9 @@ export type FunctionalCustomElement<Props extends string[]> = (
      * レンダリング関数の登録
      * Register render function
      */
-    render: (cb: () => KatuJSXElement) => void;
+    render: (cb: () => KatuNode) => void;
   }) => void,
   options: FunctionalCustomElementOptions<Props>
 ) => {
-  new (): HTMLElement & {
-    /**
-     * 仮想DOMノードのキャッシュ
-     * Cache for virtual DOM node
-     */
-    _vnode: VNode | string | null;
-    /**
-     * connectedCallbackのハンドラ
-     * Handler for connectedCallback
-     */
-    handleConnected: () => void;
-  };
+  new (): HTMLElement;
 };

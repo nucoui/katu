@@ -38,6 +38,7 @@ describe("functionalCustomElement", () => {
     if (!customElements.get(tagName))
       customElements.define(tagName, CustomElement);
     const el = document.createElement(tagName) as InstanceType<typeof CustomElement>;
+    document.body.appendChild(el); // connectedCallbackを発火させる
     expect(el.shadowRoot).not.toBeNull();
   });
 

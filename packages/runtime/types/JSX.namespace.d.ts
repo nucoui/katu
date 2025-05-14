@@ -127,7 +127,14 @@ export interface SpanKatuIntrinsicElement extends KatuIntrinsicElements {}
  * button要素の属性型
  * Attributes for button element
  */
-export interface ButtonKatuIntrinsicElement extends KatuIntrinsicElements {}
+export interface ButtonKatuIntrinsicElement extends KatuIntrinsicElements {
+  type?: string;
+  disabled?: boolean;
+  autofocus?: boolean;
+  form?: string;
+  name?: string;
+  value?: string | number;
+}
 /**
  * a要素の属性型
  * Attributes for a element
@@ -304,6 +311,19 @@ export interface TextKatuIntrinsicElement extends KatuIntrinsicElements {
   stroke?: string;
 }
 
+/**
+ * slot要素の属性型
+ * Attributes for slot element
+ */
+export interface SlotKatuIntrinsicElement extends KatuIntrinsicElements {
+  name?: string;
+  /**
+   * @deprecated
+   * @description Deprecated: Use `name` attribute instead.
+   */
+  slot?: string;
+}
+
 declare global {
   namespace JSX {
     interface IntrinsicElements {
@@ -355,6 +375,7 @@ declare global {
       polygon: PolygonKatuIntrinsicElement;
       ellipse: EllipseKatuIntrinsicElement;
       text: TextKatuIntrinsicElement;
+      slot: SlotKatuIntrinsicElement;
     }
 
     type Element = KatuJSXElement;

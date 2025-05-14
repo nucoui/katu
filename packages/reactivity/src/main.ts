@@ -22,17 +22,17 @@ const {
 let activeSub: Subscriber | undefined;
 let batchDepth = 0;
 
-export function startBatch(): void {
+function startBatch(): void {
   ++batchDepth;
 }
 
-export function endBatch(): void {
+function endBatch(): void {
   if (!--batchDepth) {
     processEffectNotifications();
   }
 }
 
-export function signal<T>(initialValue: T): [() => T, (value: T | ((prev: T) => T)) => void] {
+function signal<T>(initialValue: T): [() => T, (value: T | ((prev: T) => T)) => void] {
   let value = initialValue;
   const dep = {
     subs: undefined,
@@ -60,7 +60,7 @@ export function signal<T>(initialValue: T): [() => T, (value: T | ((prev: T) => 
   return [getter, setter];
 }
 
-export class Signal<T = any> implements Dependency {
+class Signal<T = any> implements Dependency {
   // Dependency fields
   subs: Link | undefined = undefined;
   subsTail: Link | undefined = undefined;
@@ -90,12 +90,12 @@ export class Signal<T = any> implements Dependency {
   }
 }
 
-export function computed<T>(getter: () => T): () => T {
+function computed<T>(getter: () => T): () => T {
   const computedInstance = new Computed<T>(getter);
   return () => computedInstance.get();
 }
 
-export class Computed<T = any> implements Subscriber, Dependency {
+class Computed<T = any> implements Subscriber, Dependency {
   currentValue: T | undefined = undefined;
 
   // Dependency fields
@@ -143,13 +143,13 @@ export class Computed<T = any> implements Subscriber, Dependency {
   }
 }
 
-export function effect<T>(fn: () => T): Effect<T> {
+function effect<T>(fn: () => T): Effect<T> {
   const e = new Effect(fn);
   e.run();
   return e;
 }
 
-export class Effect<T = any> implements Subscriber {
+class Effect<T = any> implements Subscriber {
   // Subscriber fields
   deps: Link | undefined = undefined;
   depsTail: Link | undefined = undefined;
@@ -188,3 +188,14 @@ export class Effect<T = any> implements Subscriber {
     endTracking(this);
   }
 }
+
+export {
+  computed,
+  Computed,
+  effect,
+  Effect,
+  endBatch,
+  signal,
+  Signal,
+  startBatch,
+};
