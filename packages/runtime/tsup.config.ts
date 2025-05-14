@@ -2,6 +2,8 @@ import { defineConfig } from "tsup";
 
 export default defineConfig({
   entry: [
+    "src/jsx-runtime.ts",
+    "src/jsx-dev-runtime.ts",
     "src/main.ts",
   ],
   format: ["esm", "cjs"],

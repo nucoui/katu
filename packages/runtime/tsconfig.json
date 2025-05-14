@@ -9,7 +9,7 @@
       "@/*": ["src/*"],
       "@root/*": ["./*"]
     },
-    "types": [],
+    "types": ["./types/JSX.namespace.d.ts"],
     "strict": true,
     "outDir": "./dist",
     "esModuleInterop": true,

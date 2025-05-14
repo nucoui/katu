@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "jsx": "preserve",
+    "jsx": "react-jsx",
+    "jsxImportSource": "@katu/runtime",
     "useDefineForClassFields": true,
     "module": "ESNext",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
