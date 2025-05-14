@@ -6,9 +6,38 @@ import type { KatuJSXElement } from "@root/types/JSX.namespace";
  */
 type VNode = {
   tag: string;
-  props: Record<string, string>;
+  /**
+   * 属性・イベントハンドラを含むprops
+   * Props including attributes and event handlers
+   */
+  props: Record<string, any>;
   children: Array<VNode | string>;
+  /**
+   * Fragmentノードかどうか
+   * Whether this node is a Fragment
+   */
+  isFragment?: boolean;
 };
+
+/**
+ * childrenを常に配列として正規化し、KatuJSXElementはVNodeに変換する
+ * Utility to normalize children to an array of VNode or string
+ */
+function normalizeChildren(input: any): Array<VNode | string> {
+  if (input == null)
+    return [];
+  if (Array.isArray(input)) {
+    return input.flatMap(normalizeChildren);
+  }
+  if (typeof input === "string" || typeof input === "number") {
+    return [String(input)];
+  }
+  // KatuJSXElementの場合はVNodeに変換
+  if (typeof input === "object" && "tag" in input && "props" in input) {
+    return [nodeToVNode(input)];
+  }
+  return [];
+}
 
 /**
  * NodeまたはKatuJSXElementからVNodeへ変換する関数
@@ -20,12 +49,24 @@ function nodeToVNode(node: Node): VNode | string;
 function nodeToVNode(node: KatuJSXElement): VNode | string;
 function nodeToVNode(node: any): VNode | string {
   // KatuJSXElementの場合
-  if (node && typeof node === "object" && "tag" in node && "props" in node && "children" in node) {
-    // KatuJSXElementの型定義に合わせて変換
+  if (node && typeof node === "object" && "tag" in node && "props" in node) {
+    // childrenをpropsから除外
+    const { children: _children, ...restProps } = node.props ?? {};
+    // Fragmentの場合はchildrenを平坦化
+    if (node.tag === "__fragment__") {
+      const children = normalizeChildren(node.props.children);
+      return {
+        tag: "__fragment__",
+        props: {},
+        children,
+        isFragment: true,
+      };
+    }
+    // 通常ノード
     return {
       tag: node.tag,
-      props: node.props ?? {},
-      children: (node.children ?? []).map(nodeToVNode),
+      props: restProps,
+      children: normalizeChildren(node.props.children),
     };
   }
   // Nodeの場合
@@ -40,7 +81,7 @@ function nodeToVNode(node: any): VNode | string {
         props[attr.name] = attr.value;
       }
       const children = Array.from(node.childNodes).map(nodeToVNode);
-      return { tag: el.tagName.toLowerCase(), props, children };
+      return { tag: el.tagName, props, children };
     }
   }
   return "";
@@ -54,9 +95,25 @@ function createNode(vnode: VNode | string): Node {
   if (typeof vnode === "string") {
     return document.createTextNode(vnode);
   }
+  if (vnode.isFragment) {
+    const fragment = document.createDocumentFragment();
+    vnode.children.forEach((child) => {
+      fragment.appendChild(createNode(child));
+    });
+    return fragment;
+  }
   const el = document.createElement(vnode.tag);
   for (const [k, v] of Object.entries(vnode.props)) {
-    el.setAttribute(k, v);
+    if (/^on[A-Z]/.test(k) && typeof v === "function") {
+      const event = k.slice(2).toLowerCase();
+      el.addEventListener(event, v);
+    }
+    else if (v === true) {
+      el.setAttribute(k, "");
+    }
+    else if (v != null && typeof v !== "function") {
+      el.setAttribute(k, String(v));
+    }
   }
   vnode.children.forEach((child) => {
     el.appendChild(createNode(child));
@@ -92,7 +149,12 @@ function patch(parent: Node, oldVNode: VNode | string | null, newVNode: VNode | 
   // 属性の差分反映
   const el = child as Element;
   for (const [k, v] of Object.entries(newVNode.props)) {
-    if (el.getAttribute(k) !== v) {
+    if (/^on[A-Z]/.test(k) && typeof v === "function") {
+      // onClick等はaddEventListenerでバインド
+      const event = k.slice(2).toLowerCase();
+      el.addEventListener(event, v);
+    }
+    else if (el.getAttribute(k) !== v && typeof v !== "function") {
       el.setAttribute(k, v);
     }
   }
@@ -102,9 +164,11 @@ function patch(parent: Node, oldVNode: VNode | string | null, newVNode: VNode | 
     }
   }
   // 子要素の差分反映
-  const max = Math.max(oldVNode.children.length, newVNode.children.length);
+  const oldChildren = Array.isArray(oldVNode.children) ? oldVNode.children : [];
+  const newChildren = Array.isArray(newVNode.children) ? newVNode.children : [];
+  const max = Math.max(oldChildren.length, newChildren.length);
   for (let i = 0; i < max; i++) {
-    patch(child, oldVNode.children[i], newVNode.children[i], i);
+    patch(child, oldChildren[i], newChildren[i], i);
   }
 }
 

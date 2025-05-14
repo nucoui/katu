@@ -139,8 +139,9 @@
 
     "cSpell.words": [
       "antfu",
+      "katu",
       "Nuco",
-      "katu"
+      "vnode"
     ],
 
     "terminal.integrated.cwd": "${workspaceFolder}",

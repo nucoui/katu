@@ -1,3 +1,5 @@
+import type { KatuJSXElement } from "../types/JSX.namespace";
+
 /**
  * JSX.Fragment用のダミーシンボル
  * @description JSXのFragmentを表すためのダミー。jsx関数内で判定用。
@@ -14,7 +16,7 @@ export const Fragment = Symbol.for("katu.fragment");
  *
  * @example jsx("div", { id: "foo", children: "bar" }) // => '<div id="foo">bar</div>'
  */
-export function jsx(tag: string | typeof Fragment, props: Record<string, any>): string {
+export function jsxString(tag: string | typeof Fragment, props: Record<string, any>): string {
   if (tag === Fragment) {
     // Fragmentは子要素をそのまま連結
     const c = props.children;
@@ -49,6 +51,25 @@ export function jsx(tag: string | typeof Fragment, props: Record<string, any>): 
  * クライアント用: DOM要素を生成し、onXXX属性をaddEventListenerでバインドする
  * @param tag HTMLタグ名またはFragment
  * @param props 属性＋children
+ * @returns KatuJSXElement
+ *
+ * onClick, onChange等のイベントハンドラはaddEventListenerでバインドされる
+ * SSR用途ではなく、クライアントでの動的生成用
+ * FragmentはDOM上に存在しない: 子要素を平坦化して返す
+ */
+export function jsx(tag: string | typeof Fragment, props: Record<string, any>): KatuJSXElement {
+  // FragmentはKatuJSXElementのtag型(string)に変換
+  const tagValue = tag === Fragment ? "__fragment__" : tag;
+  return {
+    tag: tagValue,
+    props: { ...props },
+  };
+}
+
+/**
+ * クライアント用: DOM要素を生成し、onXXX属性をaddEventListenerでバインドする
+ * @param tag HTMLタグ名またはFragment
+ * @param props 属性＋children
  * @returns HTMLElement | Node[]
  *
  * onClick, onChange等のイベントハンドラはaddEventListenerでバインドされる
@@ -56,50 +77,39 @@ export function jsx(tag: string | typeof Fragment, props: Record<string, any>): 
  * FragmentはDOM上に存在しない: 子要素を平坦化して返す
  */
 export function jsxDom(tag: string | typeof Fragment, props: Record<string, any>): HTMLElement | Node[] {
-  // FragmentはDOM上に存在しない: 子要素を平坦化して返す
   if (tag === Fragment) {
     const c = props.children;
-    if (Array.isArray(c))
-      return c;
-    if (c == null)
-      return [];
+    if (Array.isArray(c)) return c;
+    if (c == null) return [];
     return [c];
   }
   const el = document.createElement(tag as string);
   for (const key in props) {
-    if (key === "children" || props[key] == null)
-      continue;
-    // onXXX属性はイベントとしてバインド
+    if (key === "children" || props[key] == null) continue;
     if (/^on[A-Z]/.test(key) && typeof props[key] === "function") {
       const event = key.slice(2).toLowerCase();
       el.addEventListener(event, props[key]);
+      (el as any)[key.toLowerCase()] = props[key]; // devtool用
       continue;
     }
     if (props[key] === true) {
       el.setAttribute(key, "");
-    }
-    else {
+    } else {
       el.setAttribute(key, String(props[key]));
     }
   }
   const children = props.children;
   if (Array.isArray(children)) {
     children.forEach((child) => {
-      if (typeof child === "string") {
-        el.appendChild(document.createTextNode(child));
-      }
-      if (typeof child === "number") {
+      if (typeof child === "string" || typeof child === "number") {
         el.appendChild(document.createTextNode(String(child)));
-      }
-      else if (child instanceof Node) {
+      } else if (child instanceof Node) {
         el.appendChild(child);
       }
     });
-  }
-  else if (typeof children === "string") {
-    el.appendChild(document.createTextNode(children));
-  }
-  else if (children instanceof Node) {
+  } else if (typeof children === "string" || typeof children === "number") {
+    el.appendChild(document.createTextNode(String(children)));
+  } else if (children instanceof Node) {
     el.appendChild(children);
   }
   return el;

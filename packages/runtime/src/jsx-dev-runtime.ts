@@ -1,3 +1,4 @@
-import { jsxDom } from "@/jsx-runtime";
+import { jsx } from "@/jsx-runtime";
 
-export const jsxDEV = jsxDom;
+export const jsxDEV = jsx;
+export { Fragment } from "@/jsx-runtime";

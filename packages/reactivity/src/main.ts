@@ -124,6 +124,7 @@ export class Computed<T = any> implements Subscriber, Dependency {
 
   update(): boolean {
     const prevSub = activeSub;
+    // eslint-disable-next-line ts/no-this-alias
     activeSub = this;
     startTracking(this);
     try {
@@ -170,6 +171,7 @@ export class Effect<T = any> implements Subscriber {
 
   run(): T {
     const prevSub = activeSub;
+    // eslint-disable-next-line ts/no-this-alias
     activeSub = this;
     startTracking(this);
     try {

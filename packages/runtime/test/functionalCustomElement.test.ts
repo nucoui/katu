@@ -15,31 +15,58 @@ const DummyJSX = (): import("../types/JSX.namespace").KatuJSXElement => ({
 
 describe("functionalCustomElement", () => {
   it("customElementクラスを生成できる", () => {
+    const tagName = "x-test-el1";
     const CustomElement = functionalCustomElement(({ onConnected, render }) => {
       onConnected(() => {
         /* connected callback */
       });
       render(() => DummyJSX());
     }, {});
-    const el = new CustomElement();
+    if (!customElements.get(tagName))
+      customElements.define(tagName, CustomElement);
+    const el = document.createElement(tagName) as InstanceType<typeof CustomElement>;
     expect(el).toBeInstanceOf(HTMLElement);
     expect(typeof el.handleConnected).toBe("function");
     expect("_vnode" in el).toBe(true);
   });
 
   it("shadowRootオプションが有効でshadowRootが存在する", () => {
+    const tagName = "x-test-el2";
     const CustomElement = functionalCustomElement(({ render }) => {
       render(() => DummyJSX());
     }, { shadowRoot: true });
-    const el = new CustomElement();
+    if (!customElements.get(tagName))
+      customElements.define(tagName, CustomElement);
+    const el = document.createElement(tagName) as InstanceType<typeof CustomElement>;
     expect(el.shadowRoot).not.toBeNull();
   });
 
   it("shadowRootオプションが無効でshadowRootが存在しない", () => {
+    const tagName = "x-test-el3";
     const CustomElement = functionalCustomElement(({ render }) => {
       render(() => DummyJSX());
     }, { shadowRoot: false });
-    const el = new CustomElement();
+    if (!customElements.get(tagName))
+      customElements.define(tagName, CustomElement);
+    const el = document.createElement(tagName) as InstanceType<typeof CustomElement>;
     expect(el.shadowRoot).toBeNull();
+  });
+
+  it("propsに全ての属性が含まれる", () => {
+    const tagName = "x-test-el4";
+    const CustomElement = functionalCustomElement(() => {
+      // テスト用にpropsを返すだけのダミー
+      return {};
+    }, {});
+    if (!customElements.get(tagName))
+      customElements.define(tagName, CustomElement);
+    const el = document.createElement(tagName) as InstanceType<typeof CustomElement>;
+    el.setAttribute("foo", "bar");
+    el.setAttribute("baz", "qux");
+    // propsが属性を正しく含むか確認
+    const props = Object.fromEntries(
+      Array.from(el.getAttributeNames()).map(attr => [attr, el.getAttribute(attr)]),
+    );
+    expect(props).toEqual({ foo: "bar", baz: "qux" });
   });
 });
