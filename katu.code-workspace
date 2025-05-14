@@ -37,10 +37,6 @@
       "path": "packages/runtime"
     },
     {
-      "name": "📦 transpiler",
-      "path": "packages/transpiler"
-    },
-    {
       "name": "========= 🎮 =",
       "path": "🎮"
     },
