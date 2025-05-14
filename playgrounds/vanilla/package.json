@@ -12,7 +12,7 @@
     "@katu/reactivity": "workspace:*",
     "@katu/runtime": "workspace:*",
     "typescript": "~5.7.2",
-    "vite": "^6.2.0"
+    "vite": "catalog:"
   },
   "dependencies": {
     "consola": "^3.4.2"

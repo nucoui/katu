@@ -6,5 +6,5 @@ packages:
 
 catalog:
   "typescript": "5.8.3" # https://www.npmjs.com/package/typescript
-  "vite": "6.2.6" # https://www.npmjs.com/package/vite
+  "vite": "6.2.7" # https://www.npmjs.com/package/vite
   "eslint": "9.24.0" # https://www.npmjs.com/package/eslint
