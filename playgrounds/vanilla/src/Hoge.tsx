@@ -1,14 +1,16 @@
 import { functionalCustomElement } from "@katu/runtime";
 
-export const Hoge = functionalCustomElement<["foo", "bar"]>(({
+export const Hoge = functionalCustomElement(({
   reactivity: { signal, effect },
-  props,
+  defineProps,
   onConnected,
   onDisconnected,
   onAttributeChanged,
   render
 }) => {
   console.log("constructor");
+
+  const props = defineProps(["foo", "bar"]);
 
   const [time, setTime] = signal(0);
   const [name, setName] = signal("");
@@ -91,7 +93,6 @@ export const Hoge = functionalCustomElement<["foo", "bar"]>(({
 }, {
   shadowRoot: true,
   shadowRootMode: "open",
-  propsNames: ["foo", "bar"],
   style: `
     :host {
       display: block;

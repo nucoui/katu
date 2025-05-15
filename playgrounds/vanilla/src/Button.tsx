@@ -1,20 +1,43 @@
 import { functionalCustomElement } from "@katu/runtime";
 
-export const Button = functionalCustomElement<["disabled"]>(({
+  const convertToBoolean = (value: string | null) => {
+    if (value === null) {
+      return false;
+    }
+    if (value === "") {
+      return true;
+    }
+    if (value === "true") {
+      return true;
+    }
+    if (value === "false") {
+      return false;
+    }
+    return Boolean(value);
+  };
+
+export const Button = functionalCustomElement(({
   reactivity: { signal, effect, computed },
-  props,
+  defineProps,
+  defineEmits,
   onConnected,
   onDisconnected,
   onAttributeChanged,
   render
 }) => {
-  // effect(() => {
-  //   console.log("disabled", props().disabled);
-  // });
+  const props = defineProps(["disabled"]);
+  const emits = defineEmits(["on-click", "on-disabled"]);
+
+  const [clickCount, setClickCount] = signal(0);
 
   const disabled = computed(() => {
-    return props().disabled === "";
+    return convertToBoolean(props().disabled);
   });
+
+  const handleClick = () => {
+    setClickCount(c => c + 1);
+    emits("on-click", { count: clickCount() });
+  };
 
   render(() => {
     return (
@@ -24,16 +47,12 @@ export const Button = functionalCustomElement<["disabled"]>(({
       //   </button>
       //   <p>Disabled: {disabled}</p>
       // </>
-      <button disabled={disabled()}>
+      <button disabled={disabled()} onClick={handleClick}>
         {disabled() ? "Disabled" : <slot />}
       </button>
     );
   });
-}
-, {
-  shadowRoot: true,
-  shadowRootMode: "open",
-  propsNames: ["disabled"],
+}, {
   style: `
     button {
       background-color: #007bff;
@@ -55,6 +74,9 @@ customElements.define("hoge-button", Button);
 
 const hogeButton = document.createElement("hoge-button") as InstanceType<typeof Button>;
 hogeButton.innerHTML = "Hoge Button";
+hogeButton.addEventListener("on-click", (e) => {
+  console.log("Hoge Button clicked", e.detail.count);
+})
 setInterval(() => {
   if (hogeButton.getAttribute("disabled") === "") {
     hogeButton.removeAttribute("disabled");

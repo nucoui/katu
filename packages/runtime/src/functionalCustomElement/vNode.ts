@@ -6,9 +6,12 @@ export type VNode = {
 };
 
 function normalizeChildren(input: any): Array<VNode | string> {
-  if (input == null) return [];
-  if (Array.isArray(input)) return input.flatMap(normalizeChildren);
-  if (typeof input === "string" || typeof input === "number") return [String(input)];
+  if (input == null)
+    return [];
+  if (Array.isArray(input))
+    return input.flatMap(normalizeChildren);
+  if (typeof input === "string" || typeof input === "number")
+    return [String(input)];
   if (typeof input === "object" && input !== null && "tag" in input && "props" in input && typeof input.tag === "string") {
     return [createVNode(input.tag, input.props)];
   }
@@ -39,24 +42,28 @@ export function createVNode(tag: string, props: Record<string, any>): VNode {
 export function mount(vnode: VNode): Node {
   const el = document.createElement(vnode.tag);
   for (const [k, v] of Object.entries(vnode.props)) {
-    if (v == null) continue;
+    if (v == null)
+      continue;
     if (/^on[A-Z]/.test(k) && typeof v === "function") {
       // onClickなどはイベントリスナーとして登録
       const event = k.slice(2).toLowerCase();
       el.addEventListener(event, v as EventListenerOrEventListenerObject);
-    } else if (typeof v === "boolean") {
+    }
+    else if (typeof v === "boolean") {
       if (v) {
         el.setAttribute(k, "");
-      } else {
+      }
+      else {
         el.removeAttribute(k);
       }
-    } else {
+    }
+    else {
       el.setAttribute(k, String(v));
     }
   }
   for (const child of Array.isArray(vnode.children) ? vnode.children : []) {
     el.appendChild(
-      typeof child === "string" ? document.createTextNode(child) : mount(child)
+      typeof child === "string" ? document.createTextNode(child) : mount(child),
     );
   }
   return el;
@@ -74,7 +81,7 @@ export function mount(vnode: VNode): Node {
  * English: Compares vNode diffs and updates only necessary DOM parts. Boolean props are set as empty string for true, removed for false.
  */
 export function patch(parent: Node, oldVNode: VNode, newVNode: VNode, index = 0) {
-  const el = parent.childNodes[index];
+  const el = parent.childNodes[index] as Element;
   if (!el || oldVNode.tag !== newVNode.tag) {
     parent.replaceChild(mount(newVNode), el);
     return;
@@ -83,50 +90,58 @@ export function patch(parent: Node, oldVNode: VNode, newVNode: VNode, index = 0)
     if (oldVNode.props[k] !== v) {
       if (typeof v === "boolean") {
         if (v) {
-          (el as Element).setAttribute(k, "");
-        } else {
-          (el as Element).removeAttribute(k);
+          el.setAttribute(k, "");
         }
-      } else {
-        (el as Element).setAttribute(k, String(v));
+        else {
+          el.removeAttribute(k);
+        }
+      }
+      else {
+        el.setAttribute(k, String(v));
       }
     }
   }
   for (const k of Object.keys(oldVNode.props)) {
     if (!(k in newVNode.props)) {
-      (el as Element).removeAttribute(k);
+      el.removeAttribute(k);
     }
   }
+
   const oldChildren = oldVNode.children;
   const newChildren = newVNode.children;
   const max = Math.max(oldChildren.length, newChildren.length);
+
   for (let i = 0; i < max; i++) {
     if (i >= oldChildren.length) {
       el.appendChild(
         typeof newChildren[i] === "string"
           ? document.createTextNode(newChildren[i] as string)
-          : mount(newChildren[i] as VNode)
+          : mount(newChildren[i] as VNode),
       );
-    } else if (i >= newChildren.length) {
+    }
+    else if (i >= newChildren.length) {
       el.removeChild(el.childNodes[i]);
-    } else if (
-      typeof oldChildren[i] === "string" &&
-      typeof newChildren[i] === "string"
+    }
+    else if (
+      typeof oldChildren[i] === "string"
+      && typeof newChildren[i] === "string"
     ) {
       if (oldChildren[i] !== newChildren[i]) {
         el.childNodes[i].textContent = newChildren[i] as string;
       }
-    } else if (
-      typeof oldChildren[i] === "object" &&
-      typeof newChildren[i] === "object"
+    }
+    else if (
+      typeof oldChildren[i] === "object"
+      && typeof newChildren[i] === "object"
     ) {
       patch(el, oldChildren[i] as VNode, newChildren[i] as VNode, i);
-    } else {
+    }
+    else {
       el.replaceChild(
         typeof newChildren[i] === "string"
           ? document.createTextNode(newChildren[i] as string)
           : mount(newChildren[i] as VNode),
-        el.childNodes[i]
+        el.childNodes[i],
       );
     }
   }

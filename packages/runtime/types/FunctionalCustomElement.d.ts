@@ -16,7 +16,7 @@
 
 import type { KatuNode } from "./JSX.namespace";
 
-export type FunctionalCustomElementOptions<Props extends string[]> = {
+export type FunctionalCustomElementOptions = {
   /**
    * ShadowRootを有効にするかどうか
    * Enable ShadowRoot or not
@@ -27,11 +27,6 @@ export type FunctionalCustomElementOptions<Props extends string[]> = {
    * Whether to associate as a form element or not
    */
   isFormAssociated?: boolean;
-  /**
-   * 属性名リスト
-   * List of attribute names
-   */
-  propsNames?: Props;
   /**
    * ShadowRoot用のスタイル（CSSコード）
    * Style for ShadowRoot (CSS code)
@@ -53,7 +48,7 @@ export type FunctionalCustomElementOptions<Props extends string[]> = {
   shadowRootMode?: never;
 });
 
-export type FunctionalCustomElement<Props extends string[]> = (
+export type FunctionalCustomElement = (
   callback: (params: {
     reactivity: {
       signal: typeof import("@katu/reactivity").signal;
@@ -66,10 +61,23 @@ export type FunctionalCustomElement<Props extends string[]> = (
       Effect: typeof import("@katu/reactivity").Effect;
     };
     /**
-     * propsNamesで指定した属性名の値を返すリアクティブなオブジェクト
-     * Returns a reactive object of attribute values specified by propsNames
+     * Propsの定義を行う関数
+     * Define the props
+     *
+     * @example
+     *   const props = defineProps(["foo", "bar"])
+     *   // props(): { foo: string | null, bar: string | null }
      */
-    props: () => Record<Props[number], string | null>;
+    defineProps: <const T extends readonly string[] = readonly string[]>(props: T) => () => { [K in T[number]]: string | null };
+    /**
+     * Emitsの定義を行う関数
+     * Define the emits
+     *
+     * @example
+     *   const emits = defineEmits(["click", "change"])
+     *   emits("click", { foo: "bar" }) // CustomEventで発火
+     */
+    defineEmits: <const U extends readonly `on-${string}`[] = readonly `on-${string}`[]>(events: U) => (type: U[number], detail?: any, options?: EventInit) => void;
     /**
      * connectedCallback時のフック登録
      * Register hook for connectedCallback
@@ -96,7 +104,7 @@ export type FunctionalCustomElement<Props extends string[]> = (
      */
     render: (cb: () => KatuNode) => void;
   }) => void,
-  options: FunctionalCustomElementOptions<Props>
+  options: FunctionalCustomElementOptions
 ) => {
   new (): HTMLElement;
 };

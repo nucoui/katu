@@ -8,25 +8,37 @@ import { computed, Computed, effect, Effect, endBatch, signal, Signal, startBatc
  * FunctionalCustomElementの型引数を関数使用時に指定できるようにします。
  * Allow generics to be specified at function usage.
  */
-const functionalCustomElement = <Props extends string[] = string[]>(
-  callback: Parameters<FunctionalCustomElement<Props>>[0],
-  options: Parameters<FunctionalCustomElement<Props>>[1],
+const functionalCustomElement: FunctionalCustomElement = (
+  callback,
+  options,
 ) => {
   const {
     shadowRoot = true,
     shadowRootMode,
     isFormAssociated,
-    propsNames,
-    style,
+    // style,
   } = options || {};
 
   return class CustomElement extends HTMLElement {
     static formAssociated = isFormAssociated ?? false;
-    static observedAttributes = propsNames ?? [];
+    /**
+     * MutationObserverインスタンス
+     * MutationObserver instance for attribute changes
+     *
+     * TypeScriptの制約により、エクスポートされるクラスのprivate/protectedプロパティは型エラーとなるためpublicにします。
+     */
+    _attributeObserver: MutationObserver;
+    /**
+     * 監視対象属性リスト
+     * List of observed attributes
+     */
+    observedAttributes: readonly string[] = [];
 
-    props = signal(Object.fromEntries(
-      (propsNames ?? []).map(attr => [attr, this.getAttribute(attr)]),
-    ));
+    /**
+     * 属性値を保持するリアクティブなprops
+     * Reactive props holding attribute values
+     */
+    props = signal<Record<string, string | null>>({});
 
     _vnode: VNode | null = null;
 
@@ -59,7 +71,44 @@ const functionalCustomElement = <Props extends string[] = string[]>(
          * このカスタムエレメントの全ての属性をオブジェクトとして返します。
          * Returns all attributes of this custom element as an object.
          */
-        props: this.props[0] as unknown as () => Record<Props[number], string | null>,
+        /**
+         * 属性名リストを受け取り、属性値を取得するgetter関数を返します。
+         * Accepts a list of attribute names and returns a getter function for attribute values.
+         * @param props - 属性名の配列 (Array of attribute names)
+         * @returns 属性値を取得するgetter関数 (Getter function for attribute values)
+         */
+        defineProps: (props) => {
+          this.observedAttributes = props;
+          this.props[1]((prev) => {
+            const newProps = { ...prev };
+            (props as readonly string[]).forEach((name) => {
+              newProps[name] = this.getAttribute(name);
+            });
+            return newProps;
+          });
+
+          return this.props[0] as any;
+        },
+        /**
+         * イベント名リストを受け取り、イベントを発火する関数を返します。
+         * Accepts a list of event names and returns a function to emit events.
+         * @param events - イベント名の配列 (Array of event names)
+         * @returns イベントを発火する関数 (Function to emit events)
+         */
+        defineEmits: (events) => {
+          return (type, detail, options) => {
+            if (events.includes(type)) {
+              this.dispatchEvent(
+                new CustomEvent(type, {
+                  detail,
+                  bubbles: options?.bubbles ?? true,
+                  composed: options?.composed ?? true,
+                  cancelable: options?.cancelable ?? true,
+                }),
+              );
+            }
+          };
+        },
         onConnected: (cb) => {
           onConnectedBase(cb, this.constructor);
         },
@@ -99,22 +148,41 @@ const functionalCustomElement = <Props extends string[] = string[]>(
           this._renderCallback = renderCallback;
         },
       });
+      // MutationObserverのセットアップ
+      this._attributeObserver = new MutationObserver((mutationRecords) => {
+        mutationRecords.forEach((record) => {
+          if (
+            record.type === "attributes"
+            && record.attributeName
+            && this.observedAttributes.includes(record.attributeName)
+          ) {
+            const name = record.attributeName;
+            const oldValue = record.oldValue;
+            const newValue = this.getAttribute(name);
+            this.props[1]((prev) => {
+              const newProps = { ...prev };
+              newProps[name] = newValue;
+              return newProps;
+            });
+            this.handleAttributeChanged(name, oldValue, newValue);
+          }
+        });
+      });
     }
 
     handleConnected() {}
     connectedCallback() {
+      // MutationObserverの監視開始
+      this._attributeObserver.observe(this, {
+        attributes: true,
+        attributeOldValue: true,
+        attributeFilter: [...(this.observedAttributes as readonly string[])],
+      });
+
       // 初回のみeffect/renderCallbackを登録
       if (!this._effectInitialized && this._renderCallback) {
         if (shadowRoot) {
           this.attachShadow({ mode: shadowRootMode ?? "open" });
-          if (style && this.shadowRoot) {
-            if (!this.shadowRoot.querySelector("style[data-katu-root-style]") && style.trim() !== "") {
-              const styleEl = document.createElement("style");
-              styleEl.setAttribute("data-katu-root-style", "");
-              styleEl.textContent = style;
-              this.shadowRoot.appendChild(styleEl);
-            }
-          }
         }
         effect(() => {
           this.props[0]();
@@ -127,17 +195,12 @@ const functionalCustomElement = <Props extends string[] = string[]>(
 
     handleDisconnected() {}
     disconnectedCallback() {
+      // MutationObserverの監視停止
+      this._attributeObserver.disconnect();
       this.handleDisconnected();
     }
 
     handleAttributeChanged(_name: string, _oldValue: string | null, _newValue: string | null) {}
-    attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null) {
-      this.props[1](prev => ({
-        ...prev,
-        [name]: newValue,
-      }));
-      this.handleAttributeChanged(name, oldValue, newValue);
-    }
   };
 };
 

@@ -70,4 +70,62 @@ describe("functionalCustomElement", () => {
     );
     expect(props).toEqual({ foo: "bar", baz: "qux" });
   });
+
+  /**
+   * defineEmitsのemit関数が正しくイベントを発火するかのテスト
+   * Test that defineEmits emitters fire events correctly
+   */
+  it("defineEmitsのemit関数がイベントを発火する", () => {
+    const tagName = "x-test-el-emits";
+    let receivedDetail: any = null;
+    const CustomElement = functionalCustomElement(({ defineEmits, render }) => {
+      const emits = defineEmits(["foo", "bar"]);
+      render(() => DummyJSX());
+      // テスト用にemitを公開
+      (window as any).emitFoo = emits.foo;
+      (window as any).emitBar = emits.bar;
+    }, {});
+    if (!customElements.get(tagName))
+      customElements.define(tagName, CustomElement);
+    const el = document.createElement(tagName) as InstanceType<typeof CustomElement>;
+    document.body.appendChild(el);
+    el.addEventListener("foo", (e: CustomEvent) => {
+      receivedDetail = e.detail;
+    });
+    // emit関数を呼び出してイベントが発火するか
+    (window as any).emitFoo({ hello: "world" });
+    expect(receivedDetail).toEqual({ hello: "world" });
+    // barイベントも同様に
+    let barReceived = false;
+    el.addEventListener("bar", () => {
+      barReceived = true;
+    });
+    (window as any).emitBar();
+    expect(barReceived).toBe(true);
+  });
+
+  it("defineEmitsが型定義通りのemit関数を返す", () => {
+    const tagName = "x-test-el-emits2";
+    let receivedType: string | null = null;
+    let receivedDetail: any = null;
+    const CustomElement = functionalCustomElement(({ defineEmits, render }) => {
+      // 型推論が効くかどうかのテスト
+      const emit = defineEmits(["foo", "bar"] as const);
+      render(() => DummyJSX());
+      (window as any).emit = emit;
+    }, {});
+    if (!customElements.get(tagName))
+      customElements.define(tagName, CustomElement);
+    const el = document.createElement(tagName) as InstanceType<typeof CustomElement>;
+    document.body.appendChild(el);
+    el.addEventListener("foo", (e: CustomEvent) => {
+      receivedType = "foo";
+      receivedDetail = e.detail;
+    });
+    (window as any).emit("foo", { a: 1 });
+    expect(receivedType).toBe("foo");
+    expect(receivedDetail).toEqual({ a: 1 });
+    // 存在しないイベント名は型エラーになることをTypeScriptで確認できる
+    // (window as any).emit("baz", {}); // これは型エラーになるべき
+  });
 });
