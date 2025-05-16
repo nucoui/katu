@@ -85,7 +85,7 @@ const functionalCustomElement: FunctionalCustomElement = (
           // インスタンスが持つ全属性値をバッチで一度に初期化
           const initialProps: Record<string, string | null> = {};
           for (const name of props) {
-            initialProps[name] = this.getAttribute(name);
+            initialProps[name] = this.getAttribute(name) || null;
           }
 
           // 一度の更新処理でpropsを設定（バッチ処理）
@@ -143,6 +143,22 @@ const functionalCustomElement: FunctionalCustomElement = (
         },
         onAdopted: (cb) => {
           onAdopted(cb, this.constructor);
+        },
+        /**
+         * ホスト要素（このカスタム要素自身）を取得します
+         * Returns the host element (this custom element itself)
+         * @returns ホスト要素（HTMLElement）
+         */
+        getHost: () => {
+          return this;
+        },
+        /**
+         * ShadowRootを取得します（存在する場合）
+         * Returns the ShadowRoot if it exists
+         * @returns ShadowRoot または null
+         */
+        getShadowRoot: () => {
+          return this.shadowRoot;
         },
         render: (cb) => {
           // 内部属性の値を一度だけ作成しておく（再利用）

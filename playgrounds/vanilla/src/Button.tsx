@@ -1,21 +1,21 @@
 import { functionalCustomElement } from "@katu/runtime";
-import style from "./Button.css?raw";
+import style from "./Button.scss?raw";
+import { clsx } from "clsx";
 
-  const convertToBoolean = (value: string | null) => {
-    if (value === null) {
-      return false;
-    }
-    if (value === "") {
-      return true;
-    }
-    if (value === "true") {
-      return true;
-    }
-    if (value === "false") {
-      return false;
-    }
-    return Boolean(value);
-  };
+const convertToType = (type: string): 'anchor' | 'submit' | 'reset' | "toggle" | 'button' => {
+  switch (type) {
+    case "anchor":
+      return "anchor";
+    case "submit":
+      return "submit";
+    case "reset":
+      return "reset";
+    case "toggle":
+      return "toggle";
+    default:
+      return "button";
+  }
+}
 
 export const Button = functionalCustomElement(({
   reactivity: { signal, effect, computed },
@@ -24,68 +24,102 @@ export const Button = functionalCustomElement(({
   onConnected,
   onDisconnected,
   onAttributeChanged,
-  render
+  render,
+  getHost
 }) => {
-  const props = defineProps(["disabled"]);
+  const props = defineProps([
+    "variant",
+    "disabled",
+    "width",
+    "size",
+    "type",
+    "href",
+    "target",
+  ]);
   const emits = defineEmits(["on-click", "on-disabled"]);
 
-  const [clickCount, setClickCount] = signal(0);
-
-  const disabled = computed(() => {
-    return convertToBoolean(props().disabled);
+  const type = computed(() => {
+    return convertToType(props().type || "button");
   });
 
-  const handleClick = () => {
-    setClickCount(c => c + 1);
-    emits("on-click", { count: clickCount() });
+  const disabled = computed(() => {
+    return props().disabled === "" || props().disabled === "true";
+  });
+
+  const handleClick = (e: MouseEvent) => {
+    emits("on-click", e);
+
+    if (type() === "submit") {
+      getHost().closest("form")?.requestSubmit();
+    }
   };
 
+  const commonAttr = computed(() => ({
+    class: clsx("n-button", `-${props().variant ?? "primary"}`, `n-button-${props().size ?? "medium"}`, {
+      "-anchor": type() === "anchor",
+      "-toggle": type() === "toggle",
+      "-auto": props().width === "auto",
+    }),
+    disabled: disabled(),
+    "aria-disabled": disabled(),
+    onClick: handleClick,
+  }))
+
   render(() => {
-    return (
-      // <>
-      //   <button disabled={props().disabled === ""}>
-      //     {props().disabled ? "Disabled" : "Enabled"}
-      //   </button>
-      //   <p>Disabled: {disabled}</p>
-      // </>
+    console.log("render", type(), disabled());
+    if (type() === "anchor") {
+      return (
+        <a
+          href={props().href ?? "#"}
+          target={props().target ?? "_self"}
+          {...commonAttr()}
+        >
+          <span class="contents">
+            <slot />
+          </span>
+        </a>
+      );
+    } else if (type() === "submit") {
+      return (
+        <button
+          type="submit"
+          {...commonAttr()}
+        >
+          <span class="contents">
+            <slot />
+          </span>
+        </button>
+      );
+    } else (
       <button
-        disabled={disabled()}
-        onClick={handleClick}
-        class="m3-filled"
+        type={type()}
+        {...commonAttr()}
       >
-        {disabled() ? "Disabled" : <slot />}
-        {" "}{clickCount()}
+        <span class="contents">
+          <slot />
+        </span>
       </button>
     );
   });
-}, {
-  style,
-});
+}, { style });
 
-customElements.define("hoge-button", Button);
+customElements.define("n-button", Button);
 
-const hogeButton = document.createElement("hoge-button")
-hogeButton.innerHTML = "Hoge Button";
-hogeButton.addEventListener("on-click", (e) => {
-  console.log("Hoge Button clicked", e.detail.count);
+const nButton = document.createElement("n-button")
+nButton.innerHTML = "Button";
+nButton.addEventListener("on-click", (e) => {
+  console.log("Hoge Button clicked", e.detail);
 })
-setInterval(() => {
-  if (hogeButton.getAttribute("disabled") === "") {
-    hogeButton.removeAttribute("disabled");
-  }
-  else {
-    hogeButton.setAttribute("disabled", "");
-  }
-}, 5000);
 
 const app = document.getElementById("app");
 if (app) {
-  app.appendChild(hogeButton);
+  app.appendChild(nButton);
+  nButton.setAttribute("type", "anchor");
 }
 
 declare global {
     interface HTMLElementTagNameMap {
-        "hoge-button": InstanceType<typeof Button>;
+        "n-button": InstanceType<typeof Button>;
     }
     interface HTMLElementEventMap {
         "on-click": CustomEvent<{ count: number }>;

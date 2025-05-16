@@ -1,96 +1,353 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --p-app-100: #E7EEF3;
+  --p-app-200: #CCDBE6;
+  --p-app-300: #ACC7D8;
+  --p-app-400: #86B1CA;
+  --p-app-500: #4F97BA;
+  --p-app-600: #0F698A;
+  --p-app-700: #003E5D;
+  --p-app-800: #001933;
+  --p-app-900: #00000E;
+  --p-neutral-100: #F6F6F6;
+  --p-neutral-200: #EEEEEE;
+  --p-neutral-300: #D4D4D4;
+  --p-neutral-400: #AAAAAA;
+  --p-neutral-500: #8E8E8E;
+  --p-neutral-600: #727272;
+  --p-neutral-700: #565656;
+  --p-neutral-800: #2a2a2a;
+  --p-neutral-900: #121212;
+  --p-red-100: #FFE5E4;
+  --p-red-200: #FFC7C6;
+  --p-red-300: #FFA4A1;
+  --p-red-400: #FF7672;
+  --p-red-500: #FF2400;
+  --p-red-600: #C30000;
+  --p-red-700: #8A0000;
+  --p-red-800: #5A0000;
+  --p-red-900: #480000;
+  --p-blue-100: #E6E4FF;
+  --p-blue-200: #CAC6FF;
+  --p-blue-300: #A8A1FF;
+  --p-blue-400: #7F72FF;
+  --p-blue-500: #3F00FF;
+  --p-blue-600: #0000CA;
+  --p-blue-700: #000097;
+  --p-blue-800: #000069;
+  --p-blue-900: #000040;
+  --p-yellow-100: #FFF8E4;
+  --p-yellow-200: #FEF1C6;
+  --p-yellow-300: #FEEAA2;
+  --p-yellow-400: #FDE273;
+  --p-yellow-500: #FDDA0D;
+  --p-yellow-600: #C5A900;
+  --p-yellow-700: #907A00;
+  --p-yellow-800: #604F00;
+  --p-yellow-900: #3D2600;
+  --p-green-100: #E7F5EA;
+  --p-green-200: #CCEBD4;
+  --p-green-300: #ADE0BA;
+  --p-green-400: #87D49D;
+  --p-green-500: #50C878;
+  --p-green-600: #02964B;
+  --p-green-700: #006720;
+  --p-green-800: #003A00;
+  --p-green-900: #001C00;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+:root {
+  --s-light-background-primary: var(--p-neutral-200);
+  --s-light-background-secondary: var(--p-neutral-100);
+  --s-light-text-primary: var(--p-neutral-900);
+  --s-light-text-secondary: var(--p-neutral-500);
+  --s-light-text-tertiary: var(--p-neutral-700);
+  --s-light-border-primary: var(--p-neutral-600);
+  --s-light-border-secondary: var(--p-neutral-400);
+  --s-light-border-tertiary: var(--p-neutral-300);
+  --s-dark-background-primary: var(--p-neutral-900);
+  --s-dark-background-secondary: var(--p-neutral-800);
+  --s-dark-text-primary: var(--p-neutral-100);
+  --s-dark-text-secondary: var(--p-neutral-500);
+  --s-dark-text-tertiary: var(--p-neutral-700);
+  --s-dark-border-primary: var(--p-neutral-600);
+  --s-dark-border-secondary: var(--p-neutral-700);
+  --s-dark-border-tertiary: var(--p-neutral-800);
 }
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+:root {
+  --n-1: 0.25rem;
+  --n-2: 0.5rem;
+  --n-3: 0.75rem;
+  --n-4: 1rem;
+  --n-5: 1.25rem;
+  --n-6: 1.5rem;
+  --n-7: 1.75rem;
+  --n-8: 2rem;
+  --n-9: 2.25rem;
+  --n-10: 2.5rem;
+  --n-11: 2.75rem;
+  --n-12: 3rem;
+  --n-13: 3.25rem;
+  --n-14: 3.5rem;
+  --n-15: 3.75rem;
+  --n-16: 4rem;
+  --n-17: 4.25rem;
+  --n-18: 4.5rem;
+  --n-19: 4.75rem;
+  --n-20: 5rem;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+:root {
+  --cs-background-primary: var(--s-light-background-primary);
+  --cs-background-secondary: var(--s-light-background-secondary);
+  --cs-text-primary: var(--s-light-text-primary);
+  --cs-text-secondary: var(--s-light-text-secondary);
+  --cs-text-tertiary: var(--s-light-text-tertiary);
+  --cs-border-primary: var(--s-light-border-primary);
+  --cs-border-secondary: var(--s-light-border-secondary);
+  --cs-border-tertiary: var(--s-light-border-tertiary);
+  --cs-neutral-100: var(--p-neutral-100);
+  --cs-neutral-200: var(--p-neutral-200);
+  --cs-neutral-300: var(--p-neutral-300);
+  --cs-neutral-400: var(--p-neutral-400);
+  --cs-neutral-500: var(--p-neutral-500);
+  --cs-neutral-600: var(--p-neutral-600);
+  --cs-neutral-700: var(--p-neutral-700);
+  --cs-neutral-800: var(--p-neutral-800);
+  --cs-neutral-900: var(--p-neutral-900);
+  --cs-app-100: var(--p-app-100);
+  --cs-app-200: var(--p-app-200);
+  --cs-app-300: var(--p-app-300);
+  --cs-app-400: var(--p-app-400);
+  --cs-app-500: var(--p-app-500);
+  --cs-app-600: var(--p-app-600);
+  --cs-app-700: var(--p-app-700);
+  --cs-app-800: var(--p-app-800);
+  --cs-app-900: var(--p-app-900);
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+[data-color-scheme="dark"] {
+  --cs-background-primary: var(--s-dark-background-primary);
+  --cs-background-secondary: var(--s-dark-background-secondary);
+  --cs-text-primary: var(--s-dark-text-primary);
+  --cs-text-secondary: var(--s-dark-text-secondary);
+  --cs-text-tertiary: var(--s-dark-text-tertiary);
+  --cs-border-primary: var(--s-dark-border-primary);
+  --cs-border-secondary: var(--s-dark-border-secondary);
+  --cs-border-tertiary: var(--s-dark-border-tertiary);
+  --cs-neutral-100: var(--p-neutral-900);
+  --cs-neutral-200: var(--p-neutral-800);
+  --cs-neutral-300: var(--p-neutral-700);
+  --cs-neutral-400: var(--p-neutral-600);
+  --cs-neutral-500: var(--p-neutral-500);
+  --cs-neutral-600: var(--p-neutral-400);
+  --cs-neutral-700: var(--p-neutral-300);
+  --cs-neutral-800: var(--p-neutral-200);
+  --cs-neutral-900: var(--p-neutral-100);
+  --cs-app-100: var(--p-app-900);
+  --cs-app-200: var(--p-app-800);
+  --cs-app-300: var(--p-app-700);
+  --cs-app-400: var(--p-app-600);
+  --cs-app-500: var(--p-app-500);
+  --cs-app-600: var(--p-app-400);
+  --cs-app-700: var(--p-app-300);
+  --cs-app-800: var(--p-app-200);
+  --cs-app-900: var(--p-app-100);
 }
-.logo.vanilla:hover {
-  filter: drop-shadow(0 0 2em #f7df1eaa);
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
+@media (prefers-color-scheme: dark) {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    --cs-background-primary: var(--s-dark-background-primary);
+    --cs-background-secondary: var(--s-dark-background-secondary);
+    --cs-text-primary: var(--s-dark-text-primary);
+    --cs-text-secondary: var(--s-dark-text-secondary);
+    --cs-text-tertiary: var(--s-dark-text-tertiary);
+    --cs-border-primary: var(--s-dark-border-primary);
+    --cs-border-secondary: var(--s-dark-border-secondary);
+    --cs-border-tertiary: var(--s-dark-border-tertiary);
+    --cs-neutral-100: var(--p-neutral-900);
+    --cs-neutral-200: var(--p-neutral-800);
+    --cs-neutral-300: var(--p-neutral-700);
+    --cs-neutral-400: var(--p-neutral-600);
+    --cs-neutral-500: var(--p-neutral-500);
+    --cs-neutral-600: var(--p-neutral-400);
+    --cs-neutral-700: var(--p-neutral-300);
+    --cs-neutral-800: var(--p-neutral-200);
+    --cs-neutral-900: var(--p-neutral-100);
+    --cs-app-100: var(--p-app-900);
+    --cs-app-200: var(--p-app-800);
+    --cs-app-300: var(--p-app-700);
+    --cs-app-400: var(--p-app-600);
+    --cs-app-500: var(--p-app-500);
+    --cs-app-600: var(--p-app-400);
+    --cs-app-700: var(--p-app-300);
+    --cs-app-800: var(--p-app-200);
+    --cs-app-900: var(--p-app-100);
   }
-  a:hover {
-    color: #747bff;
+  [data-color-scheme="light"] {
+    --cs-background-primary: var(--s-light-background-primary);
+    --cs-background-secondary: var(--s-light-background-secondary);
+    --cs-text-primary: var(--s-light-text-primary);
+    --cs-text-secondary: var(--s-light-text-secondary);
+    --cs-text-tertiary: var(--s-light-text-tertiary);
+    --cs-border-primary: var(--s-light-border-primary);
+    --cs-border-secondary: var(--s-light-border-secondary);
+    --cs-border-tertiary: var(--s-light-border-tertiary);
+    --cs-neutral-100: var(--p-neutral-100);
+    --cs-neutral-200: var(--p-neutral-200);
+    --cs-neutral-300: var(--p-neutral-300);
+    --cs-neutral-400: var(--p-neutral-400);
+    --cs-neutral-500: var(--p-neutral-500);
+    --cs-neutral-600: var(--p-neutral-600);
+    --cs-neutral-700: var(--p-neutral-700);
+    --cs-neutral-800: var(--p-neutral-800);
+    --cs-neutral-900: var(--p-neutral-900);
+    --cs-app-100: var(--p-app-100);
+    --cs-app-200: var(--p-app-200);
+    --cs-app-300: var(--p-app-300);
+    --cs-app-400: var(--p-app-400);
+    --cs-app-500: var(--p-app-500);
+    --cs-app-600: var(--p-app-600);
+    --cs-app-700: var(--p-app-700);
+    --cs-app-800: var(--p-app-800);
+    --cs-app-900: var(--p-app-900);
   }
-  button {
-    background-color: #f9f9f9;
+}
+
+[data-color-scheme="dark"] n-code-block::part(pre) { color: var(--shiki-dark) !important; background-color: var(--cs-background-primary) !important; } @media (prefers-color-scheme: dark) { n-code-block::part(pre) { color: var(--shiki-dark) !important; background-color: var(--cs-background-primary) !important; } } [data-color-scheme="light"] n-code-block::part(pre) { color: var(--shiki-light) !important; background-color: var(--cs-background-primary) !important; }
+
+:host {
+  box-sizing: border-box;
+  font-family: Poppins, "Noto Sans JP", sans-serif;
+
+  /* color: var(--cs-text-primary); */
+}
+
+/* :where(:not([disabled]):focus-visible, :not([disabled]):focus) {
+  outline: 1px solid var(--cs-neutral-600);
+  outline-offset: 2px;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+} */
+
+/***
+    The new CSS reset - version 1.11.3 (last updated 25.08.2024)
+    GitHub page: https://github.com/elad2412/the-new-css-reset
+***/
+
+/*
+    Remove all the styles of the "User-Agent-Stylesheet", except for the 'display' property
+    - The "symbol *" part is to solve Firefox SVG sprite bug
+    - The "html" element is excluded, otherwise a bug in Chrome breaks the CSS hyphens property (https://github.com/elad2412/the-new-css-reset/issues/36)
+ */
+*:where(:not(html, iframe, canvas, img, svg, video, audio, svg *, symbol *)) {
+  all: unset;
+  display: revert;
+}
+
+/* Preferred box-sizing value */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Fix mobile Safari increase font-size on landscape mode */
+html {
+  text-size-adjust: none;
+}
+
+/* Reapply the pointer cursor for anchor tags */
+a,
+button {
+  cursor: revert;
+}
+
+/* Remove list styles (bullets/numbers) */
+ol,
+ul,
+menu,
+summary {
+  list-style: none;
+}
+
+/* Firefox: solve issue where nested ordered lists continue numbering from parent (https://bugzilla.mozilla.org/show_bug.cgi?id=1881517) */
+ol {
+  counter-reset: revert;
+}
+
+/* For images to not be able to exceed their container */
+img {
+  max-inline-size: 100%;
+  max-block-size: 100%;
+}
+
+/* removes spacing between cells in tables */
+table {
+  border-collapse: collapse;
+}
+
+/* Safari - solving issue when using user-select:none on the <body> text input doesn't working */
+input,
+textarea {
+  user-select: auto;
+}
+
+/* revert the 'white-space' property for textarea elements on Safari */
+textarea {
+  white-space: revert;
+}
+
+/* minimum style to allow to style meter element */
+meter {
+  appearance: revert;
+}
+
+/* preformatted text - use only for this feature */
+:where(pre) {
+  all: revert;
+  box-sizing: border-box;
+}
+
+/* reset default text opacity of input placeholder */
+::placeholder {
+  color: unset;
+}
+
+/* fix the feature of 'hidden' attribute.
+ display:revert; revert to element instead of attribute */
+:where([hidden]) {
+  display: none;
+}
+
+/* revert for bug in Chromium browsers
+ - fix for the content editable attribute will work properly.
+ - webkit-user-select: auto; added for Safari in case of using user-select:none on wrapper element */
+:where([contenteditable]:not([contenteditable="false"])) {
+  -moz-user-modify: read-write;
+  -webkit-user-modify: read-write;
+  overflow-wrap: break-word;
+  -webkit-line-break: after-white-space;
+  user-select: auto;
+}
+
+/* apply back the draggable feature - exist only in Chromium and Safari */
+:where([draggable="true"]) {
+  -webkit-user-drag: element;
+}
+
+/* Revert Modal native behavior */
+:where(dialog:modal) {
+  all: revert;
+  box-sizing: border-box;
+}
+
+/* Remove details summary webkit styles */
+::-webkit-details-marker {
+  display: none;
+}
+
+
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
   }
 }

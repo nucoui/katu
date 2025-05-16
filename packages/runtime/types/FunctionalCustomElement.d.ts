@@ -98,6 +98,8 @@ export type FunctionalCustomElement = (
      * Register hook for adoptedCallback
      */
     onAdopted: (cb: () => void) => void;
+    getHost: () => HTMLElement;
+    getShadowRoot: () => ShadowRoot | null;
     /**
      * レンダリング関数の登録
      * Register render function
