@@ -1,4 +1,5 @@
 import { functionalCustomElement } from "@katu/runtime";
+import style from "./Button.css?raw";
 
   const convertToBoolean = (value: string | null) => {
     if (value === null) {
@@ -47,32 +48,23 @@ export const Button = functionalCustomElement(({
       //   </button>
       //   <p>Disabled: {disabled}</p>
       // </>
-      <button disabled={disabled()} onClick={handleClick}>
+      <button
+        disabled={disabled()}
+        onClick={handleClick}
+        class="m3-filled"
+      >
         {disabled() ? "Disabled" : <slot />}
+        {" "}{clickCount()}
       </button>
     );
   });
 }, {
-  style: `
-    button {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    button[disabled] {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
-  `,
+  style,
 });
 
 customElements.define("hoge-button", Button);
 
-const hogeButton = document.createElement("hoge-button") as InstanceType<typeof Button>;
+const hogeButton = document.createElement("hoge-button")
 hogeButton.innerHTML = "Hoge Button";
 hogeButton.addEventListener("on-click", (e) => {
   console.log("Hoge Button clicked", e.detail.count);
@@ -84,9 +76,18 @@ setInterval(() => {
   else {
     hogeButton.setAttribute("disabled", "");
   }
-}, 1000);
+}, 5000);
 
 const app = document.getElementById("app");
 if (app) {
   app.appendChild(hogeButton);
+}
+
+declare global {
+    interface HTMLElementTagNameMap {
+        "hoge-button": InstanceType<typeof Button>;
+    }
+    interface HTMLElementEventMap {
+        "on-click": CustomEvent<{ count: number }>;
+    }
 }

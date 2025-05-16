@@ -63,7 +63,7 @@ export const Hoge = functionalCustomElement(({
       return <div>foo attribute is bar. Cannot render.</div>;
     }
 
-    if (count() < 10) {
+    if (count() > 10) {
       return (
         <div>
           <p>Count: {count()}</p>
@@ -94,20 +94,11 @@ export const Hoge = functionalCustomElement(({
   shadowRoot: true,
   shadowRootMode: "open",
   style: `
-    :host {
-      display: block;
-      background-color: #f0f0f0;
-      padding: 16px;
-      border-radius: 8px;
-    }
-    h1 {
-      color: #333;
-    }
-    p {
-      color: #666;
-    }
     button {
-      margin-right: 8px;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
     }
   `
 });

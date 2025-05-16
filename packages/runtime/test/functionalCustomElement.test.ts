@@ -79,7 +79,7 @@ describe("functionalCustomElement", () => {
     const tagName = "x-test-el-emits";
     let receivedDetail: any = null;
     const CustomElement = functionalCustomElement(({ defineEmits, render }) => {
-      const emits = defineEmits(["foo", "bar"]);
+      const emits = defineEmits(["on-foo", "on-bar"]);
       render(() => DummyJSX());
       // テスト用にemitを公開
       (window as any).emitFoo = emits.foo;
@@ -89,7 +89,7 @@ describe("functionalCustomElement", () => {
       customElements.define(tagName, CustomElement);
     const el = document.createElement(tagName) as InstanceType<typeof CustomElement>;
     document.body.appendChild(el);
-    el.addEventListener("foo", (e: CustomEvent) => {
+    el.addEventListener("on-foo", (e: CustomEvent) => {
       receivedDetail = e.detail;
     });
     // emit関数を呼び出してイベントが発火するか
@@ -97,7 +97,7 @@ describe("functionalCustomElement", () => {
     expect(receivedDetail).toEqual({ hello: "world" });
     // barイベントも同様に
     let barReceived = false;
-    el.addEventListener("bar", () => {
+    el.addEventListener("on-bar", () => {
       barReceived = true;
     });
     (window as any).emitBar();
@@ -110,7 +110,7 @@ describe("functionalCustomElement", () => {
     let receivedDetail: any = null;
     const CustomElement = functionalCustomElement(({ defineEmits, render }) => {
       // 型推論が効くかどうかのテスト
-      const emit = defineEmits(["foo", "bar"] as const);
+      const emit = defineEmits(["on-foo", "on-bar"] as const);
       render(() => DummyJSX());
       (window as any).emit = emit;
     }, {});
@@ -118,12 +118,12 @@ describe("functionalCustomElement", () => {
       customElements.define(tagName, CustomElement);
     const el = document.createElement(tagName) as InstanceType<typeof CustomElement>;
     document.body.appendChild(el);
-    el.addEventListener("foo", (e: CustomEvent) => {
-      receivedType = "foo";
+    el.addEventListener("on-foo", (e: CustomEvent) => {
+      receivedType = "on-foo";
       receivedDetail = e.detail;
     });
-    (window as any).emit("foo", { a: 1 });
-    expect(receivedType).toBe("foo");
+    (window as any).emit("on-foo", { a: 1 });
+    expect(receivedType).toBe("on-foo");
     expect(receivedDetail).toEqual({ a: 1 });
     // 存在しないイベント名は型エラーになることをTypeScriptで確認できる
     // (window as any).emit("baz", {}); // これは型エラーになるべき

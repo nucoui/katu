@@ -1,7 +1,13 @@
 import type { VNode } from "@/functionalCustomElement/vNode";
 import type { FunctionalCustomElement } from "@root/types/FunctionalCustomElement";
 import { onAdopted, onAttributeChangedBase, onConnectedBase, onDisconnectedBase } from "@/functionalCustomElement/on";
-import { createVNode, mount, patch } from "@/functionalCustomElement/vNode";
+import { applyStyles } from "@/functionalCustomElement/style";
+import {
+  _INTERNAL_ATTRIBUTES,
+  createVNode,
+  mount,
+  patch,
+} from "@/functionalCustomElement/vNode";
 import { computed, Computed, effect, Effect, endBatch, signal, Signal, startBatch } from "@katu/reactivity";
 
 /**
@@ -16,10 +22,10 @@ const functionalCustomElement: FunctionalCustomElement = (
     shadowRoot = true,
     shadowRootMode,
     isFormAssociated,
-    // style,
+    style,
   } = options || {};
 
-  return class CustomElement extends HTMLElement {
+  return class extends HTMLElement {
     static formAssociated = isFormAssociated ?? false;
     /**
      * MutationObserverインスタンス
@@ -68,10 +74,6 @@ const functionalCustomElement: FunctionalCustomElement = (
           Effect,
         },
         /**
-         * このカスタムエレメントの全ての属性をオブジェクトとして返します。
-         * Returns all attributes of this custom element as an object.
-         */
-        /**
          * 属性名リストを受け取り、属性値を取得するgetter関数を返します。
          * Accepts a list of attribute names and returns a getter function for attribute values.
          * @param props - 属性名の配列 (Array of attribute names)
@@ -79,13 +81,15 @@ const functionalCustomElement: FunctionalCustomElement = (
          */
         defineProps: (props) => {
           this.observedAttributes = props;
-          this.props[1]((prev) => {
-            const newProps = { ...prev };
-            (props as readonly string[]).forEach((name) => {
-              newProps[name] = this.getAttribute(name);
-            });
-            return newProps;
-          });
+
+          // インスタンスが持つ全属性値をバッチで一度に初期化
+          const initialProps: Record<string, string | null> = {};
+          for (const name of props) {
+            initialProps[name] = this.getAttribute(name);
+          }
+
+          // 一度の更新処理でpropsを設定（バッチ処理）
+          this.props[1](prev => ({ ...prev, ...initialProps }));
 
           return this.props[0] as any;
         },
@@ -96,18 +100,37 @@ const functionalCustomElement: FunctionalCustomElement = (
          * @returns イベントを発火する関数 (Function to emit events)
          */
         defineEmits: (events) => {
-          return (type, detail, options) => {
+          // デフォルトのイベントオプション（一度だけ作成）
+          const defaultOptions = { bubbles: true, composed: true, cancelable: true };
+
+          // イベント名からメソッド名へのマッピングを事前に作成（on-foo → foo）
+          const methodMap = new Map(events.map(event => [
+            event,
+            event.replace(/^on-/, ""),
+          ]));
+
+          // イベント発火の基本関数
+          const emit = (type: any, detail: any, options?: { bubbles?: boolean; composed?: boolean; cancelable?: boolean }) => {
             if (events.includes(type)) {
+              // オプションをマージするよりもスプレッド構文の方が効率的
               this.dispatchEvent(
                 new CustomEvent(type, {
                   detail,
-                  bubbles: options?.bubbles ?? true,
-                  composed: options?.composed ?? true,
-                  cancelable: options?.cancelable ?? true,
+                  ...defaultOptions,
+                  ...options,
                 }),
               );
             }
           };
+
+          // 特定のイベント用のヘルパー関数を追加（on-foo → emit.foo()のようにアクセス可能）
+          for (const [event, methodName] of methodMap.entries()) {
+            (emit as any)[methodName] = (detail: any, options?: any) => {
+              emit(event, detail, options);
+            };
+          }
+
+          return emit;
         },
         onConnected: (cb) => {
           onConnectedBase(cb, this.constructor);
@@ -122,74 +145,145 @@ const functionalCustomElement: FunctionalCustomElement = (
           onAdopted(cb, this.constructor);
         },
         render: (cb) => {
+          // 内部属性の値を一度だけ作成しておく（再利用）
+          const internalAttribute = `${_INTERNAL_ATTRIBUTES}data-katu-internal`;
+
           const renderCallback = () => {
             const node = cb();
             if (!node && node !== 0)
               return;
+
             let newVNode: VNode;
+
+            // JSX/TSXから返されたオブジェクトを適切なVNodeに変換
             if (typeof node === "object" && node !== null && "tag" in node && "props" in node && typeof node.tag === "string") {
-              newVNode = createVNode(node.tag, node.props);
+              // オブジェクト生成を最小限に
+              const nodeProps = node.props || {};
+              const updatedProps = { ...nodeProps, [internalAttribute]: "" };
+              newVNode = createVNode(node.tag, updatedProps);
             }
             else {
-              newVNode = createVNode("span", { children: [String(node)] });
+              // 文字列やプリミティブ値の場合はspanで包む
+              newVNode = createVNode("span", {
+                [internalAttribute]: "",
+                children: [String(node)],
+              });
             }
-            const root: HTMLElement | ShadowRoot = this.shadowRoot ?? this;
-            if (root === this)
+
+            // shadowRootが存在するかチェック
+            const shadowRootInstance = this.shadowRoot;
+            if (!shadowRootInstance)
               return;
+
             if (this._vnode == null) {
-              root.innerHTML = "";
-              root.appendChild(mount(newVNode));
+              // 初回レンダリング: style要素を除いてコンテンツをクリア
+              const children = shadowRootInstance.children;
+              for (let i = children.length - 1; i >= 0; i--) {
+                if (children[i].tagName !== "STYLE") {
+                  shadowRootInstance.removeChild(children[i]);
+                }
+              }
+
+              // 新しい要素を追加
+              shadowRootInstance.appendChild(mount(newVNode));
             }
             else {
-              patch(root, this._vnode, newVNode, 0);
+              // 差分更新: 既存のDOM要素を更新
+              // DOM構造内での適切なインデックスを効率的に見つける
+              let domIndex = 0;
+              const childNodes = shadowRootInstance.childNodes;
+              for (let i = 0; i < childNodes.length; i++) {
+                const node = childNodes[i];
+                if (node.nodeType === Node.ELEMENT_NODE && (node as Element).tagName !== "STYLE") {
+                  domIndex = i;
+                  break;
+                }
+              }
+
+              patch(shadowRootInstance, this._vnode, newVNode, domIndex);
             }
             this._vnode = newVNode;
           };
           this._renderCallback = renderCallback;
         },
       });
-      // MutationObserverのセットアップ
+      // MutationObserverのセットアップ（バッチ処理を使って最適化）
       this._attributeObserver = new MutationObserver((mutationRecords) => {
-        mutationRecords.forEach((record) => {
+        if (mutationRecords.length === 0)
+          return;
+
+        // バッチ処理を開始して、複数の属性変更を1度にまとめて処理
+        startBatch();
+
+        // 変更された属性を格納するオブジェクト
+        const changedAttributes: Record<string, { oldValue: string | null; newValue: string | null }> = {};
+
+        // まず全ての変更を収集
+        for (const record of mutationRecords) {
           if (
             record.type === "attributes"
             && record.attributeName
             && this.observedAttributes.includes(record.attributeName)
           ) {
             const name = record.attributeName;
-            const oldValue = record.oldValue;
-            const newValue = this.getAttribute(name);
-            this.props[1]((prev) => {
-              const newProps = { ...prev };
+            changedAttributes[name] = {
+              oldValue: record.oldValue,
+              newValue: this.getAttribute(name),
+            };
+          }
+        }
+
+        // 一度にpropsを更新
+        if (Object.keys(changedAttributes).length > 0) {
+          this.props[1]((prev) => {
+            const newProps = { ...prev };
+            for (const [name, { newValue }] of Object.entries(changedAttributes)) {
               newProps[name] = newValue;
-              return newProps;
-            });
+            }
+            return newProps;
+          });
+
+          // 各属性変更に対してハンドラを呼び出し
+          for (const [name, { oldValue, newValue }] of Object.entries(changedAttributes)) {
             this.handleAttributeChanged(name, oldValue, newValue);
           }
-        });
+        }
+
+        // バッチ処理を終了
+        endBatch();
       });
     }
 
     handleConnected() {}
     connectedCallback() {
-      // MutationObserverの監視開始
-      this._attributeObserver.observe(this, {
-        attributes: true,
-        attributeOldValue: true,
-        attributeFilter: [...(this.observedAttributes as readonly string[])],
-      });
+      // observedAttributesが空でない場合のみMutationObserverを設定
+      if (this.observedAttributes.length > 0) {
+        this._attributeObserver.observe(this, {
+          attributes: true,
+          attributeOldValue: true,
+          attributeFilter: [...this.observedAttributes],
+        });
+      }
 
       // 初回のみeffect/renderCallbackを登録
       if (!this._effectInitialized && this._renderCallback) {
+        // shadowRootの生成とスタイル適用を1回の処理にまとめる
         if (shadowRoot) {
-          this.attachShadow({ mode: shadowRootMode ?? "open" });
+          const shadowRootInstance = this.attachShadow({ mode: shadowRootMode ?? "open" });
+          // スタイルがある場合のみ適用処理を実行
+          if (style) {
+            applyStyles(shadowRootInstance, style);
+          }
         }
+
+        // props変更とレンダリングを連動させるエフェクト
         effect(() => {
-          this.props[0]();
+          this.props[0](); // props値の監視
           this._renderCallback!();
         });
         this._effectInitialized = true;
       }
+
       this.handleConnected();
     }
 

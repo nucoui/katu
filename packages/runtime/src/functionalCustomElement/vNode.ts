@@ -1,4 +1,48 @@
-// 新vNode型・生成・マウント・パッチ（最小構成、stringタグのみ対応）
+// 内部属性のプレフィックス - 実DOMには反映されないが仮想DOMでは使用される
+export const _INTERNAL_ATTRIBUTES = "_katu_internal_:";
+
+/**
+ * 内部属性かどうかを判定する
+ * @param key 属性名
+ * @returns 内部属性の場合はtrue
+ */
+export function isInternalAttribute(key: string): boolean {
+  return key.startsWith(_INTERNAL_ATTRIBUTES);
+}
+
+/**
+ * 内部属性の実際の名前を取得する（プレフィックスを除去）
+ * @param key 内部属性名
+ * @returns プレフィックスを除去した属性名
+ */
+export function getInternalAttributeName(key: string): string {
+  if (!isInternalAttribute(key))
+    return key;
+  return key.substring(_INTERNAL_ATTRIBUTES.length);
+}
+
+/**
+ * 仮想DOMノードから内部属性の値を取得する
+ * @param vnode 仮想DOMノード
+ * @param name 内部属性名（data-katu-internalなど、プレフィックスなし）
+ * @returns 属性値または undefined
+ */
+export function getInternalAttributeValue(vnode: VNode, name: string): any {
+  const fullName = `${_INTERNAL_ATTRIBUTES}${name}`;
+  return vnode.props[fullName];
+}
+
+/**
+ * 仮想DOMノードに内部属性が存在するかチェックする
+ * @param vnode 仮想DOMノード
+ * @param name 内部属性名（data-katu-internalなど、プレフィックスなし）
+ * @returns 属性が存在する場合はtrue
+ */
+export function hasInternalAttribute(vnode: VNode, name: string): boolean {
+  const fullName = `${_INTERNAL_ATTRIBUTES}${name}`;
+  return fullName in vnode.props;
+}
+
 export type VNode = {
   tag: string;
   props: Record<string, any>;
@@ -20,6 +64,9 @@ function normalizeChildren(input: any): Array<VNode | string> {
 
 /**
  * JSXからの出力をvNodeに変換
+ * @param tag HTML要素のタグ名
+ * @param props JSX属性と子要素を含むオブジェクト
+ * @returns 仮想DOMノード(VNode)
  */
 export function createVNode(tag: string, props: Record<string, any>): VNode {
   const { children, ...rest } = props ?? {};
@@ -41,21 +88,23 @@ export function createVNode(tag: string, props: Record<string, any>): VNode {
  */
 export function mount(vnode: VNode): Node {
   const el = document.createElement(vnode.tag);
+  const eventRegex = /^on[A-Z]/;
+
   for (const [k, v] of Object.entries(vnode.props)) {
     if (v == null)
       continue;
-    if (/^on[A-Z]/.test(k) && typeof v === "function") {
+
+    // 内部属性（_katu_internal_:プレフィックスを持つ）はDOMに反映しない
+    if (k.startsWith(_INTERNAL_ATTRIBUTES))
+      continue;
+
+    if (eventRegex.test(k) && typeof v === "function") {
       // onClickなどはイベントリスナーとして登録
       const event = k.slice(2).toLowerCase();
-      el.addEventListener(event, v as EventListenerOrEventListenerObject);
+      el.addEventListener(event, v);
     }
     else if (typeof v === "boolean") {
-      if (v) {
-        el.setAttribute(k, "");
-      }
-      else {
-        el.removeAttribute(k);
-      }
+      v ? el.setAttribute(k, "") : el.removeAttribute(k);
     }
     else {
       el.setAttribute(k, String(v));
@@ -86,22 +135,70 @@ export function patch(parent: Node, oldVNode: VNode, newVNode: VNode, index = 0)
     parent.replaceChild(mount(newVNode), el);
     return;
   }
+
+  // イベントリスナーの更新を効率化するためのマップ
+  const oldEventListeners = new Map<string, EventListenerOrEventListenerObject>();
+  const newEventListeners = new Map<string, EventListenerOrEventListenerObject>();
+
+  // 正規表現を一度だけコンパイル
+  const eventRegex = /^on[A-Z]/;
+
+  // 古いイベントリスナーを収集
+  for (const [k, v] of Object.entries(oldVNode.props)) {
+    if (eventRegex.test(k) && typeof v === "function") {
+      oldEventListeners.set(k.slice(2).toLowerCase(), v);
+    }
+  }
+
+  // 新しいpropsを適用
   for (const [k, v] of Object.entries(newVNode.props)) {
+    // 内部属性（_katu_internal_:プレフィックスを持つ）はDOMに反映しない
+    if (k.startsWith(_INTERNAL_ATTRIBUTES))
+      continue;
+
+    if (eventRegex.test(k) && typeof v === "function") {
+      // イベントリスナーの処理
+      const event = k.slice(2).toLowerCase();
+      newEventListeners.set(event, v);
+
+      // 古いリスナーと異なる場合のみ更新
+      const oldListener = oldEventListeners.get(event);
+      if (oldListener !== v) {
+        if (oldListener) {
+          el.removeEventListener(event, oldListener);
+        }
+        el.addEventListener(event, v);
+      }
+      continue;
+    }
+
+    // 値が変わった場合のみ更新
     if (oldVNode.props[k] !== v) {
       if (typeof v === "boolean") {
-        if (v) {
-          el.setAttribute(k, "");
-        }
-        else {
-          el.removeAttribute(k);
-        }
+        v ? el.setAttribute(k, "") : el.removeAttribute(k);
+      }
+      else if (v == null) {
+        el.removeAttribute(k);
       }
       else {
         el.setAttribute(k, String(v));
       }
     }
   }
+
+  // 古いイベントリスナーを削除（新しいpropsに存在しないもの）
+  for (const [event, listener] of oldEventListeners.entries()) {
+    if (!newEventListeners.has(event)) {
+      el.removeEventListener(event, listener);
+    }
+  }
+
+  // 削除された属性を処理
   for (const k of Object.keys(oldVNode.props)) {
+    // 内部属性と既に処理されたイベントリスナーは無視
+    if (k.startsWith(_INTERNAL_ATTRIBUTES) || (eventRegex.test(k) && typeof oldVNode.props[k] === "function"))
+      continue;
+
     if (!(k in newVNode.props)) {
       el.removeAttribute(k);
     }
@@ -109,23 +206,22 @@ export function patch(parent: Node, oldVNode: VNode, newVNode: VNode, index = 0)
 
   const oldChildren = oldVNode.children;
   const newChildren = newVNode.children;
-  const max = Math.max(oldChildren.length, newChildren.length);
 
-  for (let i = 0; i < max; i++) {
+  // 1. まず新しい子要素をすべて更新または追加する
+  for (let i = 0; i < newChildren.length; i++) {
     if (i >= oldChildren.length) {
+      // 新しい要素を追加
       el.appendChild(
         typeof newChildren[i] === "string"
           ? document.createTextNode(newChildren[i] as string)
           : mount(newChildren[i] as VNode),
       );
     }
-    else if (i >= newChildren.length) {
-      el.removeChild(el.childNodes[i]);
-    }
     else if (
       typeof oldChildren[i] === "string"
       && typeof newChildren[i] === "string"
     ) {
+      // 文字列ノードの更新（値が変わった場合のみ）
       if (oldChildren[i] !== newChildren[i]) {
         el.childNodes[i].textContent = newChildren[i] as string;
       }
@@ -134,15 +230,25 @@ export function patch(parent: Node, oldVNode: VNode, newVNode: VNode, index = 0)
       typeof oldChildren[i] === "object"
       && typeof newChildren[i] === "object"
     ) {
+      // オブジェクトノードの更新（再帰的）
       patch(el, oldChildren[i] as VNode, newChildren[i] as VNode, i);
     }
     else {
+      // タイプが異なる場合は置換
       el.replaceChild(
         typeof newChildren[i] === "string"
           ? document.createTextNode(newChildren[i] as string)
           : mount(newChildren[i] as VNode),
         el.childNodes[i],
       );
+    }
+  }
+
+  // 2. 古い要素で余分なものを削除（後ろから削除することで、インデックスのズレを防ぐ）
+  if (newChildren.length < oldChildren.length) {
+    // 削除すべき余分な子要素を効率的に削除
+    while (el.childNodes.length > newChildren.length) {
+      el.removeChild(el.childNodes[newChildren.length]);
     }
   }
 }

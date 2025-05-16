@@ -12,14 +12,14 @@ catalogs:
     typescript:
       specifier: 5.8.3
       version: 5.8.3
-    vite:
-      specifier: 6.2.7
-      version: 6.2.7
 
 importers:
 
   .:
     devDependencies:
+      concurrently:
+        specifier: ^9.1.2
+        version: 9.1.2
       pnpm:
         specifier: 10.8.1
         version: 10.8.1
@@ -1123,6 +1123,11 @@ packages:
 
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
+
+  concurrently@9.1.2:
+    resolution: {integrity: sha512-H9MWcoPsYddwbOGM6difjVwVZHl63nwMEwDJG/L7VGtuaJhb12h2caPG2tVPWs7emuYix252iGfqOyrz1GczTQ==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   confbox@0.1.8:
     resolution: {integrity: sha512-RMtmw0iFkeR4YV+fUOSucriAQNb9g8zFR52MWCtl+cCZOFRNL6zeB395vPzFhEjjn4fMxXudmELnl/KF/WrK6w==}
@@ -2363,6 +2368,9 @@ packages:
   run-parallel@1.2.0:
     resolution: {integrity: sha512-5l4VyZR86LZ/lDxZTR6jqL8AFE2S0IFLMP26AbjsLVADxHdhB/c0GUsH+y39UfCi3dzz8OlQuPmnaJOMoDHQBA==}
 
+  rxjs@7.8.2:
+    resolution: {integrity: sha512-dhKf903U/PQZY6boNNtAGdWbG85WAbjT/1xYoZIC7FAY0yWapOBQVsVrDl58W86//e1VpMNBtRV4MaXfdMySFA==}
+
   safer-buffer@2.1.2:
     resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}
 
@@ -2390,6 +2398,10 @@ packages:
   shebang-regex@3.0.0:
     resolution: {integrity: sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==}
     engines: {node: '>=8'}
+
+  shell-quote@1.8.2:
+    resolution: {integrity: sha512-AzqKpGKjrj7EM6rKVQEPpB288oCfnrEIuyoT9cyF4nmGa7V8Zk6f7RRqYisX8X9m+Q7bd632aZW4ky7EhbQztA==}
+    engines: {node: '>= 0.4'}
 
   siginfo@2.0.0:
     resolution: {integrity: sha512-ybx0WO1/8bSBLEWXZvEd7gMW3Sn3JFlW3TvX1nREbDLRNQNaeNN8WK0meBwPdAaOI7TtRRRJn/Es1zhrrCHu7g==}
@@ -2543,6 +2555,10 @@ packages:
   supports-color@7.2.0:
     resolution: {integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==}
     engines: {node: '>=8'}
+
+  supports-color@8.1.1:
+    resolution: {integrity: sha512-MpUEN2OodtUzxvKQl72cUF7RQ5EiHsGvSsVG0ia9c5RbWGL2CI4C7EpPS8UTBIplnlzZiNuV56w+FuNxy3ty2Q==}
+    engines: {node: '>=10'}
 
   supports-hyperlinks@3.2.0:
     resolution: {integrity: sha512-zFObLMyZeEwzAoKCyu1B91U79K2t7ApXuQfo8OuxwXLDgcKxuwM+YvcbIhm6QWqz7mHUH1TVytR1PwVVjEuMig==}
@@ -3618,11 +3634,11 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.5.0':
     optional: true
 
-  '@vitest/browser@3.1.1(playwright@1.52.0)(vite@6.2.7(@types/node@22.15.3)(yaml@2.7.1))(vitest@3.1.1)':
+  '@vitest/browser@3.1.1(playwright@1.52.0)(vite@6.2.6(@types/node@22.15.3)(yaml@2.7.1))(vitest@3.1.1)':
     dependencies:
       '@testing-library/dom': 10.4.0
       '@testing-library/user-event': 14.6.1(@testing-library/dom@10.4.0)
-      '@vitest/mocker': 3.1.1(vite@6.2.7(@types/node@22.15.3)(yaml@2.7.1))
+      '@vitest/mocker': 3.1.1(vite@6.2.6(@types/node@22.15.3)(yaml@2.7.1))
       '@vitest/utils': 3.1.1
       magic-string: 0.30.17
       sirv: 3.0.1
@@ -3654,7 +3670,7 @@ snapshots:
       tinyrainbow: 2.0.0
       vitest: 3.1.1(@types/debug@4.1.12)(@types/node@22.15.3)(@vitest/browser@3.1.1)(jsdom@26.1.0)(yaml@2.7.1)
     optionalDependencies:
-      '@vitest/browser': 3.1.1(playwright@1.52.0)(vite@6.2.7(@types/node@22.15.3)(yaml@2.7.1))(vitest@3.1.1)
+      '@vitest/browser': 3.1.1(playwright@1.52.0)(vite@6.2.6(@types/node@22.15.3)(yaml@2.7.1))(vitest@3.1.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -3680,15 +3696,6 @@ snapshots:
       magic-string: 0.30.17
     optionalDependencies:
       vite: 6.2.6(@types/node@22.15.3)(yaml@2.7.1)
-
-  '@vitest/mocker@3.1.1(vite@6.2.7(@types/node@22.15.3)(yaml@2.7.1))':
-    dependencies:
-      '@vitest/spy': 3.1.1
-      estree-walker: 3.0.3
-      magic-string: 0.30.17
-    optionalDependencies:
-      vite: 6.2.7(@types/node@22.15.3)(yaml@2.7.1)
-    optional: true
 
   '@vitest/pretty-format@3.1.1':
     dependencies:
@@ -3901,6 +3908,16 @@ snapshots:
   comment-parser@1.4.1: {}
 
   concat-map@0.0.1: {}
+
+  concurrently@9.1.2:
+    dependencies:
+      chalk: 4.1.2
+      lodash: 4.17.21
+      rxjs: 7.8.2
+      shell-quote: 1.8.2
+      supports-color: 8.1.1
+      tree-kill: 1.2.2
+      yargs: 17.7.2
 
   confbox@0.1.8: {}
 
@@ -5389,6 +5406,10 @@ snapshots:
     dependencies:
       queue-microtask: 1.2.3
 
+  rxjs@7.8.2:
+    dependencies:
+      tslib: 2.8.1
+
   safer-buffer@2.1.2:
     optional: true
 
@@ -5412,6 +5433,8 @@ snapshots:
       shebang-regex: 3.0.0
 
   shebang-regex@3.0.0: {}
+
+  shell-quote@1.8.2: {}
 
   siginfo@2.0.0: {}
 
@@ -5606,6 +5629,10 @@ snapshots:
       ts-interface-checker: 0.1.13
 
   supports-color@7.2.0:
+    dependencies:
+      has-flag: 4.0.0
+
+  supports-color@8.1.1:
     dependencies:
       has-flag: 4.0.0
 
@@ -5880,7 +5907,7 @@ snapshots:
     optionalDependencies:
       '@types/debug': 4.1.12
       '@types/node': 22.15.3
-      '@vitest/browser': 3.1.1(playwright@1.52.0)(vite@6.2.7(@types/node@22.15.3)(yaml@2.7.1))(vitest@3.1.1)
+      '@vitest/browser': 3.1.1(playwright@1.52.0)(vite@6.2.6(@types/node@22.15.3)(yaml@2.7.1))(vitest@3.1.1)
       jsdom: 26.1.0
     transitivePeerDependencies:
       - jiti

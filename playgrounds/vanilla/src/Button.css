@@ -1,0 +1,109 @@
+/* CSS Variables: M3 カラーパレットと形状の例 */
+/* 実際の M3 カラーはデザインシステムに合わせて調整してください */
+:host {
+  --m3-color-primary: #6750A4; /* 主要な色 */
+  --m3-color-on-primary: #FFFFFF; /* 主要な色の上に表示するテキスト/アイコンの色 */
+  --m3-color-surface-container-low: #F7F2FA; /* Background for Elevated/Tonal */
+  --m3-color-on-surface-variant: #49454F; /* Border for Outlined, text for Tonal */
+  --m3-color-outline: #79747E; /* Border for Outlined */
+
+  --m3-shape-corner-large: 28px; /* Filled, Elevated, Tonal ボタンの角丸 */
+  --m3-shape-corner-full: 50%; /* FABs など円形のボタン */
+
+  /* M3 Elevation (影) の例 - ガイドラインに基づいた近似値 */
+  --m3-elevation-level0: 0px 0px 0px 0px rgba(0, 0, 0, 0); /* Default */
+  --m3-elevation-level1: 0px 1px 3px 1px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3); /* Hover/Focus */
+  --m3-elevation-level2: 0px 2px 6px 2px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3); /* Pressed */
+}
+
+/* 基本的なボタンのスタイルリセットと共通設定 */
+button {
+  display: inline-flex; /* Flexbox で内容を中央寄せしやすく */
+  align-items: center; /* 垂直方向中央寄せ */
+  justify-content: center; /* 水平方向中央寄せ */
+  padding: 10px 24px; /* M3 ガイドラインに基づく一般的なパディング */
+  cursor: pointer;
+  border: none; /* デフォルトのボーダーを削除 */
+  /* background-color, color, border-radius はボタンタイプごとに設定 */
+  transition: background-color 0.2s, box-shadow 0.2s, opacity 0.2s; /* 滑らかな状態変化 */
+
+  /* M3 タイポグラフィ (Label Large) の例 */
+  font-family: 'Roboto', sans-serif; /* またはプロジェクトで使用するフォント */
+  font-size: 0.875rem; /* 14px */
+  font-weight: 500; /* Medium */
+  line-height: 1.25rem; /* 20px */
+  letter-spacing: 0.007em; /* 0.1px */
+  text-transform: none; /* M3 ボタンのテキストは通常大文字ではない */
+
+  outline: none; /* フォーカス時のデフォルトのアウトラインを削除 */
+  -webkit-tap-highlight-color: transparent; /* モバイルでのタップ時のハイライトを削除 */
+}
+
+/* Filled Button スタイル */
+button.m3-filled {
+  background-color: var(--m3-color-primary);
+  color: var(--m3-color-on-primary);
+  border-radius: var(--m3-shape-corner-large);
+  box-shadow: var(--m3-elevation-level0); /* デフォルトは影なし */
+}
+
+/* Filled Button State: Hover */
+button.m3-filled:hover {
+  /* ホバー時にはプライマリカラーの上に半透明の on-primary カラーが重なるイメージ */
+  /* color-mix 関数は比較的新しいため、対応ブラウザに注意 */
+  background-color: color-mix(in srgb, var(--m3-color-primary) 92%, var(--m3-color-on-primary) 8%);
+  box-shadow: var(--m3-elevation-level1); /* 影を少し出す */
+}
+
+/* Filled Button State: Focus */
+button.m3-filled:focus-visible { /* キーボードフォーカス時のみに推奨 */
+  /* フォーカス時は通常、輪郭や背景の変化で示す */
+  /* アクセシビリティのために視覚的なフォーカスインジケーターは重要 */
+  outline: 2px solid color-mix(in srgb, var(--m3-color-primary) 50%, var(--m3-color-on-primary) 50%); /* 例: プライマリと on-primary の中間色 */
+  outline-offset: 2px; /* 要素から少し離して表示 */
+}
+
+/* Filled Button State: Active (Pressed) */
+button.m3-filled:active {
+  /* 押下時にはより濃いオーバーレイ */
+   background-color: color-mix(in srgb, var(--m3-color-primary) 88%, var(--m3-color-on-primary) 12%);
+   box-shadow: var(--m3-elevation-level1); /* 影はホバーと同じか少し高め */
+}
+
+/* Filled Button State: Disabled */
+button.m3-filled:disabled {
+  background-color: color-mix(in srgb, var(--m3-color-on-surface) 12%, transparent); /* 不透明度を下げた背景色 */
+  color: color-mix(in srgb, var(--m3-color-on-surface) 38%, transparent); /* 不透明度を下げたテキスト色 */
+  box-shadow: var(--m3-elevation-level0); /* 影なし */
+  cursor: not-allowed;
+  pointer-events: none; /* クリックやホバーイベントを無効化 */
+  color: var(--m3-color-on-surface-variant); /* Disabled 状態のテキスト色 */
+}
+
+/* --- その他の M3 ボタンタイプの例 (コメントアウト) --- */
+/* .m3-outlined {
+  background-color: transparent;
+  color: var(--m3-color-primary);
+  border: 1px solid var(--m3-color-outline);
+  border-radius: var(--m3-shape-corner-medium); # 角丸は少し小さめが一般的
+  padding: 9px 24px; # ボーダーの分、パディングを調整
+  box-shadow: var(--m3-elevation-level0);
+}
+.m3-outlined:hover {
+    background-color: color-mix(in srgb, var(--m3-color-primary) 8%, transparent);
+    box-shadow: var(--m3-elevation-level1); # Hover gains elevation
+}
+... 他の状態も同様に追加 */
+
+/* .m3-text {
+  background-color: transparent;
+  color: var(--m3-color-primary);
+  border-radius: var(--m3-shape-corner-medium); # 角丸は小さめが一般的
+  padding: 10px 12px; # 水平パディングが小さめ
+  box-shadow: var(--m3-elevation-level0); # Text buttons typically have no shadow
+}
+.m3-text:hover {
+  background-color: color-mix(in srgb, var(--m3-color-primary) 8%, transparent);
+  box-shadow: var(--m3-elevation-level0);
+}
+... 他の状態も同様に追加 */
