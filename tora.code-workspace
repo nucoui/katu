@@ -9,6 +9,10 @@
       "path": "⚙️"
     },
     {
+      "name": ".github",
+      "path": "./.github"
+    },
+    {
       "name": "⚙️ config",
       "path": "./config",
     },
