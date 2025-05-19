@@ -1,0 +1,81 @@
+name: Publish Package
+
+on:
+  workflow_dispatch:
+    inputs:
+      pre:
+        description: 'Is this a NEW pre-release?'
+        required: false
+        default: false
+        type: boolean
+      level:
+        description: 'Release level'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+          - preup
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      actions: write
+      checks: write
+      deployments: write
+      pull-requests: write
+      repository-projects: write
+      security-events: write
+      statuses: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          registry-url: 'https://registry.npmjs.org'
+
+      - uses: pnpm/action-setup@v4
+
+      - name: Install dependencies
+        run: pnpm i --frozen-lockfile
+
+      - name: Build
+        run: pnpm p:core build
+
+      - name: Release
+        run: |
+          if [ "${{ github.event.inputs.pre }}" == "true" ]; then
+            pnpm p:core release --level ${{ github.event.inputs.level }} --pre
+          else
+            pnpm p:core release --level ${{ github.event.inputs.level }}
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Get Current package info
+        id: get-package-info
+        run: |
+          echo "PACKAGE_VERSION=$(pnpm view @tora/core version)" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        id: create-release
+        uses: release-drafter/release-drafter@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          version: ${{ steps.get-package-info.outputs.PACKAGE_VERSION }}
+          prerelease: ${{ contains(steps.get-package-info.outputs.PACKAGE_VERSION, '-beta') }}
