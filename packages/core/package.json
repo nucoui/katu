@@ -60,12 +60,12 @@
     "release:test": "rlse -l patch -k config,commit-changes,create-release-branch --dry-run"
   },
   "dependencies": {
-    "@tora/reactivity": "workspace:*",
-    "@tora/runtime": "workspace:*"
+    "@chatora/reactivity": "workspace:*",
+    "@chatora/runtime": "workspace:*"
   },
   "devDependencies": {
     "@takuma-ru/rlse": "0.0.1-beta.5",
-    "@tora/config": "workspace:*",
+    "@chatora/config": "workspace:*",
     "eslint": "catalog:",
     "tsup": "catalog:",
     "typescript": "catalog:"
