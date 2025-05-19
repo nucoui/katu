@@ -1,6 +1,6 @@
 {
-  "name": "catto",
-  "version": "1.0.0",
+  "name": "chatora",
+  "version": "0.0.0",
   "scripts": {
     "p:core": "pnpm -C packages/core",
     "p:rtv": "pnpm -C packages/reactivity",
