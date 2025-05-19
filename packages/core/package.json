@@ -1,18 +1,18 @@
 {
   "name": "chatora",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.0.1-beta.0",
   "private": false,
   "description": "Framework for creating custom elements with JSX function components",
   "author": "nuco <takuma-ru@takumaru.dev> (https://github.com/takuma-ru/)",
   "license": "MPL-2.0",
-  "homepage": "https://github.com/nucoui/tora",
+  "homepage": "https://github.com/nucoui/chatora",
   "repository": {
     "type": "git",
-    "url": "https://github.com/nucoui/tora"
+    "url": "https://github.com/nucoui/chatora"
   },
   "bugs": {
-    "url": "https://github.com/nucoui/tora/issues",
+    "url": "https://github.com/nucoui/chatora/issues",
     "email": "takuma-ru@takumaru.dev"
   },
   "exports": {
@@ -60,12 +60,12 @@
     "release:test": "rlse -l patch -k config,commit-changes,create-release-branch --dry-run"
   },
   "dependencies": {
-    "@tora/reactivity": "workspace:*",
-    "@tora/runtime": "workspace:*"
+    "@chatora/reactivity": "workspace:*",
+    "@chatora/runtime": "workspace:*"
   },
   "devDependencies": {
     "@takuma-ru/rlse": "0.0.1-beta.5",
-    "@tora/config": "workspace:*",
+    "@chatora/config": "workspace:*",
     "eslint": "catalog:",
     "tsup": "catalog:",
     "typescript": "catalog:"
