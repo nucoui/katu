@@ -18,34 +18,35 @@
   "exports": {
     ".": {
       "types": "./dist/main.d.ts",
-      "import": "./dist/main.mjs",
-      "require": "./dist/main.js"
+      "import": "./dist/main.js",
+      "require": "./dist/main.cjs"
     },
     "./reactivity": {
       "types": "./dist/reactivity.d.ts",
-      "import": "./dist/reactivity.mjs",
-      "require": "./dist/reactivity.js"
+      "import": "./dist/reactivity.js",
+      "require": "./dist/reactivity.cjs"
     },
     "./runtime": {
       "types": "./dist/runtime.d.ts",
-      "import": "./dist/runtime.mjs",
-      "require": "./dist/runtime.js"
+      "import": "./dist/runtime.js",
+      "require": "./dist/runtime.cjs"
     },
     "./jsx-runtime": {
       "types": "./dist/jsx-runtime.d.ts",
-      "import": "./dist/jsx-runtime.mjs",
-      "require": "./dist/jsx-runtime.js"
+      "import": "./dist/jsx-runtime.js",
+      "require": "./dist/jsx-runtime.cjs"
     },
     "./jsx-dev-runtime": {
       "types": "./dist/jsx-dev-runtime.d.ts",
-      "import": "./dist/jsx-dev-runtime.mjs",
-      "require": "./dist/jsx-dev-runtime.js"
+      "import": "./dist/jsx-dev-runtime.js",
+      "require": "./dist/jsx-dev-runtime.cjs"
     }
   },
   "files": [
     "README.md",
     "dist",
-    "package.json"
+    "package.json",
+    "../../README.md"
   ],
   "publishConfig": {
     "access": "public",
