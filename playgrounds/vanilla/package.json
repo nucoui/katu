@@ -9,8 +9,8 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "@katu/reactivity": "workspace:*",
-    "@katu/runtime": "workspace:*",
+    "@tora/reactivity": "workspace:*",
+    "@tora/runtime": "workspace:*",
     "clsx": "^2.1.1",
     "typescript": "~5.7.2",
     "vite": "catalog:"

@@ -1,7 +1,7 @@
 # Project Overview
 
 ## About this Project
-This project is named `katu`, which means "cat" in Basque language (Euskara).
+This project is named `tora`, which means "cat" in Basque language (Euskara).
 This project provides a library that utilizes JSX/TSX syntax to generate custom element classes for Web components and static HTML code for SSR.
 
 ## Purpose
@@ -51,7 +51,7 @@ Please understand the following knowledge. These are assumed to be known when pr
     - `<root>/packages/reactivity`: Package to make variables used in JSX syntax reactive. Uses alien-signals, customized to provide our own implementation.
     - `<root>/packages/runtime`: Package providing functionality to convert JSX syntax to custom element classes. Also includes implementation to make code transpiled by tsc's react-jsx reactive using packages/reactivity.
     - `<root>/packages/transpiler`: Package to convert JSX syntax to custom element classes. Uses babel to convert JSX syntax to custom element classes. (Not currently used)
-  - `<root>/playgrounds/**`: Sample code for the project. Stores sample code that works using @katu/core.
+  - `<root>/playgrounds/**`: Sample code for the project. Stores sample code that works using @tora/core.
 - This project uses ESLint for linting and formatting.
 - This project is written in TypeScript.
 - This project is tested with Vitest.
@@ -67,11 +67,11 @@ Please understand the following knowledge. These are assumed to be known when pr
     - `pnpm pg:<project-name>`: Executes commands for `<root>/playgrounds/<project-name>`.
 
 # Achievement Goals
-- @katu/reactivity
+- @tora/reactivity
   This package should allow variables used in JSX syntax to be reactive.
   Specifically, use alien-signals. Provide three functions: signal, computed, and effect.
   The behavior of each function should conform to alien-signals.
-- @katu/runtime
+- @tora/runtime
   This package should be able to convert JSX syntax into custom element classes.
   Specifically, receive code transpiled using tsc's react-jsx.
-  Using that code, enable virtual DOM management with @katu/reactivity, props management using @katu/reactivity, and event management using @katu/reactivity.
+  Using that code, enable virtual DOM management with @tora/reactivity, props management using @tora/reactivity, and event management using @tora/reactivity.

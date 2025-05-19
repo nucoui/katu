@@ -14,7 +14,7 @@
  * @returns CustomElement class
  */
 
-import type { KatuNode } from "./JSX.namespace";
+import type { ToraNode } from "./JSX.namespace";
 
 export type FunctionalCustomElementOptions = {
   /**
@@ -51,14 +51,14 @@ export type FunctionalCustomElementOptions = {
 export type FunctionalCustomElement = (
   callback: (params: {
     reactivity: {
-      signal: typeof import("@katu/reactivity").signal;
-      computed: typeof import("@katu/reactivity").computed;
-      effect: typeof import("@katu/reactivity").effect;
-      startBatch: typeof import("@katu/reactivity").startBatch;
-      endBatch: typeof import("@katu/reactivity").endBatch;
-      Signal: typeof import("@katu/reactivity").Signal;
-      Computed: typeof import("@katu/reactivity").Computed;
-      Effect: typeof import("@katu/reactivity").Effect;
+      signal: typeof import("@tora/reactivity").signal;
+      computed: typeof import("@tora/reactivity").computed;
+      effect: typeof import("@tora/reactivity").effect;
+      startBatch: typeof import("@tora/reactivity").startBatch;
+      endBatch: typeof import("@tora/reactivity").endBatch;
+      Signal: typeof import("@tora/reactivity").Signal;
+      Computed: typeof import("@tora/reactivity").Computed;
+      Effect: typeof import("@tora/reactivity").Effect;
     };
     /**
      * Propsの定義を行う関数
@@ -104,7 +104,7 @@ export type FunctionalCustomElement = (
      * レンダリング関数の登録
      * Register render function
      */
-    render: (cb: () => KatuNode) => void;
+    render: (cb: () => ToraNode) => void;
   }) => void,
   options: FunctionalCustomElementOptions
 ) => {

@@ -1,4 +1,4 @@
-import { functionalCustomElement } from "@katu/runtime";
+import { functionalCustomElement } from "@tora/runtime";
 import style from "./Button.scss?raw";
 import { clsx } from "clsx";
 

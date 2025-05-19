@@ -7,7 +7,8 @@
     "p:rt": "pnpm -C packages/runtime",
     "p:ts": "pnpm -C packages/transpiler",
     "pg:vanilla": "pnpm -C playgrounds/vanilla",
-    "watch": "concurrently \"pnpm p:core watch\" \"pnpm p:rtv watch\" \"pnpm p:rt watch\" \"pnpm p:ts watch\""
+    "watch": "concurrently \"pnpm p:core watch\" \"pnpm p:rtv watch\" \"pnpm p:rt watch\" \"pnpm p:ts watch\"",
+    "build": "pnpm p:core build && pnpm p:rtv build && pnpm p:rt build && pnpm p:ts build"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",

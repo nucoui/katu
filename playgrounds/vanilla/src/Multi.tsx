@@ -1,4 +1,4 @@
-import { functionalCustomElement } from "@katu/runtime";
+import { functionalCustomElement } from "@tora/runtime";
 
 const MultiA = functionalCustomElement(
   ({ reactivity: { signal }, render }) => {

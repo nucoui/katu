@@ -70,7 +70,7 @@ importers:
         specifier: ^1.0.13
         version: 1.0.13
     devDependencies:
-      '@katu/config':
+      '@tora/config':
         specifier: workspace:*
         version: link:../../config
       eslint:
@@ -85,10 +85,10 @@ importers:
 
   packages/runtime:
     devDependencies:
-      '@katu/config':
+      '@tora/config':
         specifier: workspace:*
         version: link:../../config
-      '@katu/reactivity':
+      '@tora/reactivity':
         specifier: workspace:*
         version: link:../reactivity
       '@vitest/coverage-v8':
@@ -113,10 +113,10 @@ importers:
         specifier: ^3.4.2
         version: 3.4.2
     devDependencies:
-      '@katu/reactivity':
+      '@tora/reactivity':
         specifier: workspace:*
         version: link:../../packages/reactivity
-      '@katu/runtime':
+      '@tora/runtime':
         specifier: workspace:*
         version: link:../../packages/runtime
       clsx:

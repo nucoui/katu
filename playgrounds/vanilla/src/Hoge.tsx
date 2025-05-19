@@ -1,4 +1,4 @@
-import { functionalCustomElement } from "@katu/runtime";
+import { functionalCustomElement } from "@tora/runtime";
 
 export const Hoge = functionalCustomElement(({
   reactivity: { signal, effect },

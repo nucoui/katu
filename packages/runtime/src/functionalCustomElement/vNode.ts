@@ -1,5 +1,5 @@
 // 内部属性のプレフィックス - 実DOMには反映されないが仮想DOMでは使用される
-export const _INTERNAL_ATTRIBUTES = "_katu_internal_:";
+export const _INTERNAL_ATTRIBUTES = "_tora_internal_:";
 
 /**
  * 内部属性かどうかを判定する
@@ -24,7 +24,7 @@ export function getInternalAttributeName(key: string): string {
 /**
  * 仮想DOMノードから内部属性の値を取得する
  * @param vnode 仮想DOMノード
- * @param name 内部属性名（data-katu-internalなど、プレフィックスなし）
+ * @param name 内部属性名（data-tora-internalなど、プレフィックスなし）
  * @returns 属性値または undefined
  */
 export function getInternalAttributeValue(vnode: VNode, name: string): any {
@@ -35,7 +35,7 @@ export function getInternalAttributeValue(vnode: VNode, name: string): any {
 /**
  * 仮想DOMノードに内部属性が存在するかチェックする
  * @param vnode 仮想DOMノード
- * @param name 内部属性名（data-katu-internalなど、プレフィックスなし）
+ * @param name 内部属性名（data-tora-internalなど、プレフィックスなし）
  * @returns 属性が存在する場合はtrue
  */
 export function hasInternalAttribute(vnode: VNode, name: string): boolean {
@@ -94,7 +94,7 @@ export function mount(vnode: VNode): Node {
     if (v == null)
       continue;
 
-    // 内部属性（_katu_internal_:プレフィックスを持つ）はDOMに反映しない
+    // 内部属性（_tora_internal_:プレフィックスを持つ）はDOMに反映しない
     if (k.startsWith(_INTERNAL_ATTRIBUTES))
       continue;
 
@@ -152,7 +152,7 @@ export function patch(parent: Node, oldVNode: VNode, newVNode: VNode, index = 0)
 
   // 新しいpropsを適用
   for (const [k, v] of Object.entries(newVNode.props)) {
-    // 内部属性（_katu_internal_:プレフィックスを持つ）はDOMに反映しない
+    // 内部属性（_tora_internal_:プレフィックスを持つ）はDOMに反映しない
     if (k.startsWith(_INTERNAL_ATTRIBUTES))
       continue;
 

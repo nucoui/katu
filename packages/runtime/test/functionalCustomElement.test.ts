@@ -7,8 +7,8 @@
 import { describe, expect, it } from "vitest";
 import { functionalCustomElement } from "../src/functionalCustomElement";
 
-// ダミーのKatuJSXElementを返す
-const DummyJSX = (): import("../types/JSX.namespace").KatuJSXElement => ({
+// ダミーのToraJSXElementを返す
+const DummyJSX = (): import("../types/JSX.namespace").ToraJSXElement => ({
   tag: "div",
   props: {},
 });

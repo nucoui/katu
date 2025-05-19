@@ -1,18 +1,18 @@
-export type KatuNode =
+export type ToraNode =
   | string
   | number
-  | KatuJSXElement
-  | KatuNode[]
+  | ToraJSXElement
+  | ToraNode[]
   | null
   | undefined;
 
-export type FunctionComponentResult = KatuNode | Promise<KatuNode>;
+export type FunctionComponentResult = ToraNode | Promise<ToraNode>;
 
 export interface HTMLElementEvent<T extends EventTarget> extends Event {
   target: T;
 }
 
-export interface KatuJSXElement {
+export interface ToraJSXElement {
   tag: string | ((props: Record<string, unknown>) => FunctionComponentResult);
   props: Record<string, unknown>;
 }
@@ -21,7 +21,7 @@ export interface KatuJSXElement {
  * onXXX系イベントハンドラ属性型
  * Event handler attributes (onXXX)
  */
-interface KatuEventHandlers {
+interface ToraEventHandlers {
   /**
    * クリックイベント
    * Click event handler
@@ -35,7 +35,7 @@ interface KatuEventHandlers {
   // 必要に応じて他のonXXXイベントもここに追加可能
 }
 
-interface KatuIntrinsicElements extends KatuEventHandlers {
+interface ToraIntrinsicElements extends ToraEventHandlers {
   /**
    * 要素のID属性
    * id attribute for the element
@@ -45,7 +45,7 @@ interface KatuIntrinsicElements extends KatuEventHandlers {
    * 子ノード
    * Children nodes
    */
-  children?: KatuNode;
+  children?: ToraNode;
   /**
    * class属性
    * class attribute for the element
@@ -92,42 +92,42 @@ interface KatuIntrinsicElements extends KatuEventHandlers {
  * div要素の属性型
  * Attributes for div element
  */
-export interface DivKatuIntrinsicElement extends KatuIntrinsicElements {}
+export interface DivToraIntrinsicElement extends ToraIntrinsicElements {}
 /**
  * h1要素の属性型
  * Attributes for h1 element
  */
-export interface H1KatuIntrinsicElement extends KatuIntrinsicElements {}
+export interface H1ToraIntrinsicElement extends ToraIntrinsicElements {}
 /**
  * p要素の属性型
  * Attributes for p element
  */
-export interface PKatuIntrinsicElement extends KatuIntrinsicElements {}
+export interface PToraIntrinsicElement extends ToraIntrinsicElements {}
 /**
  * ul要素の属性型
  * Attributes for ul element
  */
-export interface UlKatuIntrinsicElement extends KatuIntrinsicElements {}
+export interface UlToraIntrinsicElement extends ToraIntrinsicElements {}
 /**
  * ol要素の属性型
  * Attributes for ol element
  */
-export interface OlKatuIntrinsicElement extends KatuIntrinsicElements {}
+export interface OlToraIntrinsicElement extends ToraIntrinsicElements {}
 /**
  * li要素の属性型
  * Attributes for li element
  */
-export interface LiKatuIntrinsicElement extends KatuIntrinsicElements {}
+export interface LiToraIntrinsicElement extends ToraIntrinsicElements {}
 /**
  * span要素の属性型
  * Attributes for span element
  */
-export interface SpanKatuIntrinsicElement extends KatuIntrinsicElements {}
+export interface SpanToraIntrinsicElement extends ToraIntrinsicElements {}
 /**
  * button要素の属性型
  * Attributes for button element
  */
-export interface ButtonKatuIntrinsicElement extends KatuIntrinsicElements {
+export interface ButtonToraIntrinsicElement extends ToraIntrinsicElements {
   type?: string;
   disabled?: boolean;
   autofocus?: boolean;
@@ -139,7 +139,7 @@ export interface ButtonKatuIntrinsicElement extends KatuIntrinsicElements {
  * a要素の属性型
  * Attributes for a element
  */
-export interface AKatuIntrinsicElement extends KatuIntrinsicElements {
+export interface AToraIntrinsicElement extends ToraIntrinsicElements {
   href?: string;
   target?: string;
   rel?: string;
@@ -148,7 +148,7 @@ export interface AKatuIntrinsicElement extends KatuIntrinsicElements {
  * img要素の属性型
  * Attributes for img element
  */
-export interface ImgKatuIntrinsicElement extends KatuIntrinsicElements {
+export interface ImgToraIntrinsicElement extends ToraIntrinsicElements {
   src?: string;
   alt?: string;
   width?: number | string;
@@ -158,7 +158,7 @@ export interface ImgKatuIntrinsicElement extends KatuIntrinsicElements {
  * input要素の属性型
  * Attributes for input element
  */
-export interface InputKatuIntrinsicElement extends KatuIntrinsicElements {
+export interface InputToraIntrinsicElement extends ToraIntrinsicElements {
   type?: string;
   value?: string | number;
   checked?: boolean;
@@ -172,7 +172,7 @@ export interface InputKatuIntrinsicElement extends KatuIntrinsicElements {
  * textarea要素の属性型
  * Attributes for textarea element
  */
-export interface TextareaKatuIntrinsicElement extends KatuIntrinsicElements {
+export interface TextareaToraIntrinsicElement extends ToraIntrinsicElements {
   value?: string;
   placeholder?: string;
   name?: string;
@@ -186,7 +186,7 @@ export interface TextareaKatuIntrinsicElement extends KatuIntrinsicElements {
  * form要素の属性型
  * Attributes for form element
  */
-export interface FormKatuIntrinsicElement extends KatuIntrinsicElements {
+export interface FormToraIntrinsicElement extends ToraIntrinsicElements {
   action?: string;
   method?: string;
   enctype?: string;
@@ -196,14 +196,14 @@ export interface FormKatuIntrinsicElement extends KatuIntrinsicElements {
  * label要素の属性型
  * Attributes for label element
  */
-export interface LabelKatuIntrinsicElement extends KatuIntrinsicElements {
+export interface LabelToraIntrinsicElement extends ToraIntrinsicElements {
   for?: string;
 }
 /**
  * td要素の属性型
  * Attributes for td element
  */
-export interface TdKatuIntrinsicElement extends KatuIntrinsicElements {
+export interface TdToraIntrinsicElement extends ToraIntrinsicElements {
   colspan?: number;
   rowspan?: number;
 }
@@ -211,7 +211,7 @@ export interface TdKatuIntrinsicElement extends KatuIntrinsicElements {
  * th要素の属性型
  * Attributes for th element
  */
-export interface ThKatuIntrinsicElement extends KatuIntrinsicElements {
+export interface ThToraIntrinsicElement extends ToraIntrinsicElements {
   colspan?: number;
   rowspan?: number;
   scope?: string;
@@ -220,7 +220,7 @@ export interface ThKatuIntrinsicElement extends KatuIntrinsicElements {
  * svg要素の属性型
  * Attributes for svg element
  */
-export interface SvgKatuIntrinsicElement extends KatuIntrinsicElements {
+export interface SvgToraIntrinsicElement extends ToraIntrinsicElements {
   width?: number | string;
   height?: number | string;
   viewBox?: string;
@@ -231,7 +231,7 @@ export interface SvgKatuIntrinsicElement extends KatuIntrinsicElements {
  * path要素の属性型
  * Attributes for path element
  */
-export interface PathKatuIntrinsicElement extends KatuIntrinsicElements {
+export interface PathToraIntrinsicElement extends ToraIntrinsicElements {
   d?: string;
   fill?: string;
   stroke?: string;
@@ -240,7 +240,7 @@ export interface PathKatuIntrinsicElement extends KatuIntrinsicElements {
  * circle要素の属性型
  * Attributes for circle element
  */
-export interface CircleKatuIntrinsicElement extends KatuIntrinsicElements {
+export interface CircleToraIntrinsicElement extends ToraIntrinsicElements {
   cx?: number | string;
   cy?: number | string;
   r?: number | string;
@@ -251,7 +251,7 @@ export interface CircleKatuIntrinsicElement extends KatuIntrinsicElements {
  * rect要素の属性型
  * Attributes for rect element
  */
-export interface RectKatuIntrinsicElement extends KatuIntrinsicElements {
+export interface RectToraIntrinsicElement extends ToraIntrinsicElements {
   x?: number | string;
   y?: number | string;
   width?: number | string;
@@ -263,7 +263,7 @@ export interface RectKatuIntrinsicElement extends KatuIntrinsicElements {
  * line要素の属性型
  * Attributes for line element
  */
-export interface LineKatuIntrinsicElement extends KatuIntrinsicElements {
+export interface LineToraIntrinsicElement extends ToraIntrinsicElements {
   x1?: number | string;
   y1?: number | string;
   x2?: number | string;
@@ -274,7 +274,7 @@ export interface LineKatuIntrinsicElement extends KatuIntrinsicElements {
  * polyline要素の属性型
  * Attributes for polyline element
  */
-export interface PolylineKatuIntrinsicElement extends KatuIntrinsicElements {
+export interface PolylineToraIntrinsicElement extends ToraIntrinsicElements {
   points?: string;
   fill?: string;
   stroke?: string;
@@ -283,7 +283,7 @@ export interface PolylineKatuIntrinsicElement extends KatuIntrinsicElements {
  * polygon要素の属性型
  * Attributes for polygon element
  */
-export interface PolygonKatuIntrinsicElement extends KatuIntrinsicElements {
+export interface PolygonToraIntrinsicElement extends ToraIntrinsicElements {
   points?: string;
   fill?: string;
   stroke?: string;
@@ -292,7 +292,7 @@ export interface PolygonKatuIntrinsicElement extends KatuIntrinsicElements {
  * ellipse要素の属性型
  * Attributes for ellipse element
  */
-export interface EllipseKatuIntrinsicElement extends KatuIntrinsicElements {
+export interface EllipseToraIntrinsicElement extends ToraIntrinsicElements {
   cx?: number | string;
   cy?: number | string;
   rx?: number | string;
@@ -304,7 +304,7 @@ export interface EllipseKatuIntrinsicElement extends KatuIntrinsicElements {
  * text要素の属性型
  * Attributes for text element
  */
-export interface TextKatuIntrinsicElement extends KatuIntrinsicElements {
+export interface TextToraIntrinsicElement extends ToraIntrinsicElements {
   x?: number | string;
   y?: number | string;
   fill?: string;
@@ -315,7 +315,7 @@ export interface TextKatuIntrinsicElement extends KatuIntrinsicElements {
  * slot要素の属性型
  * Attributes for slot element
  */
-export interface SlotKatuIntrinsicElement extends KatuIntrinsicElements {
+export interface SlotToraIntrinsicElement extends ToraIntrinsicElements {
   name?: string;
   /**
    * @deprecated
@@ -327,64 +327,64 @@ export interface SlotKatuIntrinsicElement extends KatuIntrinsicElements {
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      div: DivKatuIntrinsicElement;
-      h1: H1KatuIntrinsicElement;
-      p: PKatuIntrinsicElement;
-      ul: UlKatuIntrinsicElement;
-      ol: OlKatuIntrinsicElement;
-      li: LiKatuIntrinsicElement;
-      span: SpanKatuIntrinsicElement;
-      button: ButtonKatuIntrinsicElement;
-      a: AKatuIntrinsicElement;
-      img: ImgKatuIntrinsicElement;
-      input: InputKatuIntrinsicElement;
-      textarea: TextareaKatuIntrinsicElement;
-      form: FormKatuIntrinsicElement;
-      label: LabelKatuIntrinsicElement;
-      table: KatuIntrinsicElements;
-      tr: KatuIntrinsicElements;
-      td: TdKatuIntrinsicElement;
-      th: ThKatuIntrinsicElement;
-      thead: KatuIntrinsicElements;
-      tbody: KatuIntrinsicElements;
-      tfoot: KatuIntrinsicElements;
-      section: KatuIntrinsicElements;
-      article: KatuIntrinsicElements;
-      nav: KatuIntrinsicElements;
-      header: KatuIntrinsicElements;
-      footer: KatuIntrinsicElements;
-      aside: KatuIntrinsicElements;
-      main: KatuIntrinsicElements;
-      strong: KatuIntrinsicElements;
-      em: KatuIntrinsicElements;
-      b: KatuIntrinsicElements;
-      i: KatuIntrinsicElements;
-      u: KatuIntrinsicElements;
-      s: KatuIntrinsicElements;
-      pre: KatuIntrinsicElements;
-      code: KatuIntrinsicElements;
-      blockquote: KatuIntrinsicElements;
-      hr: KatuIntrinsicElements;
-      br: KatuIntrinsicElements;
-      svg: SvgKatuIntrinsicElement;
-      path: PathKatuIntrinsicElement;
-      circle: CircleKatuIntrinsicElement;
-      rect: RectKatuIntrinsicElement;
-      line: LineKatuIntrinsicElement;
-      polyline: PolylineKatuIntrinsicElement;
-      polygon: PolygonKatuIntrinsicElement;
-      ellipse: EllipseKatuIntrinsicElement;
-      text: TextKatuIntrinsicElement;
-      slot: SlotKatuIntrinsicElement;
+      div: DivToraIntrinsicElement;
+      h1: H1ToraIntrinsicElement;
+      p: PToraIntrinsicElement;
+      ul: UlToraIntrinsicElement;
+      ol: OlToraIntrinsicElement;
+      li: LiToraIntrinsicElement;
+      span: SpanToraIntrinsicElement;
+      button: ButtonToraIntrinsicElement;
+      a: AToraIntrinsicElement;
+      img: ImgToraIntrinsicElement;
+      input: InputToraIntrinsicElement;
+      textarea: TextareaToraIntrinsicElement;
+      form: FormToraIntrinsicElement;
+      label: LabelToraIntrinsicElement;
+      table: ToraIntrinsicElements;
+      tr: ToraIntrinsicElements;
+      td: TdToraIntrinsicElement;
+      th: ThToraIntrinsicElement;
+      thead: ToraIntrinsicElements;
+      tbody: ToraIntrinsicElements;
+      tfoot: ToraIntrinsicElements;
+      section: ToraIntrinsicElements;
+      article: ToraIntrinsicElements;
+      nav: ToraIntrinsicElements;
+      header: ToraIntrinsicElements;
+      footer: ToraIntrinsicElements;
+      aside: ToraIntrinsicElements;
+      main: ToraIntrinsicElements;
+      strong: ToraIntrinsicElements;
+      em: ToraIntrinsicElements;
+      b: ToraIntrinsicElements;
+      i: ToraIntrinsicElements;
+      u: ToraIntrinsicElements;
+      s: ToraIntrinsicElements;
+      pre: ToraIntrinsicElements;
+      code: ToraIntrinsicElements;
+      blockquote: ToraIntrinsicElements;
+      hr: ToraIntrinsicElements;
+      br: ToraIntrinsicElements;
+      svg: SvgToraIntrinsicElement;
+      path: PathToraIntrinsicElement;
+      circle: CircleToraIntrinsicElement;
+      rect: RectToraIntrinsicElement;
+      line: LineToraIntrinsicElement;
+      polyline: PolylineToraIntrinsicElement;
+      polygon: PolygonToraIntrinsicElement;
+      ellipse: EllipseToraIntrinsicElement;
+      text: TextToraIntrinsicElement;
+      slot: SlotToraIntrinsicElement;
     }
 
-    type Element = KatuJSXElement;
+    type Element = ToraJSXElement;
     type ElementType = string | ((props: any) => FunctionComponentResult);
 
     interface ElementChildrenAttribute {
       children: unknown;
     }
 
-    type LibraryManagedAttributes<_F, P> = P & KatuIntrinsicElements;
+    type LibraryManagedAttributes<_F, P> = P & ToraIntrinsicElements;
   }
 }
