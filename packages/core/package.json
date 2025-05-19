@@ -1,7 +1,7 @@
 {
   "name": "chatora",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.0.1-beta.0",
   "private": false,
   "description": "Framework for creating custom elements with JSX function components",
   "author": "nuco <takuma-ru@takumaru.dev> (https://github.com/takuma-ru/)",
@@ -49,8 +49,7 @@
   ],
   "publishConfig": {
     "access": "public",
-    "registry": "https://registry.npmjs.org/",
-    "provenance": true
+    "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
     "build": "tsup",
