@@ -6,13 +6,13 @@
   "description": "Framework for creating custom elements with JSX function components",
   "author": "nuco <takuma-ru@takumaru.dev> (https://github.com/takuma-ru/)",
   "license": "MPL-2.0",
-  "homepage": "https://github.com/nucoui/tora",
+  "homepage": "https://github.com/nucoui/chatora",
   "repository": {
     "type": "git",
-    "url": "https://github.com/nucoui/tora"
+    "url": "https://github.com/nucoui/chatora"
   },
   "bugs": {
-    "url": "https://github.com/nucoui/tora/issues",
+    "url": "https://github.com/nucoui/chatora/issues",
     "email": "takuma-ru@takumaru.dev"
   },
   "exports": {
@@ -49,7 +49,8 @@
   ],
   "publishConfig": {
     "access": "public",
-    "registry": "https://registry.npmjs.org/"
+    "registry": "https://registry.npmjs.org/",
+    "provenance": true
   },
   "scripts": {
     "build": "tsup",

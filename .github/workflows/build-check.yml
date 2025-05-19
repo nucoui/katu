@@ -6,7 +6,7 @@ on:
     paths:
       - 'packages/reactivity/**'
       - 'packages/runtime/**'
-      - 'packages/chatora/**'
+      - 'packages/core/**'
 
 jobs:
   build:
@@ -61,25 +61,25 @@ jobs:
               - 'packages/reactivity/**'
             runtime:
               - 'packages/runtime/**'
-            chatora:
-              - 'packages/chatora/**'
+            core:
+              - 'packages/core/**'
 
       # Build all packages sequentially in the correct dependency order
       - name: Build all packages
         shell: bash
         run: |
           # Check if any of the packages need to be built
-          if [[ "${{ steps.filter.outputs.reactivity }}" == "true" || "${{ steps.filter.outputs.runtime }}" == "true" || "${{ steps.filter.outputs.chatora }}" == "true" ]]; then
+          if [[ "${{ steps.filter.outputs.reactivity }}" == "true" || "${{ steps.filter.outputs.runtime }}" == "true" || "${{ steps.filter.outputs.core }}" == "true" ]]; then
             echo "Building reactivity package..."
             pnpm p:rtv build
           fi
 
-          if [[ "${{ steps.filter.outputs.runtime }}" == "true" || "${{ steps.filter.outputs.chatora }}" == "true" ]]; then
+          if [[ "${{ steps.filter.outputs.runtime }}" == "true" || "${{ steps.filter.outputs.core }}" == "true" ]]; then
             echo "Building runtime package..."
             pnpm p:rt build
           fi
 
-          if [[ "${{ steps.filter.outputs.chatora }}" == "true" ]]; then
+          if [[ "${{ steps.filter.outputs.core }}" == "true" ]]; then
             echo "Building chatora package..."
-            pnpm p:chatora build
+            pnpm p:core build
           fi
