@@ -1,4 +1,4 @@
-import { functionalCustomElement } from "tora";
+import { functionalCustomElement } from "chatora";
 
 export const Hoge = functionalCustomElement(({
   reactivity: { signal, effect },

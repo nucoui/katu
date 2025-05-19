@@ -14,7 +14,7 @@
  * @returns CustomElement class
  */
 
-import type { ToraNode } from "./JSX.namespace";
+import type { ChatoraNode } from "./JSX.namespace";
 
 export type FunctionalCustomElementOptions = {
   /**
@@ -50,13 +50,13 @@ export type FunctionalCustomElementOptions = {
   shadowRootMode?: never;
 });
 
-export type ToraComponent = (params: {
+export type ChatoraComponent = (params: {
   reactivity: {
-    signal: typeof import("@tora/reactivity").signal;
-    computed: typeof import("@tora/reactivity").computed;
-    effect: typeof import("@tora/reactivity").effect;
-    startBatch: typeof import("@tora/reactivity").startBatch;
-    endBatch: typeof import("@tora/reactivity").endBatch;
+    signal: typeof import("@chatora/reactivity").signal;
+    computed: typeof import("@chatora/reactivity").computed;
+    effect: typeof import("@chatora/reactivity").effect;
+    startBatch: typeof import("@chatora/reactivity").startBatch;
+    endBatch: typeof import("@chatora/reactivity").endBatch;
   };
   /**
    * Propsの定義を行う関数
@@ -102,11 +102,11 @@ export type ToraComponent = (params: {
    * レンダリング関数の登録
    * Register render function
    */
-  render: (cb: () => ToraNode) => void;
+  render: (cb: () => ChatoraNode) => void;
 }) => void;
 
 export type FunctionalCustomElement = (
-  component: ToraComponent,
+  component: ChatoraComponent,
   options: FunctionalCustomElementOptions
 ) => {
   new (): HTMLElement;

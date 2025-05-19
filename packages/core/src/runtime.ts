@@ -1,1 +1,1 @@
-export * from "@tora/runtime";
+export * from "@chatora/runtime";

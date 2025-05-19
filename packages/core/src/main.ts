@@ -1,2 +1,2 @@
-export * from "@tora/reactivity";
-export * from "@tora/runtime";
+export * from "@chatora/reactivity";
+export * from "@chatora/runtime";

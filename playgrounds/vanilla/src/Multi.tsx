@@ -1,4 +1,4 @@
-import { functionalCustomElement } from "tora";
+import { functionalCustomElement } from "chatora";
 
 const MultiA = functionalCustomElement(
   ({ reactivity: { signal }, render }) => {

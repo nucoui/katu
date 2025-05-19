@@ -1,7 +1,7 @@
 /**
  * Re-exports the core reactivity functions from alien-signals with custom wrappers
- * to match the expected interface for the Tora project.
- * @module @tora/reactivity
+ * to match the expected interface for the Chatora project.
+ * @module @chatora/reactivity
  */
 
 import * as alienSignals from "alien-signals";

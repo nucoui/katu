@@ -1,4 +1,4 @@
-name: PR Build - reactivity, runtime & tora
+name: PR Build - reactivity, runtime & chatora
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
     paths:
       - 'packages/reactivity/**'
       - 'packages/runtime/**'
-      - 'packages/tora/**'
+      - 'packages/chatora/**'
 
 jobs:
   build:
@@ -61,25 +61,25 @@ jobs:
               - 'packages/reactivity/**'
             runtime:
               - 'packages/runtime/**'
-            tora:
-              - 'packages/tora/**'
+            chatora:
+              - 'packages/chatora/**'
 
       # Build all packages sequentially in the correct dependency order
       - name: Build all packages
         shell: bash
         run: |
           # Check if any of the packages need to be built
-          if [[ "${{ steps.filter.outputs.reactivity }}" == "true" || "${{ steps.filter.outputs.runtime }}" == "true" || "${{ steps.filter.outputs.tora }}" == "true" ]]; then
+          if [[ "${{ steps.filter.outputs.reactivity }}" == "true" || "${{ steps.filter.outputs.runtime }}" == "true" || "${{ steps.filter.outputs.chatora }}" == "true" ]]; then
             echo "Building reactivity package..."
             pnpm p:rtv build
           fi
 
-          if [[ "${{ steps.filter.outputs.runtime }}" == "true" || "${{ steps.filter.outputs.tora }}" == "true" ]]; then
+          if [[ "${{ steps.filter.outputs.runtime }}" == "true" || "${{ steps.filter.outputs.chatora }}" == "true" ]]; then
             echo "Building runtime package..."
             pnpm p:rt build
           fi
 
-          if [[ "${{ steps.filter.outputs.tora }}" == "true" ]]; then
-            echo "Building tora package..."
-            pnpm p:tora build
+          if [[ "${{ steps.filter.outputs.chatora }}" == "true" ]]; then
+            echo "Building chatora package..."
+            pnpm p:chatora build
           fi

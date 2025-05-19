@@ -1,6 +1,6 @@
-import { functionalCustomElement, ToraComponent } from "tora";
+import { functionalCustomElement, ChatoraComponent } from "chatora";
 
-const Mini: ToraComponent = ({ reactivity: { signal }, render }) => {
+const Mini: ChatoraComponent = ({ reactivity: { signal }, render }) => {
     const [count, setCount] = signal(0);
 
     render(() => {

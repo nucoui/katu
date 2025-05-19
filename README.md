@@ -1,4 +1,4 @@
-# Tora
+# Chatora
 
 ## Description
 It is a framework that allows you to implement custom elements in a React-like manner.
@@ -8,7 +8,7 @@ Usually, knowledge of classes is required, but since the implementation is funct
 
 ### 1. Install the package
 ```bash
-npm install tora
+npm install chatora
 ```
 
 ### 2. Setting `tsconfig.json`
@@ -16,16 +16,16 @@ npm install tora
 {
   "compilerOptions": {
     "jsx": "react-jsx",
-    "jsxImportSource": "tora"
+    "jsxImportSource": "chatora"
   }
 }
 ```
 
 ### 3. Create a custom element
 ```ts
-import { functionalCustomElement, ToraComponent } from "tora";
+import { functionalCustomElement, ChatoraComponent } from "chatora";
 
-const Comp: ToraComponent = ({ reactivity: { signal }, render }) => {
+const Comp: ChatoraComponent = ({ reactivity: { signal }, render }) => {
     const [count, setCount] = signal(0);
 
     render(() => {
@@ -56,4 +56,4 @@ const MiniElement = functionalCustomElement(Comp, {
 ```
 
 ### Eponym
-**tora**(*/tora/*) means tabby in Japanese
+**chatora**(*/chatora/*) means tabby in Japanese

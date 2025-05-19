@@ -1,7 +1,7 @@
 # プロジェクト概要
 
 ## このプロジェクトについて
-このプロジェクトは `tora` という名前のプロジェクトです。`tora` は日本語で「トラ」を意味します。このプロジェクトは、JSX/TSXを使用してWeb components の custom element class および、SSR用の静的HTMLコードを生成するためのライブラリを提供します。
+このプロジェクトは `chatora` という名前のプロジェクトです。`chatora` は日本語で「トラ」を意味します。このプロジェクトは、JSX/TSXを使用してWeb components の custom element class および、SSR用の静的HTMLコードを生成するためのライブラリを提供します。
 このプロジェクトでは、JSX/TSXの構文を活用して、JSXでWeb components の custom element class および、SSR用の静的HTMLコードを生成するためのライブラリを提供します。
 
 ## 目的
@@ -51,7 +51,7 @@
     - `<root>/packages/reactivity`: JSX構文内で使用する変数をリアクティブにするためのパッケージ。alien-signalsを使用して、独自にカスタマイズしたものを提供します。
     - `<root>/packages/runtime`: JSX構文を custom element class に変換するための機能を提供するパッケージ。tscのreact-jsxによってトランスパイルされたコードをpackages/reactivityを使用してリアクティブにするための実装も含まれています。
     - `<root>/packages/transpiler`: JSX構文を custom element class に変換するためのパッケージ。babelを使用して、JSX構文を custom element class に変換します。（現在は使用されてません）
-  - `<root>/playgrounds/**`: プロジェクトのサンプルコード。@tora/coreを使用して、実際に動作するサンプルコードを格納します。
+  - `<root>/playgrounds/**`: プロジェクトのサンプルコード。@chatora/coreを使用して、実際に動作するサンプルコードを格納します。
 - このプロジェクトはESLintでリントやフォーマットを行います。
 - このプロジェクトはTypeScriptで書かれています。
 - このプロジェクトはVitestでテストされます。
@@ -67,11 +67,11 @@
     - `pnpm pg:<project-name>`: `<root>/playgrounds/<project-name>`のコマンドを実行します。
 
 # 達成目標
-- @tora/reactivity
+- @chatora/reactivity
   このパッケージでは、JSX構文内で使用する変数をリアクティブにすることができること。
   具体的には、alien-signalsを使用する。signalとcomputed、effectの3つの関数を提供する。
   各関数の動作はalien-signalsに準拠すること。
--@tora/runtime
+-@chatora/runtime
   このパッケージでは、JSX構文を custom element class に変換することができること。
   具体的には、tscのreact-jsxを使用して変換されたコードを受け取りる。
-  そのコードを使って、仮想DOMと@tora/reactivityによるDOM管理、@tora/reactivityを使用したpropsの管理、@tora/reactivityを使用したイベントの管理を行うことができること。
+  そのコードを使って、仮想DOMと@chatora/reactivityによるDOM管理、@chatora/reactivityを使用したpropsの管理、@chatora/reactivityを使用したイベントの管理を行うことができること。

@@ -8,7 +8,7 @@ import {
   mount,
   patch,
 } from "@/functionalCustomElement/vNode";
-import { computed, effect, endBatch, signal, startBatch } from "@tora/reactivity";
+import { computed, effect, endBatch, signal, startBatch } from "@chatora/reactivity";
 
 /**
  * FunctionalCustomElementの型引数を関数使用時に指定できるようにします。
@@ -159,7 +159,7 @@ const functionalCustomElement: FunctionalCustomElement = (
         },
         render: (cb) => {
           // 内部属性の値を一度だけ作成しておく（再利用）
-          const internalAttribute = `${_INTERNAL_ATTRIBUTES}data-tora-internal`;
+          const internalAttribute = `${_INTERNAL_ATTRIBUTES}data-chatora-internal`;
 
           const renderCallback = () => {
             const node = cb();

@@ -1,5 +1,5 @@
 {
-  "name": "@tora/reactivity",
+  "name": "@chatora/reactivity",
   "version": "1.0.0",
   "private": false,
   "packageManager": "pnpm@10.8.1",
@@ -21,7 +21,7 @@
     "alien-signals": "^2.0.5"
   },
   "devDependencies": {
-    "@tora/config": "workspace:*",
+    "@chatora/config": "workspace:*",
     "eslint": "catalog:",
     "tsup": "catalog:",
     "vitest": "^3.1.1"

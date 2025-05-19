@@ -1,1 +1,1 @@
-export * from "@tora/runtime/jsx-dev-runtime";
+export * from "@chatora/runtime/jsx-dev-runtime";

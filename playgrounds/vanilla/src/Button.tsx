@@ -1,12 +1,12 @@
-import { functionalCustomElement } from "tora";
-import type { ToraComponent } from "tora";
+import { functionalCustomElement } from "chatora";
+import type { ChatoraComponent } from "chatora";
 import style from "./Button.scss?raw";
 import { clsx } from "clsx";
 import z from "zod/v4"
 
 const TypeSchema = z.literal(["anchor", "submit", "reset", "toggle", "button"])
 
-const ButtonComponent: ToraComponent = ({
+const ButtonComponent: ChatoraComponent = ({
   reactivity: { signal, effect, computed },
   defineProps,
   defineEmits,

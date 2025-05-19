@@ -24,7 +24,7 @@ export function getInternalAttributeName(key: string): string {
 /**
  * 仮想DOMノードから内部属性の値を取得する
  * @param vnode 仮想DOMノード
- * @param name 内部属性名（data-tora-internalなど、プレフィックスなし）
+ * @param name 内部属性名（data-chatora-internalなど、プレフィックスなし）
  * @returns 属性値または undefined
  */
 export function getInternalAttributeValue(vnode: VNode, name: string): any {
@@ -35,7 +35,7 @@ export function getInternalAttributeValue(vnode: VNode, name: string): any {
 /**
  * 仮想DOMノードに内部属性が存在するかチェックする
  * @param vnode 仮想DOMノード
- * @param name 内部属性名（data-tora-internalなど、プレフィックスなし）
+ * @param name 内部属性名（data-chatora-internalなど、プレフィックスなし）
  * @returns 属性が存在する場合はtrue
  */
 export function hasInternalAttribute(vnode: VNode, name: string): boolean {

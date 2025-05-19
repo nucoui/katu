@@ -67,13 +67,38 @@ importers:
         specifier: ^36.0.1
         version: 36.0.1(stylelint@16.18.0(typescript@5.8.3))
 
+  packages/core:
+    dependencies:
+      '@chatora/reactivity':
+        specifier: workspace:*
+        version: link:../reactivity
+      '@chatora/runtime':
+        specifier: workspace:*
+        version: link:../runtime
+    devDependencies:
+      '@chatora/config':
+        specifier: workspace:*
+        version: link:../../config
+      '@takuma-ru/rlse':
+        specifier: 0.0.1-beta.5
+        version: 0.0.1-beta.5
+      eslint:
+        specifier: 'catalog:'
+        version: 9.24.0
+      tsup:
+        specifier: 'catalog:'
+        version: 8.4.0(postcss@8.5.3)(typescript@5.8.3)(yaml@2.7.1)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.8.3
+
   packages/reactivity:
     dependencies:
       alien-signals:
         specifier: ^2.0.5
         version: 2.0.5
     devDependencies:
-      '@tora/config':
+      '@chatora/config':
         specifier: workspace:*
         version: link:../../config
       eslint:
@@ -88,10 +113,10 @@ importers:
 
   packages/runtime:
     devDependencies:
-      '@tora/config':
+      '@chatora/config':
         specifier: workspace:*
         version: link:../../config
-      '@tora/reactivity':
+      '@chatora/reactivity':
         specifier: workspace:*
         version: link:../reactivity
       '@vitest/coverage-v8':
@@ -110,39 +135,14 @@ importers:
         specifier: ^3.1.1
         version: 3.1.1(@types/debug@4.1.12)(@types/node@22.15.3)(@vitest/browser@3.1.1)(jsdom@26.1.0)(yaml@2.7.1)
 
-  packages/tora:
-    dependencies:
-      '@tora/reactivity':
-        specifier: workspace:*
-        version: link:../reactivity
-      '@tora/runtime':
-        specifier: workspace:*
-        version: link:../runtime
-    devDependencies:
-      '@takuma-ru/rlse':
-        specifier: 0.0.1-beta.5
-        version: 0.0.1-beta.5
-      '@tora/config':
-        specifier: workspace:*
-        version: link:../../config
-      eslint:
-        specifier: 'catalog:'
-        version: 9.24.0
-      tsup:
-        specifier: 'catalog:'
-        version: 8.4.0(postcss@8.5.3)(typescript@5.8.3)(yaml@2.7.1)
-      typescript:
-        specifier: 'catalog:'
-        version: 5.8.3
-
   playgrounds/vanilla:
     dependencies:
+      chatora:
+        specifier: workspace:*
+        version: link:../../packages/core
       consola:
         specifier: ^3.4.2
         version: 3.4.2
-      tora:
-        specifier: workspace:*
-        version: link:../../packages/tora
       zod:
         specifier: 3.25.0-beta.20250519T033844
         version: 3.25.0-beta.20250519T033844

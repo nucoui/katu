@@ -1,2 +1,2 @@
 /// <reference types="vite/client" />
-/// <reference types="@tora/runtime/JSX" />
+/// <reference types="@chatora/runtime/JSX" />

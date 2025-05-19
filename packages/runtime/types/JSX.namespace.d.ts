@@ -1,18 +1,18 @@
-export type ToraNode =
+export type ChatoraNode =
   | string
   | number
-  | ToraJSXElement
-  | ToraNode[]
+  | ChatoraJSXElement
+  | ChatoraNode[]
   | null
   | undefined;
 
-export type FunctionComponentResult = ToraNode | Promise<ToraNode>;
+export type FunctionComponentResult = ChatoraNode | Promise<ChatoraNode>;
 
 export interface HTMLElementEvent<T extends EventTarget> extends Event {
   target: T;
 }
 
-export interface ToraJSXElement {
+export interface ChatoraJSXElement {
   tag: string | ((props: Record<string, unknown>) => FunctionComponentResult);
   props: Record<string, unknown>;
 }
@@ -21,7 +21,7 @@ export interface ToraJSXElement {
  * onXXX系イベントハンドラ属性型
  * Event handler attributes (onXXX)
  */
-interface ToraEventHandlers {
+interface ChatoraEventHandlers {
   /**
    * クリックイベント
    * Click event handler
@@ -35,7 +35,7 @@ interface ToraEventHandlers {
   // 必要に応じて他のonXXXイベントもここに追加可能
 }
 
-interface ToraIntrinsicElements extends ToraEventHandlers {
+interface ChatoraIntrinsicElements extends ChatoraEventHandlers {
   /**
    * 要素のID属性
    * id attribute for the element
@@ -45,7 +45,7 @@ interface ToraIntrinsicElements extends ToraEventHandlers {
    * 子ノード
    * Children nodes
    */
-  children?: ToraNode;
+  children?: ChatoraNode;
   /**
    * class属性
    * class attribute for the element
@@ -92,42 +92,42 @@ interface ToraIntrinsicElements extends ToraEventHandlers {
  * div要素の属性型
  * Attributes for div element
  */
-export interface DivToraIntrinsicElement extends ToraIntrinsicElements {}
+export interface DivChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
 /**
  * h1要素の属性型
  * Attributes for h1 element
  */
-export interface H1ToraIntrinsicElement extends ToraIntrinsicElements {}
+export interface H1ChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
 /**
  * p要素の属性型
  * Attributes for p element
  */
-export interface PToraIntrinsicElement extends ToraIntrinsicElements {}
+export interface PChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
 /**
  * ul要素の属性型
  * Attributes for ul element
  */
-export interface UlToraIntrinsicElement extends ToraIntrinsicElements {}
+export interface UlChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
 /**
  * ol要素の属性型
  * Attributes for ol element
  */
-export interface OlToraIntrinsicElement extends ToraIntrinsicElements {}
+export interface OlChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
 /**
  * li要素の属性型
  * Attributes for li element
  */
-export interface LiToraIntrinsicElement extends ToraIntrinsicElements {}
+export interface LiChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
 /**
  * span要素の属性型
  * Attributes for span element
  */
-export interface SpanToraIntrinsicElement extends ToraIntrinsicElements {}
+export interface SpanChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
 /**
  * button要素の属性型
  * Attributes for button element
  */
-export interface ButtonToraIntrinsicElement extends ToraIntrinsicElements {
+export interface ButtonChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   type?: string;
   disabled?: boolean;
   autofocus?: boolean;
@@ -139,7 +139,7 @@ export interface ButtonToraIntrinsicElement extends ToraIntrinsicElements {
  * a要素の属性型
  * Attributes for a element
  */
-export interface AToraIntrinsicElement extends ToraIntrinsicElements {
+export interface AChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   href?: string;
   target?: string;
   rel?: string;
@@ -148,7 +148,7 @@ export interface AToraIntrinsicElement extends ToraIntrinsicElements {
  * img要素の属性型
  * Attributes for img element
  */
-export interface ImgToraIntrinsicElement extends ToraIntrinsicElements {
+export interface ImgChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   src?: string;
   alt?: string;
   width?: number | string;
@@ -158,7 +158,7 @@ export interface ImgToraIntrinsicElement extends ToraIntrinsicElements {
  * input要素の属性型
  * Attributes for input element
  */
-export interface InputToraIntrinsicElement extends ToraIntrinsicElements {
+export interface InputChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   type?: string;
   value?: string | number;
   checked?: boolean;
@@ -172,7 +172,7 @@ export interface InputToraIntrinsicElement extends ToraIntrinsicElements {
  * textarea要素の属性型
  * Attributes for textarea element
  */
-export interface TextareaToraIntrinsicElement extends ToraIntrinsicElements {
+export interface TextareaChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   value?: string;
   placeholder?: string;
   name?: string;
@@ -186,7 +186,7 @@ export interface TextareaToraIntrinsicElement extends ToraIntrinsicElements {
  * form要素の属性型
  * Attributes for form element
  */
-export interface FormToraIntrinsicElement extends ToraIntrinsicElements {
+export interface FormChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   action?: string;
   method?: string;
   enctype?: string;
@@ -196,14 +196,14 @@ export interface FormToraIntrinsicElement extends ToraIntrinsicElements {
  * label要素の属性型
  * Attributes for label element
  */
-export interface LabelToraIntrinsicElement extends ToraIntrinsicElements {
+export interface LabelChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   for?: string;
 }
 /**
  * td要素の属性型
  * Attributes for td element
  */
-export interface TdToraIntrinsicElement extends ToraIntrinsicElements {
+export interface TdChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   colspan?: number;
   rowspan?: number;
 }
@@ -211,7 +211,7 @@ export interface TdToraIntrinsicElement extends ToraIntrinsicElements {
  * th要素の属性型
  * Attributes for th element
  */
-export interface ThToraIntrinsicElement extends ToraIntrinsicElements {
+export interface ThChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   colspan?: number;
   rowspan?: number;
   scope?: string;
@@ -220,7 +220,7 @@ export interface ThToraIntrinsicElement extends ToraIntrinsicElements {
  * svg要素の属性型
  * Attributes for svg element
  */
-export interface SvgToraIntrinsicElement extends ToraIntrinsicElements {
+export interface SvgChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   width?: number | string;
   height?: number | string;
   viewBox?: string;
@@ -231,7 +231,7 @@ export interface SvgToraIntrinsicElement extends ToraIntrinsicElements {
  * path要素の属性型
  * Attributes for path element
  */
-export interface PathToraIntrinsicElement extends ToraIntrinsicElements {
+export interface PathChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   d?: string;
   fill?: string;
   stroke?: string;
@@ -240,7 +240,7 @@ export interface PathToraIntrinsicElement extends ToraIntrinsicElements {
  * circle要素の属性型
  * Attributes for circle element
  */
-export interface CircleToraIntrinsicElement extends ToraIntrinsicElements {
+export interface CircleChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   cx?: number | string;
   cy?: number | string;
   r?: number | string;
@@ -251,7 +251,7 @@ export interface CircleToraIntrinsicElement extends ToraIntrinsicElements {
  * rect要素の属性型
  * Attributes for rect element
  */
-export interface RectToraIntrinsicElement extends ToraIntrinsicElements {
+export interface RectChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   x?: number | string;
   y?: number | string;
   width?: number | string;
@@ -263,7 +263,7 @@ export interface RectToraIntrinsicElement extends ToraIntrinsicElements {
  * line要素の属性型
  * Attributes for line element
  */
-export interface LineToraIntrinsicElement extends ToraIntrinsicElements {
+export interface LineChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   x1?: number | string;
   y1?: number | string;
   x2?: number | string;
@@ -274,7 +274,7 @@ export interface LineToraIntrinsicElement extends ToraIntrinsicElements {
  * polyline要素の属性型
  * Attributes for polyline element
  */
-export interface PolylineToraIntrinsicElement extends ToraIntrinsicElements {
+export interface PolylineChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   points?: string;
   fill?: string;
   stroke?: string;
@@ -283,7 +283,7 @@ export interface PolylineToraIntrinsicElement extends ToraIntrinsicElements {
  * polygon要素の属性型
  * Attributes for polygon element
  */
-export interface PolygonToraIntrinsicElement extends ToraIntrinsicElements {
+export interface PolygonChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   points?: string;
   fill?: string;
   stroke?: string;
@@ -292,7 +292,7 @@ export interface PolygonToraIntrinsicElement extends ToraIntrinsicElements {
  * ellipse要素の属性型
  * Attributes for ellipse element
  */
-export interface EllipseToraIntrinsicElement extends ToraIntrinsicElements {
+export interface EllipseChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   cx?: number | string;
   cy?: number | string;
   rx?: number | string;
@@ -304,7 +304,7 @@ export interface EllipseToraIntrinsicElement extends ToraIntrinsicElements {
  * text要素の属性型
  * Attributes for text element
  */
-export interface TextToraIntrinsicElement extends ToraIntrinsicElements {
+export interface TextChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   x?: number | string;
   y?: number | string;
   fill?: string;
@@ -315,7 +315,7 @@ export interface TextToraIntrinsicElement extends ToraIntrinsicElements {
  * slot要素の属性型
  * Attributes for slot element
  */
-export interface SlotToraIntrinsicElement extends ToraIntrinsicElements {
+export interface SlotChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   name?: string;
   /**
    * @deprecated
@@ -327,64 +327,64 @@ export interface SlotToraIntrinsicElement extends ToraIntrinsicElements {
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      div: DivToraIntrinsicElement;
-      h1: H1ToraIntrinsicElement;
-      p: PToraIntrinsicElement;
-      ul: UlToraIntrinsicElement;
-      ol: OlToraIntrinsicElement;
-      li: LiToraIntrinsicElement;
-      span: SpanToraIntrinsicElement;
-      button: ButtonToraIntrinsicElement;
-      a: AToraIntrinsicElement;
-      img: ImgToraIntrinsicElement;
-      input: InputToraIntrinsicElement;
-      textarea: TextareaToraIntrinsicElement;
-      form: FormToraIntrinsicElement;
-      label: LabelToraIntrinsicElement;
-      table: ToraIntrinsicElements;
-      tr: ToraIntrinsicElements;
-      td: TdToraIntrinsicElement;
-      th: ThToraIntrinsicElement;
-      thead: ToraIntrinsicElements;
-      tbody: ToraIntrinsicElements;
-      tfoot: ToraIntrinsicElements;
-      section: ToraIntrinsicElements;
-      article: ToraIntrinsicElements;
-      nav: ToraIntrinsicElements;
-      header: ToraIntrinsicElements;
-      footer: ToraIntrinsicElements;
-      aside: ToraIntrinsicElements;
-      main: ToraIntrinsicElements;
-      strong: ToraIntrinsicElements;
-      em: ToraIntrinsicElements;
-      b: ToraIntrinsicElements;
-      i: ToraIntrinsicElements;
-      u: ToraIntrinsicElements;
-      s: ToraIntrinsicElements;
-      pre: ToraIntrinsicElements;
-      code: ToraIntrinsicElements;
-      blockquote: ToraIntrinsicElements;
-      hr: ToraIntrinsicElements;
-      br: ToraIntrinsicElements;
-      svg: SvgToraIntrinsicElement;
-      path: PathToraIntrinsicElement;
-      circle: CircleToraIntrinsicElement;
-      rect: RectToraIntrinsicElement;
-      line: LineToraIntrinsicElement;
-      polyline: PolylineToraIntrinsicElement;
-      polygon: PolygonToraIntrinsicElement;
-      ellipse: EllipseToraIntrinsicElement;
-      text: TextToraIntrinsicElement;
-      slot: SlotToraIntrinsicElement;
+      div: DivChatoraIntrinsicElement;
+      h1: H1ChatoraIntrinsicElement;
+      p: PChatoraIntrinsicElement;
+      ul: UlChatoraIntrinsicElement;
+      ol: OlChatoraIntrinsicElement;
+      li: LiChatoraIntrinsicElement;
+      span: SpanChatoraIntrinsicElement;
+      button: ButtonChatoraIntrinsicElement;
+      a: AChatoraIntrinsicElement;
+      img: ImgChatoraIntrinsicElement;
+      input: InputChatoraIntrinsicElement;
+      textarea: TextareaChatoraIntrinsicElement;
+      form: FormChatoraIntrinsicElement;
+      label: LabelChatoraIntrinsicElement;
+      table: ChatoraIntrinsicElements;
+      tr: ChatoraIntrinsicElements;
+      td: TdChatoraIntrinsicElement;
+      th: ThChatoraIntrinsicElement;
+      thead: ChatoraIntrinsicElements;
+      tbody: ChatoraIntrinsicElements;
+      tfoot: ChatoraIntrinsicElements;
+      section: ChatoraIntrinsicElements;
+      article: ChatoraIntrinsicElements;
+      nav: ChatoraIntrinsicElements;
+      header: ChatoraIntrinsicElements;
+      footer: ChatoraIntrinsicElements;
+      aside: ChatoraIntrinsicElements;
+      main: ChatoraIntrinsicElements;
+      strong: ChatoraIntrinsicElements;
+      em: ChatoraIntrinsicElements;
+      b: ChatoraIntrinsicElements;
+      i: ChatoraIntrinsicElements;
+      u: ChatoraIntrinsicElements;
+      s: ChatoraIntrinsicElements;
+      pre: ChatoraIntrinsicElements;
+      code: ChatoraIntrinsicElements;
+      blockquote: ChatoraIntrinsicElements;
+      hr: ChatoraIntrinsicElements;
+      br: ChatoraIntrinsicElements;
+      svg: SvgChatoraIntrinsicElement;
+      path: PathChatoraIntrinsicElement;
+      circle: CircleChatoraIntrinsicElement;
+      rect: RectChatoraIntrinsicElement;
+      line: LineChatoraIntrinsicElement;
+      polyline: PolylineChatoraIntrinsicElement;
+      polygon: PolygonChatoraIntrinsicElement;
+      ellipse: EllipseChatoraIntrinsicElement;
+      text: TextChatoraIntrinsicElement;
+      slot: SlotChatoraIntrinsicElement;
     }
 
-    type Element = ToraJSXElement;
+    type Element = ChatoraJSXElement;
     type ElementType = string | ((props: any) => FunctionComponentResult);
 
     interface ElementChildrenAttribute {
       children: unknown;
     }
 
-    type LibraryManagedAttributes<_F, P> = P & ToraIntrinsicElements;
+    type LibraryManagedAttributes<_F, P> = P & ChatoraIntrinsicElements;
   }
 }

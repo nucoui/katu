@@ -69,7 +69,7 @@ jobs:
       - name: Get Current package info
         id: get-package-info
         run: |
-          echo "PACKAGE_VERSION=$(pnpm view @tora/core version)" >> $GITHUB_OUTPUT
+          echo "PACKAGE_VERSION=$(pnpm view @chatora/core version)" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
         id: create-release
