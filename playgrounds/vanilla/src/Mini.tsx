@@ -1,7 +1,6 @@
-import { functionalCustomElement } from "@tora/runtime";
+import { functionalCustomElement, ToraComponent } from "tora";
 
-const Mini = functionalCustomElement(
-  ({ reactivity: { signal }, render }) => {
+const Mini: ToraComponent = ({ reactivity: { signal }, render }) => {
     const [count, setCount] = signal(0);
 
     render(() => {
@@ -14,13 +13,13 @@ const Mini = functionalCustomElement(
         </div>
       );
     });
-  },
-  {
-    shadowRoot: true,
-  },
-);
+  }
 
-customElements.define("mini-element", Mini);
+const MiniElement = functionalCustomElement(Mini,{
+  shadowRoot: true,
+});
+
+customElements.define("mini-element", MiniElement);
 
 const mini = document.createElement("mini-element");
 document.querySelector("#app")?.appendChild(mini);

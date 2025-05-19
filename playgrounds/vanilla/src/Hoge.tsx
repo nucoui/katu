@@ -1,4 +1,4 @@
-import { functionalCustomElement } from "@tora/runtime";
+import { functionalCustomElement } from "tora";
 
 export const Hoge = functionalCustomElement(({
   reactivity: { signal, effect },

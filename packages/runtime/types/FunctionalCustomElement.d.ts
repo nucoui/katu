@@ -30,8 +30,10 @@ export type FunctionalCustomElementOptions = {
   /**
    * ShadowRoot用のスタイル（CSSコード）
    * Style for ShadowRoot (CSS code)
+   * 文字列または文字列の配列を指定可能
+   * Can specify a string or an array of strings
    */
-  style?: string;
+  style?: string | string[];
 } & ({
   shadowRoot: true;
   /**
@@ -48,64 +50,66 @@ export type FunctionalCustomElementOptions = {
   shadowRootMode?: never;
 });
 
+export type ToraComponent = (params: {
+  reactivity: {
+    signal: typeof import("@tora/reactivity").signal;
+    computed: typeof import("@tora/reactivity").computed;
+    effect: typeof import("@tora/reactivity").effect;
+    startBatch: typeof import("@tora/reactivity").startBatch;
+    endBatch: typeof import("@tora/reactivity").endBatch;
+    Signal: typeof import("@tora/reactivity").Signal;
+    Computed: typeof import("@tora/reactivity").Computed;
+    Effect: typeof import("@tora/reactivity").Effect;
+  };
+  /**
+   * Propsの定義を行う関数
+   * Define the props
+   *
+   * @example
+   *   const props = defineProps(["foo", "bar"])
+   *   // props(): { foo: string | null, bar: string | null }
+   */
+  defineProps: <const T extends readonly string[] = readonly string[]>(props: T) => () => { [K in T[number]]: string | null };
+  /**
+   * Emitsの定義を行う関数
+   * Define the emits
+   *
+   * @example
+   *   const emits = defineEmits(["click", "change"])
+   *   emits("click", { foo: "bar" }) // CustomEventで発火
+   */
+  defineEmits: <const U extends readonly `on-${string}`[] = readonly `on-${string}`[]>(events: U) => (type: U[number], detail?: any, options?: EventInit) => void;
+  /**
+   * connectedCallback時のフック登録
+   * Register hook for connectedCallback
+   */
+  onConnected: (cb: () => void) => void;
+  /**
+   * disconnectedCallback時のフック登録
+   * Register hook for disconnectedCallback
+   */
+  onDisconnected: (cb: () => void) => void;
+  /**
+   * 属性の変更を監視する
+   * Observe attribute changes
+   */
+  onAttributeChanged: (cb: (name: string, oldValue: string | null, newValue: string | null) => void) => void;
+  /**
+   * adoptedCallback時のフック登録
+   * Register hook for adoptedCallback
+   */
+  onAdopted: (cb: () => void) => void;
+  getHost: () => HTMLElement;
+  getShadowRoot: () => ShadowRoot | null;
+  /**
+   * レンダリング関数の登録
+   * Register render function
+   */
+  render: (cb: () => ToraNode) => void;
+}) => void;
+
 export type FunctionalCustomElement = (
-  callback: (params: {
-    reactivity: {
-      signal: typeof import("@tora/reactivity").signal;
-      computed: typeof import("@tora/reactivity").computed;
-      effect: typeof import("@tora/reactivity").effect;
-      startBatch: typeof import("@tora/reactivity").startBatch;
-      endBatch: typeof import("@tora/reactivity").endBatch;
-      Signal: typeof import("@tora/reactivity").Signal;
-      Computed: typeof import("@tora/reactivity").Computed;
-      Effect: typeof import("@tora/reactivity").Effect;
-    };
-    /**
-     * Propsの定義を行う関数
-     * Define the props
-     *
-     * @example
-     *   const props = defineProps(["foo", "bar"])
-     *   // props(): { foo: string | null, bar: string | null }
-     */
-    defineProps: <const T extends readonly string[] = readonly string[]>(props: T) => () => { [K in T[number]]: string | null };
-    /**
-     * Emitsの定義を行う関数
-     * Define the emits
-     *
-     * @example
-     *   const emits = defineEmits(["click", "change"])
-     *   emits("click", { foo: "bar" }) // CustomEventで発火
-     */
-    defineEmits: <const U extends readonly `on-${string}`[] = readonly `on-${string}`[]>(events: U) => (type: U[number], detail?: any, options?: EventInit) => void;
-    /**
-     * connectedCallback時のフック登録
-     * Register hook for connectedCallback
-     */
-    onConnected: (cb: () => void) => void;
-    /**
-     * disconnectedCallback時のフック登録
-     * Register hook for disconnectedCallback
-     */
-    onDisconnected: (cb: () => void) => void;
-    /**
-     * 属性の変更を監視する
-     * Observe attribute changes
-     */
-    onAttributeChanged: (cb: (name: string, oldValue: string | null, newValue: string | null) => void) => void;
-    /**
-     * adoptedCallback時のフック登録
-     * Register hook for adoptedCallback
-     */
-    onAdopted: (cb: () => void) => void;
-    getHost: () => HTMLElement;
-    getShadowRoot: () => ShadowRoot | null;
-    /**
-     * レンダリング関数の登録
-     * Register render function
-     */
-    render: (cb: () => ToraNode) => void;
-  }) => void,
+  component: ToraComponent,
   options: FunctionalCustomElementOptions
 ) => {
   new (): HTMLElement;

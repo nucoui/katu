@@ -3,4 +3,4 @@
 ## Description
 
 ### Eponym
-**tora**(*/tora/ []*) means tabby in Japanese
+**tora**(*/tora/*) means tabby in Japanese

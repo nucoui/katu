@@ -1,23 +1,12 @@
-import { functionalCustomElement } from "@tora/runtime";
+import { functionalCustomElement } from "tora";
+import type { ToraComponent } from "tora";
 import style from "./Button.scss?raw";
 import { clsx } from "clsx";
+import z from "zod/v4"
 
-const convertToType = (type: string): 'anchor' | 'submit' | 'reset' | "toggle" | 'button' => {
-  switch (type) {
-    case "anchor":
-      return "anchor";
-    case "submit":
-      return "submit";
-    case "reset":
-      return "reset";
-    case "toggle":
-      return "toggle";
-    default:
-      return "button";
-  }
-}
+const TypeSchema = z.literal(["anchor", "submit", "reset", "toggle", "button"])
 
-export const Button = functionalCustomElement(({
+const ButtonComponent: ToraComponent = ({
   reactivity: { signal, effect, computed },
   defineProps,
   defineEmits,
@@ -39,7 +28,7 @@ export const Button = functionalCustomElement(({
   const emits = defineEmits(["on-click", "on-disabled"]);
 
   const type = computed(() => {
-    return convertToType(props().type || "button");
+    return TypeSchema.parse(props().type || "button")
   });
 
   const disabled = computed(() => {
@@ -66,7 +55,6 @@ export const Button = functionalCustomElement(({
   }))
 
   render(() => {
-    console.log("render", type(), disabled());
     if (type() === "anchor") {
       return (
         <a
@@ -79,7 +67,9 @@ export const Button = functionalCustomElement(({
           </span>
         </a>
       );
-    } else if (type() === "submit") {
+    }
+
+    if (type() === "submit") {
       return (
         <button
           type="submit"
@@ -90,7 +80,9 @@ export const Button = functionalCustomElement(({
           </span>
         </button>
       );
-    } else (
+    }
+
+    return (
       <button
         type={type()}
         {...commonAttr()}
@@ -99,22 +91,48 @@ export const Button = functionalCustomElement(({
           <slot />
         </span>
       </button>
-    );
-  });
-}, { style });
+    )
+  })
+}
+
+export const Button = functionalCustomElement(ButtonComponent, { style: [ style ] });
 
 customElements.define("n-button", Button);
 
+const h1 = document.createElement("h1");
+h1.innerHTML = "Button.tsx";
+h1.style.marginBottom = "1rem";
 const nButton = document.createElement("n-button")
 nButton.innerHTML = "Button";
 nButton.addEventListener("on-click", (e) => {
   console.log("Hoge Button clicked", e.detail);
 })
 
+const form = document.createElement("form");
+const formInput = document.createElement("input");
+formInput.setAttribute("type", "text")
+formInput.setAttribute("name", "name")
+formInput.style.border = "1px solid #ccc"
+formInput.style.padding = "0.5rem"
+formInput.style.margin = "0.5rem 0"
+const formButton = document.createElement("n-button");
+formButton.innerHTML = "submit"
+form.onsubmit = (e) => {
+  e.preventDefault()
+  const formData = new FormData(form);
+  console.log(formData.get("name")?.toString())
+}
+
+form.appendChild(formInput);
+form.appendChild(formButton);
+
 const app = document.getElementById("app");
 if (app) {
+  app.appendChild(h1);
   app.appendChild(nButton);
   nButton.setAttribute("type", "anchor");
+  app.appendChild(form);
+  formButton.setAttribute("type", "submit");
 }
 
 declare global {

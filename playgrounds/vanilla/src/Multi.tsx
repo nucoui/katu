@@ -1,4 +1,4 @@
-import { functionalCustomElement } from "@tora/runtime";
+import { functionalCustomElement } from "tora";
 
 const MultiA = functionalCustomElement(
   ({ reactivity: { signal }, render }) => {

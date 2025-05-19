@@ -6,9 +6,10 @@
     "p:rtv": "pnpm -C packages/reactivity",
     "p:rt": "pnpm -C packages/runtime",
     "p:ts": "pnpm -C packages/transpiler",
+    "p:tora": "pnpm -C packages/tora",
     "pg:vanilla": "pnpm -C playgrounds/vanilla",
-    "watch": "concurrently \"pnpm p:core watch\" \"pnpm p:rtv watch\" \"pnpm p:rt watch\" \"pnpm p:ts watch\"",
-    "build": "pnpm p:core build && pnpm p:rtv build && pnpm p:rt build && pnpm p:ts build"
+    "watch": "concurrently \"pnpm p:core watch\" \"pnpm p:rtv watch\" \"pnpm p:rt watch\" \"pnpm p:ts watch\" \"pnpm p:tora watch\"",
+    "build": "pnpm p:core build && pnpm p:rtv build && pnpm p:rt build && pnpm p:ts build && pnpm p:tora build"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",

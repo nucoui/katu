@@ -9,6 +9,9 @@ catalogs:
     eslint:
       specifier: 9.24.0
       version: 9.24.0
+    tsup:
+      specifier: ^8.4.0
+      version: 8.4.0
     typescript:
       specifier: 5.8.3
       version: 5.8.3
@@ -77,7 +80,7 @@ importers:
         specifier: 'catalog:'
         version: 9.24.0
       tsup:
-        specifier: ^8.4.0
+        specifier: 'catalog:'
         version: 8.4.0(postcss@8.5.3)(typescript@5.8.3)(yaml@2.7.1)
       vitest:
         specifier: ^3.1.1
@@ -98,7 +101,7 @@ importers:
         specifier: 'catalog:'
         version: 9.24.0
       tsup:
-        specifier: ^8.4.0
+        specifier: 'catalog:'
         version: 8.4.0(postcss@8.5.3)(typescript@5.8.3)(yaml@2.7.1)
       typescript:
         specifier: 'catalog:'
@@ -107,18 +110,40 @@ importers:
         specifier: ^3.1.1
         version: 3.1.1(@types/debug@4.1.12)(@types/node@22.15.3)(@vitest/browser@3.1.1)(jsdom@26.1.0)(yaml@2.7.1)
 
+  packages/tora:
+    dependencies:
+      '@tora/reactivity':
+        specifier: workspace:*
+        version: link:../reactivity
+      '@tora/runtime':
+        specifier: workspace:*
+        version: link:../runtime
+    devDependencies:
+      '@tora/config':
+        specifier: workspace:*
+        version: link:../../config
+      eslint:
+        specifier: 'catalog:'
+        version: 9.24.0
+      tsup:
+        specifier: 'catalog:'
+        version: 8.4.0(postcss@8.5.3)(typescript@5.8.3)(yaml@2.7.1)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.8.3
+
   playgrounds/vanilla:
     dependencies:
       consola:
         specifier: ^3.4.2
         version: 3.4.2
+      tora:
+        specifier: workspace:*
+        version: link:../../packages/tora
+      zod:
+        specifier: 3.25.0-beta.20250519T033844
+        version: 3.25.0-beta.20250519T033844
     devDependencies:
-      '@tora/reactivity':
-        specifier: workspace:*
-        version: link:../../packages/reactivity
-      '@tora/runtime':
-        specifier: workspace:*
-        version: link:../../packages/runtime
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -2982,6 +3007,9 @@ packages:
   yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+
+  zod@3.25.0-beta.20250519T033844:
+    resolution: {integrity: sha512-VBo8CvzaJkblCm9TJQDW84hejnBw1YPp8X2DzbolcKPhZMYnVk6d3eBHxekBjHtDc+Boy269nKFlmyPz4JAKpw==}
 
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
@@ -6052,5 +6080,7 @@ snapshots:
       yargs-parser: 21.1.1
 
   yocto-queue@0.1.0: {}
+
+  zod@3.25.0-beta.20250519T033844: {}
 
   zwitch@2.0.4: {}

@@ -52,4 +52,51 @@ describe("style Support", () => {
 
     document.body.removeChild(el);
   });
+
+  it("配列形式の複数スタイルを適用できる", () => {
+    const tagName = "x-multi-styled-element";
+    const cssArray = [
+      "div { color: blue; }",
+      "p { font-size: 16px; }",
+      "button { background-color: #eee; }",
+    ];
+
+    const CustomElement = functionalCustomElement(({ render }) => {
+      render(() => DummyJSX());
+    }, { shadowRoot: true, style: cssArray });
+
+    if (!customElements.get(tagName))
+      customElements.define(tagName, CustomElement);
+
+    const el = document.createElement(tagName) as HTMLElement;
+    document.body.appendChild(el);
+
+    expect(el.shadowRoot).not.toBeNull();
+
+    // スタイル要素が存在して、全てのスタイルが含まれているか確認
+    const styleEl = el.shadowRoot!.querySelector("style");
+    expect(styleEl).not.toBeNull();
+
+    const styleContent = styleEl!.textContent || "";
+    cssArray.forEach((css) => {
+      expect(styleContent).toContain(css.trim());
+    });
+
+    document.body.removeChild(el);
+  });
+
+  it("applyStylesが配列形式のスタイルを適用できる", () => {
+    const root = document.createElement("div");
+    const shadow = root.attachShadow({ mode: "open" });
+    const cssArray = [
+      "div { color: red; }",
+      "span { color: blue; }",
+    ];
+
+    const styleEl = applyStyles(shadow, cssArray);
+
+    expect(styleEl).toBeInstanceOf(HTMLStyleElement);
+    expect(styleEl.textContent).toBe(cssArray.join("\n"));
+    expect(shadow.childNodes[0]).toBe(styleEl);
+  });
 });
