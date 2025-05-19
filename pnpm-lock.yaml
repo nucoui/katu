@@ -119,6 +119,9 @@ importers:
         specifier: workspace:*
         version: link:../runtime
     devDependencies:
+      '@takuma-ru/rlse':
+        specifier: 0.0.1-beta.5
+        version: 0.0.1-beta.5
       '@tora/config':
         specifier: workspace:*
         version: link:../../config
@@ -720,6 +723,10 @@ packages:
     peerDependencies:
       eslint: '>=8.40.0'
 
+  '@takuma-ru/rlse@0.0.1-beta.5':
+    resolution: {integrity: sha512-gGexDpm7kyNuDGvDrnV1uQbeQED9JkbMokphBiFsRyJYn7sBq1PQfCIuTSPj6HBCpOCg/KCzj7tnRBYsTapGzA==}
+    hasBin: true
+
   '@testing-library/dom@10.4.0':
     resolution: {integrity: sha512-pemlzrSESWbdAloYml3bAJMEfNh1Z7EduzqPKprCH5S341frlpYnUEW0H72dLxa6IsYr+mPno20GiSm+h9dEdQ==}
     engines: {node: '>=18'}
@@ -1147,6 +1154,10 @@ packages:
 
   colord@2.9.3:
     resolution: {integrity: sha512-jeC1axXpnb0/2nn/Y1LPuLdgXBLH7aDcHu4KEKfqw3CUhX7ZpfBSlPKyqXE6btIgEzfWtrX3/tyBCaCvXvMkOw==}
+
+  commander@12.1.0:
+    resolution: {integrity: sha512-Vw8qHK3bZM9y/P10u3Vib8o/DdkvA2OtPtZvD871QKjy74Wj1WSKFILMPRPSdUSx5RFK1arlJzEtA4PkFgnbuA==}
+    engines: {node: '>=18'}
 
   commander@4.1.1:
     resolution: {integrity: sha512-NOKm8xhkzAjzFx8B2v5OAHT+u5pRQc2UCa2Vq9jYL/31o2wi9mxBA7LIFs3sV5VSC49z6pEhfbMULvShKj26WA==}
@@ -3008,6 +3019,9 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
+  zod@3.24.4:
+    resolution: {integrity: sha512-OdqJE9UDRPwWsrHjLN2F8bPxvwJBK22EHLWtanu0LSYr5YqzsaaW3RMgmjwr8Rypg5k+meEJdSPXJZXE/yqOMg==}
+
   zod@3.25.0-beta.20250519T033844:
     resolution: {integrity: sha512-VBo8CvzaJkblCm9TJQDW84hejnBw1YPp8X2DzbolcKPhZMYnVk6d3eBHxekBjHtDc+Boy269nKFlmyPz4JAKpw==}
 
@@ -3486,6 +3500,13 @@ snapshots:
       - supports-color
       - typescript
 
+  '@takuma-ru/rlse@0.0.1-beta.5':
+    dependencies:
+      commander: 12.1.0
+      consola: 3.4.2
+      semver: 7.7.1
+      zod: 3.24.4
+
   '@testing-library/dom@10.4.0':
     dependencies:
       '@babel/code-frame': 7.26.2
@@ -3670,26 +3691,6 @@ snapshots:
     optional: true
 
   '@unrs/resolver-binding-win32-x64-msvc@1.5.0':
-    optional: true
-
-  '@vitest/browser@3.1.1(playwright@1.52.0)(vite@6.2.6(@types/node@22.15.3)(yaml@2.7.1))(vitest@3.1.1)':
-    dependencies:
-      '@testing-library/dom': 10.4.0
-      '@testing-library/user-event': 14.6.1(@testing-library/dom@10.4.0)
-      '@vitest/mocker': 3.1.1(vite@6.2.6(@types/node@22.15.3)(yaml@2.7.1))
-      '@vitest/utils': 3.1.1
-      magic-string: 0.30.17
-      sirv: 3.0.1
-      tinyrainbow: 2.0.0
-      vitest: 3.1.1(@types/debug@4.1.12)(@types/node@22.15.3)(@vitest/browser@3.1.1)(jsdom@26.1.0)(yaml@2.7.1)
-      ws: 8.18.1
-    optionalDependencies:
-      playwright: 1.52.0
-    transitivePeerDependencies:
-      - bufferutil
-      - msw
-      - utf-8-validate
-      - vite
     optional: true
 
   '@vitest/browser@3.1.1(playwright@1.52.0)(vite@6.2.7(@types/node@22.15.3)(yaml@2.7.1))(vitest@3.1.1)':
@@ -3971,6 +3972,8 @@ snapshots:
   color-name@1.1.4: {}
 
   colord@2.9.3: {}
+
+  commander@12.1.0: {}
 
   commander@4.1.1: {}
 
@@ -5976,7 +5979,7 @@ snapshots:
     optionalDependencies:
       '@types/debug': 4.1.12
       '@types/node': 22.15.3
-      '@vitest/browser': 3.1.1(playwright@1.52.0)(vite@6.2.6(@types/node@22.15.3)(yaml@2.7.1))(vitest@3.1.1)
+      '@vitest/browser': 3.1.1(playwright@1.52.0)(vite@6.2.7(@types/node@22.15.3)(yaml@2.7.1))(vitest@3.1.1)
       jsdom: 26.1.0
     transitivePeerDependencies:
       - jiti
@@ -6100,6 +6103,8 @@ snapshots:
       yargs-parser: 21.1.1
 
   yocto-queue@0.1.0: {}
+
+  zod@3.24.4: {}
 
   zod@3.25.0-beta.20250519T033844: {}
 

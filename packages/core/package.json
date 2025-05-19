@@ -1,8 +1,20 @@
 {
-  "name": "tora",
+  "name": "@tora/core",
+  "type": "module",
   "version": "0.0.0",
   "private": false,
   "description": "Framework for creating custom elements with JSX function components",
+  "author": "nuco <takuma-ru@takumaru.dev> (https://github.com/takuma-ru/)",
+  "license": "MPL-2.0",
+  "homepage": "https://github.com/nucoui/tora",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nucoui/tora"
+  },
+  "bugs": {
+    "url": "https://github.com/nucoui/tora/issues",
+    "email": "takuma-ru@takumaru.dev"
+  },
   "exports": {
     ".": {
       "types": "./dist/main.d.ts",
@@ -35,16 +47,24 @@
     "dist",
     "package.json"
   ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/",
+    "provenance": true
+  },
   "scripts": {
     "build": "tsup",
     "watch": "tsup --watch",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "release": "rlse",
+    "release:test": "rlse -l patch -k config,commit-changes,create-release-branch --dry-run"
   },
   "dependencies": {
     "@tora/reactivity": "workspace:*",
     "@tora/runtime": "workspace:*"
   },
   "devDependencies": {
+    "@takuma-ru/rlse": "0.0.1-beta.5",
     "@tora/config": "workspace:*",
     "eslint": "catalog:",
     "tsup": "catalog:",
