@@ -57,9 +57,6 @@ export type ToraComponent = (params: {
     effect: typeof import("@tora/reactivity").effect;
     startBatch: typeof import("@tora/reactivity").startBatch;
     endBatch: typeof import("@tora/reactivity").endBatch;
-    Signal: typeof import("@tora/reactivity").Signal;
-    Computed: typeof import("@tora/reactivity").Computed;
-    Effect: typeof import("@tora/reactivity").Effect;
   };
   /**
    * Propsの定義を行う関数

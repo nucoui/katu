@@ -1,201 +1,91 @@
-import type { Dependency, Link, Subscriber } from "alien-signals";
-import { createReactiveSystem, SubscriberFlags } from "alien-signals";
+/**
+ * Re-exports the core reactivity functions from alien-signals with custom wrappers
+ * to match the expected interface for the Tora project.
+ * @module @tora/reactivity
+ */
 
-const {
-  link,
-  propagate,
-  endTracking,
-  startTracking,
-  updateDirtyFlag,
-  processComputedUpdate,
-  processEffectNotifications,
-} = createReactiveSystem({
-  updateComputed(computed: Computed) {
-    return computed.update();
-  },
-  notifyEffect(effect: Effect) {
-    effect.notify();
-    return true;
-  },
-});
+import * as alienSignals from "alien-signals";
 
-let activeSub: Subscriber | undefined;
-let batchDepth = 0;
+/**
+ * Represents a signal function type
+ */
+export type Signal<T> = [() => T, (newValue: T | ((prev: T) => T)) => void];
 
-function startBatch(): void {
-  ++batchDepth;
+/**
+ * Represents a computed function type
+ */
+export type Computed<T> = () => T;
+
+/**
+ * Represents an effect function type
+ */
+export type Effect = () => void;
+
+/**
+ * Starts a batch of updates. Changes made to signals within a batch will trigger effects only once at the end.
+ */
+export function startBatch(): void {
+  alienSignals.startBatch();
 }
 
-function endBatch(): void {
-  if (!--batchDepth) {
-    processEffectNotifications();
-  }
+/**
+ * Ends a batch of updates, triggering any pending effects.
+ */
+export function endBatch(): void {
+  alienSignals.endBatch();
 }
 
-function signal<T>(initialValue: T): [() => T, (value: T | ((prev: T) => T)) => void] {
-  let value = initialValue;
-  const dep = {
-    subs: undefined,
-    subsTail: undefined,
+/**
+ * Creates a reactive signal with the given initial value.
+ * Returns a tuple containing a getter function and a setter function.
+ *
+ * @param initialValue - The initial value for the signal.
+ * @returns A tuple containing [getter, setter] for the signal.
+ */
+export function signal<T>(initialValue: T): [() => T, (newValue: T | ((prev: T) => T)) => void] {
+  const s = alienSignals.signal(initialValue);
+
+  // Getter function
+  const get = () => s();
+
+  // Setter function that supports both direct value and updater function
+  const set = (newValue: T | ((prev: T) => T)) => {
+    if (typeof newValue === "function") {
+      // If an updater function is provided, call it with the current value
+      const updaterFn = newValue as (prev: T) => T;
+      s(updaterFn(get()));
+    }
+    else {
+      // Otherwise, set the value directly
+      s(newValue);
+    }
   };
 
-  const getter = () => {
-    if (activeSub) {
-      link(dep, activeSub);
-    }
-    return value;
-  };
-
-  const setter = (newValue: T | ((prev: T) => T)) => {
-    const resolvedValue = typeof newValue === "function" ? (newValue as (prev: T) => T)(value) : newValue;
-    if (value !== resolvedValue) {
-      value = resolvedValue;
-      if (dep.subs) {
-        propagate(dep.subs);
-        processEffectNotifications();
-      }
-    }
-  };
-
-  return [getter, setter];
+  return [get, set];
 }
 
-class Signal<T = any> implements Dependency {
-  // Dependency fields
-  subs: Link | undefined = undefined;
-  subsTail: Link | undefined = undefined;
+/**
+ * Creates a computed signal that derives its value from other signals.
+ * The computed value is automatically updated when any of its dependencies change.
+ *
+ * @param getter - A function that computes the derived value.
+ * @returns A getter function for the computed value.
+ */
+export function computed<T>(getter: () => T): () => T {
+  const c = alienSignals.computed(getter);
 
-  constructor(
-    public currentValue: T,
-  ) { }
-
-  get(): T {
-    if (activeSub !== undefined) {
-      link(this, activeSub);
-    }
-    return this.currentValue;
-  }
-
-  set(value: T): void {
-    if (this.currentValue !== value) {
-      this.currentValue = value;
-      const subs = this.subs;
-      if (subs !== undefined) {
-        propagate(subs);
-        if (!batchDepth) {
-          processEffectNotifications();
-        }
-      }
-    }
-  }
+  // Return a function that accesses the computed value
+  return () => c();
 }
 
-function computed<T>(getter: () => T): () => T {
-  const computedInstance = new Computed<T>(getter);
-  return () => computedInstance.get();
+/**
+ * Creates an effect that runs when its dependencies change.
+ * The effect is automatically triggered when any signal accessed within the effect function changes.
+ *
+ * @param fn - The effect function to execute.
+ * @returns A function that can be called to clean up the effect.
+ */
+export function effect(fn: () => void): () => void {
+  // Create the effect and return the cleanup function
+  return alienSignals.effect(fn);
 }
-
-class Computed<T = any> implements Subscriber, Dependency {
-  currentValue: T | undefined = undefined;
-
-  // Dependency fields
-  subs: Link | undefined = undefined;
-  subsTail: Link | undefined = undefined;
-
-  // Subscriber fields
-  deps: Link | undefined = undefined;
-  depsTail: Link | undefined = undefined;
-  flags: SubscriberFlags = SubscriberFlags.Computed | SubscriberFlags.Dirty;
-
-  constructor(
-    public getter: () => T,
-  ) { }
-
-  get(): T {
-    const flags = this.flags;
-    if (flags & (SubscriberFlags.PendingComputed | SubscriberFlags.Dirty)) {
-      processComputedUpdate(this, flags);
-    }
-    if (activeSub !== undefined) {
-      link(this, activeSub);
-    }
-    return this.currentValue!;
-  }
-
-  update(): boolean {
-    const prevSub = activeSub;
-    // eslint-disable-next-line ts/no-this-alias
-    activeSub = this;
-    startTracking(this);
-    try {
-      const oldValue = this.currentValue;
-      const newValue = this.getter();
-      if (oldValue !== newValue) {
-        this.currentValue = newValue;
-        return true;
-      }
-      return false;
-    }
-    finally {
-      activeSub = prevSub;
-      endTracking(this);
-    }
-  }
-}
-
-function effect<T>(fn: () => T): Effect<T> {
-  const e = new Effect(fn);
-  e.run();
-  return e;
-}
-
-class Effect<T = any> implements Subscriber {
-  // Subscriber fields
-  deps: Link | undefined = undefined;
-  depsTail: Link | undefined = undefined;
-  flags: SubscriberFlags = SubscriberFlags.Effect;
-
-  constructor(
-    public fn: () => T,
-  ) { }
-
-  notify(): void {
-    const flags = this.flags;
-    if (
-      flags & SubscriberFlags.Dirty
-      || (flags & SubscriberFlags.PendingComputed && updateDirtyFlag(this, flags))
-    ) {
-      this.run();
-    }
-  }
-
-  run(): T {
-    const prevSub = activeSub;
-    // eslint-disable-next-line ts/no-this-alias
-    activeSub = this;
-    startTracking(this);
-    try {
-      return this.fn();
-    }
-    finally {
-      activeSub = prevSub;
-      endTracking(this);
-    }
-  }
-
-  stop(): void {
-    startTracking(this);
-    endTracking(this);
-  }
-}
-
-export {
-  computed,
-  Computed,
-  effect,
-  Effect,
-  endBatch,
-  signal,
-  Signal,
-  startBatch,
-};

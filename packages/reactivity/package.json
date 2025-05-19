@@ -14,10 +14,11 @@
   "scripts": {
     "build": "tsup",
     "watch": "tsup --watch",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "vitest run"
   },
   "dependencies": {
-    "alien-signals": "^1.0.13"
+    "alien-signals": "^2.0.5"
   },
   "devDependencies": {
     "@tora/config": "workspace:*",

@@ -8,7 +8,7 @@ import {
   mount,
   patch,
 } from "@/functionalCustomElement/vNode";
-import { computed, Computed, effect, Effect, endBatch, signal, Signal, startBatch } from "@tora/reactivity";
+import { computed, effect, endBatch, signal, startBatch } from "@tora/reactivity";
 
 /**
  * FunctionalCustomElementの型引数を関数使用時に指定できるようにします。
@@ -69,9 +69,6 @@ const functionalCustomElement: FunctionalCustomElement = (
           computed,
           startBatch,
           endBatch,
-          Signal,
-          Computed,
-          Effect,
         },
         /**
          * 属性名リストを受け取り、属性値を取得するgetter関数を返します。
