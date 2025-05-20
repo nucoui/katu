@@ -53,7 +53,7 @@ jobs:
         run: pnpm i --frozen-lockfile
 
       - name: Build
-        run: pnpm p:core build
+        run: pnpm build
 
       - name: Release
         run: |
