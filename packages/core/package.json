@@ -46,7 +46,7 @@
     "README.md",
     "dist",
     "package.json",
-    "../../README.md"
+    "README.md"
   ],
   "publishConfig": {
     "access": "public",
