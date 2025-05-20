@@ -45,8 +45,7 @@
   "files": [
     "README.md",
     "dist",
-    "package.json",
-    "README.md"
+    "package.json"
   ],
   "publishConfig": {
     "access": "public",
@@ -65,8 +64,8 @@
     "@chatora/runtime": "workspace:*"
   },
   "devDependencies": {
-    "@takuma-ru/rlse": "0.0.1-beta.5",
     "@chatora/config": "workspace:*",
+    "@takuma-ru/rlse": "0.0.1-beta.5",
     "eslint": "catalog:",
     "tsup": "catalog:",
     "typescript": "catalog:"
