@@ -1,6 +1,19 @@
 name-template: "Release $RESOLVED_VERSION"
 tag-template: "$RESOLVED_VERSION"
 
+# バージョンの解決方法
+version-resolver:
+  major:
+    labels:
+      - "major"
+  minor:
+    labels:
+      - "minor"
+  patch:
+    labels:
+      - "patch"
+  default: patch
+
 categories:
   - title: "✨ Features"
     labels:
@@ -19,6 +32,18 @@ categories:
   - title: "♻️ Refactoring"
     labels:
       - ":recycle: refactor"
+  - title: "🚀 Release"
+    labels:
+      - ":rocket: release"
+  - title: "📦 Core Feature"
+    labels:
+      - ":package: core feature"
+  - title: "📦 Reactivity Feature"
+    labels:
+      - ":package: reactivity feature"
+  - title: "📦 Runtime Feature"
+    labels:
+      - ":package: runtime feature"
 
 change-template: "- $TITLE @$AUTHOR ([#$NUMBER]($URL))"
 
@@ -49,6 +74,7 @@ autolabeler:
       - "/(enhancement|improve)[/-].+/"
   - label: ":rocket: release"
     branch:
+      - "/^release[/-].+/"
       - "/^release[/-].+/"
   - label: ":package: core feature"
     files:
