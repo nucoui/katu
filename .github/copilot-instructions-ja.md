@@ -30,6 +30,7 @@
 - コミットメッセージを生成する際は、必ず英語で出力してください。また `<gitmoji> 変更の概要を100文字以内で`の形式で出力してください。`<gitmoji>`は、変更内容に応じたGitmojiを選択してください。Gitmojiの一覧は[こちら](https://gitmoji.dev/)を参照してください。2行目以降は、変更内容の詳細を英語で記述してください。2行目は空行にしてください。3行目以降は、変更内容の詳細を英語で記述してください。2行目以降は必須ではありません。 `feat:`や`hotfix: `のような記法は使わないでください
 - コードは全てESMモジュールとして記述してください。
 - コードは全てTypeScriptで記述してください。JavaScriptで記述することはできません。
+- 「action:translate」が入力された時、`copilot-instructions-ja.md`の内容を英語に翻訳して、`copilot-instructions.md`に出力してください。
 
 ## 遵守命令
 このセクションの命令は法律のようなものです。特例がない限り守ってください。これはプロジェクトを進める上での共通認識で、これらは基本的に守られている前提となっています。
@@ -50,7 +51,7 @@
     - `<root>/packages/core`: プロジェクトのコアとなるパッケージ。利用者はこのパッケージを利用することになる。
     - `<root>/packages/reactivity`: JSX構文内で使用する変数をリアクティブにするためのパッケージ。alien-signalsを使用して、独自にカスタマイズしたものを提供します。
     - `<root>/packages/runtime`: JSX構文を custom element class に変換するための機能を提供するパッケージ。tscのreact-jsxによってトランスパイルされたコードをpackages/reactivityを使用してリアクティブにするための実装も含まれています。
-    - `<root>/packages/transpiler`: JSX構文を custom element class に変換するためのパッケージ。babelを使用して、JSX構文を custom element class に変換します。（現在は使用されてません）
+    - `<root>/packages/util`: プロジェクトのユーティリティ関数を提供するパッケージ。
   - `<root>/playgrounds/**`: プロジェクトのサンプルコード。@chatora/coreを使用して、実際に動作するサンプルコードを格納します。
 - このプロジェクトはESLintでリントやフォーマットを行います。
 - このプロジェクトはTypeScriptで書かれています。
@@ -62,8 +63,8 @@
     - `pnpm cfg`: `<root>/config`のコマンドを実行します。
     - `pnpm p:core`: `<root>/packages/core`のコマンドを実行します。
     - `pnpm p:rtv`: `<root>/packages/reactivity`のコマンドを実行します。
-    - `pnpm p:ts`: `<root>/packages/transpiler`のコマンドを実行します。
     - `pnpm p:rt`: `<root>/packages/runtime`のコマンドを実行します。
+    - `pnpm p:ut`: `<root>/packages/util`のコマンドを実行します。
     - `pnpm pg:<project-name>`: `<root>/playgrounds/<project-name>`のコマンドを実行します。
 
 # 達成目標
@@ -73,5 +74,8 @@
   各関数の動作はalien-signalsに準拠すること。
 -@chatora/runtime
   このパッケージでは、JSX構文を custom element class に変換することができること。
-  具体的には、tscのreact-jsxを使用して変換されたコードを受け取りる。
+  具体的には、tscのreact-jsxを使用して変換されたコードを受け取る。
   そのコードを使って、仮想DOMと@chatora/reactivityによるDOM管理、@chatora/reactivityを使用したpropsの管理、@chatora/reactivityを使用したイベントの管理を行うことができること。
+- @chatora/util
+  このパッケージでは、プロジェクト全体で使用するユーティリティ関数を提供することができること。
+  具体的には、chatoraを使用して、実装を行う利用者にとって便利なユーティリティ関数を提供することができること。

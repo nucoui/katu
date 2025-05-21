@@ -14,6 +14,7 @@
     "vite": "catalog:"
   },
   "dependencies": {
+    "@chatora/util": "workspace:*",
     "consola": "^3.4.2",
     "chatora": "workspace:*",
     "zod": "3.25.0-beta.20250519T033844"

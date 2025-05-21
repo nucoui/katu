@@ -6,7 +6,10 @@
     "p:rtv": "pnpm -C packages/reactivity",
     "p:rt": "pnpm -C packages/runtime",
     "p:ts": "pnpm -C packages/transpiler",
+    "p:ut": "pnpm -C packages/util",
+
     "pg:vanilla": "pnpm -C playgrounds/vanilla",
+
     "watch": "concurrently \"pnpm p:rtv watch\" \"pnpm p:rt watch\" \"pnpm p:core watch\"",
     "build": "pnpm p:rtv build && pnpm p:rt build && pnpm p:core build"
   },

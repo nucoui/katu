@@ -3,6 +3,7 @@ import type { ChatoraComponent } from "chatora";
 import style from "./Button.scss?raw";
 import { clsx } from "clsx";
 import z from "zod/v4"
+import { toBoolean } from "@chatora/util";
 
 const TypeSchema = z.literal(["anchor", "submit", "reset", "toggle", "button"])
 
@@ -32,7 +33,7 @@ const Button: ChatoraComponent = ({
   });
 
   const disabled = computed(() => {
-    return props().disabled === "" || props().disabled === "true";
+    return toBoolean(props().disabled) || false;
   });
 
   const handleClick = (e: MouseEvent) => {
