@@ -28,6 +28,9 @@
     "lint": "eslint .",
     "test": "tsup && vitest run --coverage"
   },
+  "dependencies": {
+    "@types/hast": "^3.0.4"
+  },
   "devDependencies": {
     "@chatora/config": "workspace:*",
     "@chatora/reactivity": "workspace:*",

@@ -1,4 +1,4 @@
-import { functionalCustomElement } from "chatora";
+import { functionalCustomElement, functionalDeclarativeCustomElement } from "chatora";
 import type { ChatoraComponent } from "chatora";
 import style from "./Button.scss?raw";
 import { clsx } from "clsx";
@@ -6,7 +6,7 @@ import z from "zod/v4"
 
 const TypeSchema = z.literal(["anchor", "submit", "reset", "toggle", "button"])
 
-const ButtonComponent: ChatoraComponent = ({
+const Button: ChatoraComponent = ({
   reactivity: { signal, effect, computed },
   defineProps,
   defineEmits,
@@ -95,9 +95,9 @@ const ButtonComponent: ChatoraComponent = ({
   })
 }
 
-export const Button = functionalCustomElement(ButtonComponent, { style: [ style ] });
+export const ButtonElement = functionalCustomElement(Button, { style: [ style ] });
 
-customElements.define("n-button", Button);
+customElements.define("n-button", ButtonElement);
 
 const h1 = document.createElement("h1");
 h1.innerHTML = "Button.tsx";
@@ -137,7 +137,7 @@ if (app) {
 
 declare global {
     interface HTMLElementTagNameMap {
-        "n-button": InstanceType<typeof Button>;
+        "n-button": InstanceType<typeof ButtonElement>;
     }
     interface HTMLElementEventMap {
         "on-click": CustomEvent<{ count: number }>;
