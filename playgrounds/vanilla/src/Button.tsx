@@ -28,13 +28,9 @@ const Button: ChatoraComponent = ({
   ]);
   const emits = defineEmits(["on-click", "on-disabled"]);
 
-  const type = computed(() => {
-    return TypeSchema.parse(props().type || "button")
-  });
+  const type = computed(() => TypeSchema.parse(props().type || "button"));
 
-  const disabled = computed(() => {
-    return toBoolean(props().disabled) || false;
-  });
+  const disabled = computed(() => toBoolean(props().disabled) || false);
 
   const handleClick = (e: MouseEvent) => {
     emits("on-click", e);

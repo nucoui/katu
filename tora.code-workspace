@@ -9,7 +9,7 @@
       "path": "⚙️"
     },
     {
-      "name": ".github",
+      "name": "⚙️ .github",
       "path": "./.github"
     },
     {
@@ -39,6 +39,10 @@
     {
       "name": "📦 runtime",
       "path": "packages/runtime"
+    },
+    {
+      "name": "📦 util",
+      "path": "packages/util"
     },
     {
       "name": "========= 🎮 =",
