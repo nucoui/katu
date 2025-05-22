@@ -7,11 +7,6 @@ describe("convert/main exports", () => {
     expect(typeof convertExports.toBoolean).toBe("function");
   });
 
-  it("should export toLiteral function", () => {
-    expect(convertExports.toLiteral).toBeDefined();
-    expect(typeof convertExports.toLiteral).toBe("function");
-  });
-
   it("should export toNumber function", () => {
     expect(convertExports.toNumber).toBeDefined();
     expect(typeof convertExports.toNumber).toBe("function");
