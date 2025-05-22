@@ -39,15 +39,26 @@ const functionalDeclarativeCustomElement = (
       endBatch,
     },
     /**
-     * 属性名リストを受け取り、属性値を取得するgetter関数を返します。
+     * 属性名リストまたは属性変換関数オブジェクトを受け取り、属性値を取得するgetter関数を返します。
      * SSRでは初期値のみを返します。
      *
-     * @param _propsNames - 属性名の配列
+     * @param propsNamesOrTransformers - 属性名の配列または属性変換関数オブジェクト
      * @returns 属性値を取得するgetter関数
      */
-    defineProps: (_propsNames) => {
+    defineProps: (propsNamesOrTransformers: string[] | Record<string, (value: string | null) => any>) => {
       // SSRでは空のプロップを返す（実際の値はクライアント側で注入される）
-      return props[0] as any;
+      if (Array.isArray(propsNamesOrTransformers)) {
+        return props[0] as any;
+      }
+      else {
+        // オブジェクトの場合も同様に空オブジェクトを返す
+        const emptyProps: Record<string, any> = {};
+        for (const key of Object.keys(propsNamesOrTransformers)) {
+          // 対応する変換関数で初期値を生成
+          emptyProps[key] = propsNamesOrTransformers[key](null);
+        }
+        return () => emptyProps as any;
+      }
     },
     /**
      * イベント名リストを受け取り、イベントを発火する関数を返します。

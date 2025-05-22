@@ -63,10 +63,21 @@ export type ChatoraComponent = (params: {
    * Define the props
    *
    * @example
+   *   // 文字列配列を使用
    *   const props = defineProps(["foo", "bar"])
    *   // props(): { foo: string | null, bar: string | null }
+   *
+   *   // 変換関数を使用
+   *   const props = defineProps({
+   *     disabled: toBoolean,
+   *     value: (v) => v
+   *   })
+   *   // props(): { disabled: boolean | null, value: string | null }
    */
-  defineProps: <const T extends readonly string[] = readonly string[]>(props: T) => () => { [K in T[number]]: string | null };
+  defineProps: {
+    <const T extends readonly string[] = readonly string[]>(props: T): () => { [K in T[number]]: string | null };
+    <T extends Record<string, (value: string | null) => any>>(props: T): () => { [K in keyof T]: ReturnType<T[K]> };
+  };
   /**
    * Emitsの定義を行う関数
    * Define the emits

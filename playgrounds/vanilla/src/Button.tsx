@@ -1,11 +1,8 @@
-import { functionalCustomElement, functionalDeclarativeCustomElement } from "chatora";
+import { functionalCustomElement } from "chatora";
 import type { ChatoraComponent } from "chatora";
 import style from "./Button.scss?raw";
 import { clsx } from "clsx";
-import z from "zod/v4"
-import { toBoolean } from "@chatora/util";
-
-const TypeSchema = z.literal(["anchor", "submit", "reset", "toggle", "button"])
+import { toBoolean, toMatched } from "@chatora/util";
 
 const Button: ChatoraComponent = ({
   reactivity: { signal, effect, computed },
@@ -17,42 +14,38 @@ const Button: ChatoraComponent = ({
   render,
   getHost
 }) => {
-  const props = defineProps([
-    "variant",
-    "disabled",
-    "width",
-    "size",
-    "type",
-    "href",
-    "target",
-  ]);
+  const props = defineProps({
+    type: (v) => toMatched(v, ["anchor", "submit", "reset", "toggle", "button"]) ?? "button",
+    variant: (v) => v,
+    size: (v) => v,
+    disabled: (v) => toBoolean(v) ?? false,
+    href: (v) => v,
+    target: (v) => v,
+    width: (v) => v
+  });
   const emits = defineEmits(["on-click", "on-disabled"]);
-
-  const type = computed(() => TypeSchema.parse(props().type || "button"));
-
-  const disabled = computed(() => toBoolean(props().disabled) || false);
 
   const handleClick = (e: MouseEvent) => {
     emits("on-click", e);
 
-    if (type() === "submit") {
+    if (props().type === "submit") {
       getHost().closest("form")?.requestSubmit();
     }
   };
 
   const commonAttr = computed(() => ({
     class: clsx("n-button", `-${props().variant ?? "primary"}`, `n-button-${props().size ?? "medium"}`, {
-      "-anchor": type() === "anchor",
-      "-toggle": type() === "toggle",
+      "-anchor": props().type === "anchor",
+      "-toggle": props().type === "toggle",
       "-auto": props().width === "auto",
     }),
-    disabled: disabled(),
-    "aria-disabled": disabled(),
+    disabled: props().disabled,
+    "aria-disabled": props().disabled,
     onClick: handleClick,
   }))
 
   render(() => {
-    if (type() === "anchor") {
+    if (props().type === "anchor") {
       return (
         <a
           href={props().href ?? "#"}
@@ -66,7 +59,7 @@ const Button: ChatoraComponent = ({
       );
     }
 
-    if (type() === "submit") {
+    if (props().type === "submit") {
       return (
         <button
           type="submit"
@@ -81,7 +74,7 @@ const Button: ChatoraComponent = ({
 
     return (
       <button
-        type={type()}
+        type={props().type}
         {...commonAttr()}
       >
         <span class="contents">

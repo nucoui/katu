@@ -71,24 +71,55 @@ const functionalCustomElement: FunctionalCustomElement = (
           endBatch,
         },
         /**
-         * 属性名リストを受け取り、属性値を取得するgetter関数を返します。
-         * Accepts a list of attribute names and returns a getter function for attribute values.
-         * @param props - 属性名の配列 (Array of attribute names)
+         * 属性名リストまたは属性変換関数オブジェクトを受け取り、属性値を取得するgetter関数を返します。
+         * Accepts a list of attribute names or an object of attribute transformer functions and returns a getter function for attribute values.
+         * @param props - 属性名の配列または属性変換関数オブジェクト (Array of attribute names or object of attribute transformer functions)
          * @returns 属性値を取得するgetter関数 (Getter function for attribute values)
          */
-        defineProps: (props) => {
-          this.observedAttributes = props;
+        defineProps: (props: string[] | Record<string, (value: string | null) => any>) => {
+          // 配列の場合
+          if (Array.isArray(props)) {
+            this.observedAttributes = props;
 
-          // インスタンスが持つ全属性値をバッチで一度に初期化
-          const initialProps: Record<string, string | null> = {};
-          for (const name of props) {
-            initialProps[name] = this.getAttribute(name) || null;
+            // インスタンスが持つ全属性値をバッチで一度に初期化
+            const initialProps: Record<string, string | null> = {};
+            for (const name of props) {
+              initialProps[name] = this.getAttribute(name) || null;
+            }
+
+            // 一度の更新処理でpropsを設定（バッチ処理）
+            this.props[1](prev => ({ ...prev, ...initialProps }));
+
+            return this.props[0] as any;
           }
 
-          // 一度の更新処理でpropsを設定（バッチ処理）
-          this.props[1](prev => ({ ...prev, ...initialProps }));
+          // オブジェクトの場合- 変換関数を使用
+          else {
+            // 属性名のリストを抽出
+            const propNames = Object.keys(props);
+            this.observedAttributes = propNames;
 
-          return this.props[0] as any;
+            // インスタンスが持つ全属性値をバッチで一度に初期化
+            const initialProps: Record<string, string | null> = {};
+            for (const name of propNames) {
+              initialProps[name] = this.getAttribute(name) || null;
+            }
+
+            // 一度の更新処理でpropsを設定（バッチ処理）
+            this.props[1](prev => ({ ...prev, ...initialProps }));
+
+            // 変換関数を適用してgetter関数を返す
+            return () => {
+              const rawProps = this.props[0]();
+              const transformedProps: Record<string, any> = {};
+
+              for (const [key, transformer] of Object.entries(props) as Array<[string, (value: string | null) => any]>) {
+                transformedProps[key] = transformer(rawProps[key]);
+              }
+
+              return transformedProps as any;
+            };
+          }
         },
         /**
          * イベント名リストを受け取り、イベントを発火する関数を返します。
