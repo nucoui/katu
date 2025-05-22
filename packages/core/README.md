@@ -56,4 +56,4 @@ const MiniElement = functionalCustomElement(Comp, {
 ```
 
 ### Eponym
-**chatora**(*/chatora/*) means tabby in Japanese
+**chatora**(*/t͡ɕa toɾa/*) means tabby in Japanese
