@@ -73,9 +73,9 @@ jobs:
 
       - name: Release depended libraries
         run: |
-          pnpm p:rtv publish --level fix --release-version ${{ steps.get-package-info.outputs.PACKAGE_VERSION }}
-          pnpm p:rt publish --level fix --release-version ${{ steps.get-package-info.outputs.PACKAGE_VERSION }}
-          pnpm p:ut publish --level fix --release-version ${{ steps.get-package-info.outputs.PACKAGE_VERSION }}
+          pnpm p:rtv release --level fix --release-version ${{ steps.get-package-info.outputs.PACKAGE_VERSION }}
+          pnpm p:rt release --level fix --release-version ${{ steps.get-package-info.outputs.PACKAGE_VERSION }}
+          pnpm p:ut release --level fix --release-version ${{ steps.get-package-info.outputs.PACKAGE_VERSION }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
