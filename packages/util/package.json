@@ -1,8 +1,20 @@
 {
   "name": "@chatora/util",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.0.1-beta.3",
   "private": false,
+  "description": "Framework for creating custom elements with JSX function components",
+  "author": "nuco <takuma-ru@takumaru.dev> (https://github.com/takuma-ru/)",
+  "license": "MPL-2.0",
+  "homepage": "https://github.com/nucoui/chatora",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nucoui/chatora/tree/main/packages/util"
+  },
+  "bugs": {
+    "url": "https://github.com/nucoui/chatora/issues",
+    "email": "takuma-ru@takumaru.dev"
+  },
   "exports": {
     ".": {
       "types": "./dist/main.d.ts",
@@ -15,14 +27,22 @@
       "require": "./dist/convert/main.cjs"
     }
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/",
+    "provenance": true
+  },
   "scripts": {
     "build": "tsup",
     "watch": "tsup --watch",
     "lint": "eslint .",
-    "test": "tsup && vitest run --coverage"
+    "test": "tsup && vitest run --coverage",
+    "release": "rlse",
+    "release:test": "rlse -l patch -k config,commit-changes,create-release-branch --dry-run"
   },
   "devDependencies": {
     "@chatora/config": "workspace:*",
+    "@takuma-ru/rlse": "catalog:",
     "@vitest/coverage-v8": "3.1.1",
     "eslint": "catalog:",
     "tsup": "catalog:",

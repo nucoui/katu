@@ -6,6 +6,9 @@ settings:
 
 catalogs:
   default:
+    '@takuma-ru/rlse':
+      specifier: 0.0.1-beta.7
+      version: 0.0.1-beta.7
     eslint:
       specifier: 9.24.0
       version: 9.24.0
@@ -80,8 +83,8 @@ importers:
         specifier: workspace:*
         version: link:../../config
       '@takuma-ru/rlse':
-        specifier: 0.0.1-beta.5
-        version: 0.0.1-beta.5
+        specifier: 'catalog:'
+        version: 0.0.1-beta.7
       eslint:
         specifier: 'catalog:'
         version: 9.24.0
@@ -101,6 +104,9 @@ importers:
       '@chatora/config':
         specifier: workspace:*
         version: link:../../config
+      '@takuma-ru/rlse':
+        specifier: 'catalog:'
+        version: 0.0.1-beta.7
       eslint:
         specifier: 'catalog:'
         version: 9.24.0
@@ -123,6 +129,9 @@ importers:
       '@chatora/reactivity':
         specifier: workspace:*
         version: link:../reactivity
+      '@takuma-ru/rlse':
+        specifier: 'catalog:'
+        version: 0.0.1-beta.7
       '@vitest/coverage-v8':
         specifier: 3.1.1
         version: 3.1.1(@vitest/browser@3.1.1)(vitest@3.1.1)
@@ -144,6 +153,9 @@ importers:
       '@chatora/config':
         specifier: workspace:*
         version: link:../../config
+      '@takuma-ru/rlse':
+        specifier: 'catalog:'
+        version: 0.0.1-beta.7
       '@vitest/coverage-v8':
         specifier: 3.1.1
         version: 3.1.1(@vitest/browser@3.1.1)(vitest@3.1.1)
@@ -751,8 +763,8 @@ packages:
     peerDependencies:
       eslint: '>=8.40.0'
 
-  '@takuma-ru/rlse@0.0.1-beta.5':
-    resolution: {integrity: sha512-gGexDpm7kyNuDGvDrnV1uQbeQED9JkbMokphBiFsRyJYn7sBq1PQfCIuTSPj6HBCpOCg/KCzj7tnRBYsTapGzA==}
+  '@takuma-ru/rlse@0.0.1-beta.7':
+    resolution: {integrity: sha512-QUX26NR8nxbVZ7yrFYZjQNCwA+peDJgn7KAYiZ/SPViJqLlWCyj4HRyrSpTpWymh/xz6pWstYdNiRnokBRZ0Cw==}
     hasBin: true
 
   '@testing-library/dom@10.4.0':
@@ -3531,7 +3543,7 @@ snapshots:
       - supports-color
       - typescript
 
-  '@takuma-ru/rlse@0.0.1-beta.5':
+  '@takuma-ru/rlse@0.0.1-beta.7':
     dependencies:
       commander: 12.1.0
       consola: 3.4.2
@@ -3728,11 +3740,11 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.5.0':
     optional: true
 
-  '@vitest/browser@3.1.1(playwright@1.52.0)(vite@6.2.7(@types/node@22.15.3)(yaml@2.7.1))(vitest@3.1.1)':
+  '@vitest/browser@3.1.1(playwright@1.52.0)(vite@6.2.6(@types/node@22.15.3)(yaml@2.7.1))(vitest@3.1.1)':
     dependencies:
       '@testing-library/dom': 10.4.0
       '@testing-library/user-event': 14.6.1(@testing-library/dom@10.4.0)
-      '@vitest/mocker': 3.1.1(vite@6.2.7(@types/node@22.15.3)(yaml@2.7.1))
+      '@vitest/mocker': 3.1.1(vite@6.2.6(@types/node@22.15.3)(yaml@2.7.1))
       '@vitest/utils': 3.1.1
       magic-string: 0.30.17
       sirv: 3.0.1
@@ -3764,7 +3776,7 @@ snapshots:
       tinyrainbow: 2.0.0
       vitest: 3.1.1(@types/debug@4.1.12)(@types/node@22.15.3)(@vitest/browser@3.1.1)(jsdom@26.1.0)(yaml@2.7.1)
     optionalDependencies:
-      '@vitest/browser': 3.1.1(playwright@1.52.0)(vite@6.2.7(@types/node@22.15.3)(yaml@2.7.1))(vitest@3.1.1)
+      '@vitest/browser': 3.1.1(playwright@1.52.0)(vite@6.2.6(@types/node@22.15.3)(yaml@2.7.1))(vitest@3.1.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -3790,15 +3802,6 @@ snapshots:
       magic-string: 0.30.17
     optionalDependencies:
       vite: 6.2.6(@types/node@22.15.3)(yaml@2.7.1)
-
-  '@vitest/mocker@3.1.1(vite@6.2.7(@types/node@22.15.3)(yaml@2.7.1))':
-    dependencies:
-      '@vitest/spy': 3.1.1
-      estree-walker: 3.0.3
-      magic-string: 0.30.17
-    optionalDependencies:
-      vite: 6.2.7(@types/node@22.15.3)(yaml@2.7.1)
-    optional: true
 
   '@vitest/pretty-format@3.1.1':
     dependencies:
@@ -6014,7 +6017,7 @@ snapshots:
     optionalDependencies:
       '@types/debug': 4.1.12
       '@types/node': 22.15.3
-      '@vitest/browser': 3.1.1(playwright@1.52.0)(vite@6.2.7(@types/node@22.15.3)(yaml@2.7.1))(vitest@3.1.1)
+      '@vitest/browser': 3.1.1(playwright@1.52.0)(vite@6.2.6(@types/node@22.15.3)(yaml@2.7.1))(vitest@3.1.1)
       jsdom: 26.1.0
     transitivePeerDependencies:
       - jiti

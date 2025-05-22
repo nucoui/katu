@@ -23,9 +23,15 @@ const Button: ChatoraComponent = ({
     target: (v) => v,
     width: (v) => v
   });
-  const emits = defineEmits(["on-click", "on-disabled"]);
+  const emits = defineEmits(["on-click"]);
 
   const handleClick = (e: MouseEvent) => {
+    if (props().disabled) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+
     emits("on-click", e);
 
     if (props().type === "submit") {
@@ -124,6 +130,10 @@ if (app) {
   app.appendChild(form);
   formButton.setAttribute("type", "submit");
 }
+
+setInterval(() => {
+  nButton.setAttribute("disabled", `${Math.random() > 0.5}`);
+}, 1000);
 
 declare global {
     interface HTMLElementTagNameMap {

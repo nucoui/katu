@@ -5,10 +5,11 @@ packages:
   - docs/
 
 catalog:
-  typescript: 5.8.3
-  vite: 6.2.7
-  eslint: 9.24.0
-  tsup: ^8.4.0
+  typescript: 5.8.3 # https://www.npmjs.com/package/typescript
+  vite: 6.2.7 # https://www.npmjs.com/package/vite
+  eslint: 9.24.0 # https://www.npmjs.com/package/eslint
+  tsup: ^8.4.0 # https://www.npmjs.com/package/tsup
+  "@takuma-ru/rlse": 0.0.1-beta.7 # https://www.npmjs.com/package/@takuma-ru/rlse
 
 ignoredBuiltDependencies:
   - esbuild

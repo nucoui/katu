@@ -65,7 +65,7 @@
   },
   "devDependencies": {
     "@chatora/config": "workspace:*",
-    "@takuma-ru/rlse": "0.0.1-beta.5",
+    "@takuma-ru/rlse": "catalog:",
     "eslint": "catalog:",
     "tsup": "catalog:",
     "typescript": "catalog:"

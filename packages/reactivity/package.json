@@ -1,27 +1,52 @@
 {
   "name": "@chatora/reactivity",
-  "version": "1.0.0",
+  "type": "module",
+  "version": "0.0.1-beta.3",
   "private": false,
   "packageManager": "pnpm@10.8.1",
-  "description": "",
+  "description": "Framework for creating custom elements with JSX function components",
+  "author": "nuco <takuma-ru@takumaru.dev> (https://github.com/takuma-ru/)",
+  "license": "MPL-2.0",
+  "homepage": "https://github.com/nucoui/chatora",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nucoui/chatora/tree/main/packages/reactivity"
+  },
+  "bugs": {
+    "url": "https://github.com/nucoui/chatora/issues",
+    "email": "takuma-ru@takumaru.dev"
+  },
   "exports": {
     ".": {
       "types": "./dist/main.d.ts",
-      "import": "./dist/main.mjs",
-      "require": "./dist/main.js"
+      "import": "./dist/main.js",
+      "require": "./dist/main.cjs"
     }
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/",
+    "provenance": true
+  },
+  "files": [
+    "README.md",
+    "dist",
+    "package.json"
+  ],
   "scripts": {
     "build": "tsup",
     "watch": "tsup --watch",
     "lint": "eslint .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "release": "rlse",
+    "release:test": "rlse -l patch -k config,commit-changes,create-release-branch --dry-run"
   },
   "dependencies": {
     "alien-signals": "^2.0.5"
   },
   "devDependencies": {
     "@chatora/config": "workspace:*",
+    "@takuma-ru/rlse": "catalog:",
     "eslint": "catalog:",
     "tsup": "catalog:",
     "vitest": "^3.1.1"
