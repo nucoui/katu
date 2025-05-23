@@ -58,9 +58,9 @@ jobs:
       - name: Release
         run: |
           if [ "${{ github.event.inputs.pre }}" == "true" ]; then
-            pnpm p:core release --level ${{ github.event.inputs.level }} -k --pre
+            pnpm p:core release --level ${{ github.event.inputs.level }} --pre
           else
-            pnpm p:core release --level ${{ github.event.inputs.level }} -k
+            pnpm p:core release --level ${{ github.event.inputs.level }}
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
