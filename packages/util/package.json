@@ -32,6 +32,11 @@
     "registry": "https://registry.npmjs.org/",
     "provenance": true
   },
+  "files": [
+    "README.md",
+    "dist",
+    "package.json"
+  ],
   "scripts": {
     "build": "tsup",
     "watch": "tsup --watch",
