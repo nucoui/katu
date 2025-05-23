@@ -12,7 +12,7 @@ permissions:
   issues: write
 
 jobs:
-  update_release_draft:
+  auto_label_pr:
     # トップレベルの権限設定
     permissions:
       # write permission is required to create a github release
@@ -30,11 +30,16 @@ jobs:
       #    echo "GHE_HOST=${GITHUB_SERVER_URL##https:\/\/}" >> $GITHUB_ENV
 
       # Used for auto-labeling PRs only
+      # Use release-drafter only for autolabeling PRs
       - uses: release-drafter/release-drafter@v6
-        # (Optional) specify config name to use, relative to .github/. Default: release-drafter.yml
         with:
           disable-autolabeler: false
           # Only run auto-labeler without creating a release draft
           config-name: release-drafter.yml
+          # The following settings prevent release draft creation
+          publish: false
+          name: ''
+          tag: ''
+          version: ''
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
