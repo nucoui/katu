@@ -1,5 +1,18 @@
+import { setElementProperty } from "./property";
+
 // 内部属性のプレフィックス - 実DOMには反映されないが仮想DOMでは使用される
 export const _INTERNAL_ATTRIBUTES = "_tora_internal_:";
+
+// プロパティとして設定すべき属性のマーカー
+export const PROPERTY_MARKER = "prop:";
+
+// 内部処理用特殊プロパティ
+export const RESERVED_PROPS = new Set([
+  "children",
+  "dangerouslySetInnerHTML",
+  "key",
+  "ref",
+]);
 
 /**
  * 内部属性かどうかを判定する
@@ -98,18 +111,33 @@ export function mount(vnode: VNode): Node {
     if (k.startsWith(_INTERNAL_ATTRIBUTES))
       continue;
 
+    // 予約プロパティ名はスキップ
+    if (RESERVED_PROPS.has(k))
+      continue;
+
     if (eventRegex.test(k) && typeof v === "function") {
       // onClickなどはイベントリスナーとして登録
       const event = k.slice(2).toLowerCase();
       el.addEventListener(event, v);
     }
+    // プロパティとして設定すべきか判断
+    else if (k.startsWith(PROPERTY_MARKER)) {
+      const propName = k.slice(PROPERTY_MARKER.length);
+      // WeakMapとDOM要素両方にプロパティを設定
+      setElementProperty(el, propName, v);
+    }
     else if (typeof v === "boolean") {
       v ? el.setAttribute(k, "") : el.removeAttribute(k);
+    }
+    // オブジェクト/配列の場合は常にプロパティとして設定
+    else if (typeof v === "object" && v !== null) {
+      setElementProperty(el, k, v);
     }
     else {
       el.setAttribute(k, String(v));
     }
   }
+
   for (const child of Array.isArray(vnode.children) ? vnode.children : []) {
     el.appendChild(
       typeof child === "string" ? document.createTextNode(child) : mount(child),
@@ -156,6 +184,10 @@ export function patch(parent: Node, oldVNode: VNode, newVNode: VNode, index = 0)
     if (k.startsWith(_INTERNAL_ATTRIBUTES))
       continue;
 
+    // 予約プロパティ名はスキップ
+    if (RESERVED_PROPS.has(k))
+      continue;
+
     if (eventRegex.test(k) && typeof v === "function") {
       // イベントリスナーの処理
       const event = k.slice(2).toLowerCase();
@@ -174,8 +206,17 @@ export function patch(parent: Node, oldVNode: VNode, newVNode: VNode, index = 0)
 
     // 値が変わった場合のみ更新
     if (oldVNode.props[k] !== v) {
-      if (typeof v === "boolean") {
+      // プロパティとして設定すべきか判断
+      if (k.startsWith(PROPERTY_MARKER)) {
+        const propName = k.slice(PROPERTY_MARKER.length);
+        setElementProperty(el as HTMLElement, propName, v);
+      }
+      else if (typeof v === "boolean") {
         v ? el.setAttribute(k, "") : el.removeAttribute(k);
+      }
+      // オブジェクト/配列の場合は常にプロパティとして設定
+      else if (typeof v === "object" && v !== null) {
+        setElementProperty(el as HTMLElement, k, v);
       }
       else if (v == null) {
         el.removeAttribute(k);

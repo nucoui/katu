@@ -1,6 +1,7 @@
 import type { VNode } from "@/functionalCustomElement/vNode";
 import type { FunctionalCustomElement } from "@root/types/FunctionalCustomElement";
 import { onAdopted, onAttributeChangedBase, onConnectedBase, onDisconnectedBase } from "@/functionalCustomElement/on";
+import { getElementProperty, hasElementProperty, setElementProperty } from "@/functionalCustomElement/property";
 import { applyStyles } from "@/functionalCustomElement/style";
 import {
   _INTERNAL_ATTRIBUTES,
@@ -342,4 +343,7 @@ const functionalCustomElement: FunctionalCustomElement = (
   };
 };
 
-export { functionalCustomElement };
+export { functionalCustomElement, getElementProperty, hasElementProperty, setElementProperty };
+
+// Custom Elements Everywhereとの互換性機能をエクスポート
+export * from "@/functionalCustomElement/compatibility";
