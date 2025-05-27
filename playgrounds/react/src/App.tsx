@@ -22,9 +22,11 @@ function App() {
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
         </button>
-        <NButton>
-          button
-          <div slot="slot1">slot1</div>
+        <NButton
+          type="reset"
+          on-click={() => setCount((count) => count + 1)}
+        >
+          count is {count}
         </NButton>
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR

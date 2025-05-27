@@ -53,7 +53,7 @@ export default function Home() {
           >
             Read our docs
           </a>
-          <NButton>
+          <NButton type="submit">
             <span>Click me</span>
             <div slot="slot1">Slot 1 content</div>
           </NButton>

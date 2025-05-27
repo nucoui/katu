@@ -12,6 +12,7 @@
     "build": "tsup"
   },
   "dependencies": {
+    "@chatora/util": "workspace:*",
     "chatora": "workspace:*"
   },
   "devDependencies": {

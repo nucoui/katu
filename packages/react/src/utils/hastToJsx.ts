@@ -1,5 +1,5 @@
 import type { ReactElement, ReactNode } from "react";
-import { jsx } from "react/jsx-runtime";
+import { Fragment, jsx } from "react/jsx-runtime";
 
 /**
  * スタイル内のセレクタにID属性を追加する関数
@@ -54,7 +54,7 @@ export const hastToJsx = (tag: string, id: string, hast: any, children?: ReactNo
       );
     });
 
-    return jsx(tag as any, {
+    return jsx(Fragment, {
       children: rootChildren,
     }, key);
   }

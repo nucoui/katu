@@ -265,6 +265,9 @@ importers:
 
   playgrounds/nextjs/chatora:
     dependencies:
+      '@chatora/util':
+        specifier: workspace:*
+        version: link:../../../packages/util
       chatora:
         specifier: workspace:*
         version: link:../../../packages/core
@@ -294,6 +297,9 @@ importers:
       '@chatora/react':
         specifier: workspace:*
         version: link:../../packages/react
+      '@chatora/util':
+        specifier: workspace:*
+        version: link:../../packages/util
       '@eslint/js':
         specifier: ^9.25.0
         version: 9.27.0

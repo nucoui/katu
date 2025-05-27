@@ -30,11 +30,6 @@
       "types": "./dist/types/components/DeclarativeShadowDom.d.ts",
       "import": "./dist/components/DeclarativeShadowDom.js",
       "require": "./dist/components/DeclarativeShadowDom.cjs"
-    },
-    "./components/ShadowDom": {
-      "types": "./dist/types/components/ShadowDom.d.ts",
-      "import": "./dist/components/ShadowDom.js",
-      "require": "./dist/components/ShadowDom.cjs"
     }
   },
   "publishConfig": {
