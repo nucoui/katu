@@ -7,7 +7,11 @@
     "p:rt": "pnpm -C packages/runtime",
     "p:ts": "pnpm -C packages/transpiler",
     "p:ut": "pnpm -C packages/util",
+    "p:react": "pnpm -C packages/react",
 
+    "pg:nextjs:app": "pnpm -C playgrounds/nextjs/app",
+    "pg:nextjs:chatora": "pnpm -C playgrounds/nextjs/chatora",
+    "pg:react": "pnpm -C playgrounds/react",
     "pg:vanilla": "pnpm -C playgrounds/vanilla",
 
     "watch": "concurrently \"pnpm p:rtv watch\" \"pnpm p:rt watch\" \"pnpm p:core watch\"",

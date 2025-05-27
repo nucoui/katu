@@ -33,16 +33,20 @@
       "path": "packages/core"
     },
     {
-      "name": "📦 reactivity",
+      "name": "📦 reactivity (p:rtv)",
       "path": "packages/reactivity"
     },
     {
-      "name": "📦 runtime",
+      "name": "📦 runtime (p:rt)",
       "path": "packages/runtime"
     },
     {
-      "name": "📦 util",
+      "name": "📦 util (p:ut)",
       "path": "packages/util"
+    },
+    {
+      "name": "📦 react",
+      "path": "packages/react"
     },
     {
       "name": "========= 🎮 =",
@@ -52,6 +56,14 @@
       "name": "🎮 vanilla",
       "path": "playgrounds/vanilla"
     },
+    {
+      "name": "🎮 react",
+      "path": "playgrounds/react"
+    },
+    {
+      "name": "🎮 nextjs",
+      "path": "playgrounds/nextjs"
+    }
   ],
   "settings": {
     "prettier.enable": false,
