@@ -50,6 +50,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
+      - name: Build
+        run: pnpm build
+
       # Run tests based on changed packages
       - name: Detect changed packages
         id: filter
