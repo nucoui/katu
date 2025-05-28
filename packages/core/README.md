@@ -1,8 +1,18 @@
-# Chatora
+# Chatora.js
 
 ## Description
 It is a framework that allows you to implement custom elements in a React-like manner.
 Usually, knowledge of classes is required, but since the implementation is function-based, this knowledge is not necessary!
+
+## Packages
+
+| Name | Description | NPM link |
+| ---- | ----------- | -------- |
+| chatora | Core package of the project. Users will use this package. | [chatora](https://www.npmjs.com/package/chatora) |
+| @chatora/runtime | Package providing functionality to convert JSX syntax to custom element classes. Also includes implementation to make code transpiled by tsc's react-jsx reactive using packages/reactivity. | [@chatora/runtime](https://www.npmjs.com/package/@chatora/runtime) |
+| @chatora/reactivity | Package to make variables used in JSX syntax reactive. Uses alien-signals, customized to provide our own implementation. | [@chatora/reactivity](https://www.npmjs.com/package/@chatora/reactivity) |
+| @chatora/util | Package providing utility functions for the project. This package is used by other packages. | [@chatora/util](https://www.npmjs.com/package/@chatora/util) |
+| @chatora/react | Package that provides wrapper components and functionality to make Chatora.js work with React's SSR/CSR | [@chatora/react](https://www.npmjs.com/package/@chatora/react) |
 
 # Installation
 
