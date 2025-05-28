@@ -27,6 +27,16 @@
       "require": "./dist/components/ChatoraWrapper.vue.cjs"
     }
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/",
+    "provenance": true
+  },
+  "files": [
+    "README.md",
+    "dist",
+    "package.json"
+  ],
   "scripts": {
     "build": "vite build",
     "lint": "eslint .",
