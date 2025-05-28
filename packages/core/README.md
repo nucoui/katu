@@ -13,6 +13,7 @@ Usually, knowledge of classes is required, but since the implementation is funct
 | @chatora/reactivity | Package to make variables used in JSX syntax reactive. Uses alien-signals, customized to provide our own implementation. | [@chatora/reactivity](https://www.npmjs.com/package/@chatora/reactivity) |
 | @chatora/util | Package providing utility functions for the project. This package is used by other packages. | [@chatora/util](https://www.npmjs.com/package/@chatora/util) |
 | @chatora/react | Package that provides wrapper components and functionality to make Chatora.js work with React's SSR/CSR | [@chatora/react](https://www.npmjs.com/package/@chatora/react) |
+| @chatora/vue | Package that provides wrapper components and functionality to make Chatora.js work with Vue's SSR/CSR | [@chatora/vue](https://www.npmjs.com/package/@chatora/vue) |
 
 # Installation
 
