@@ -45,8 +45,12 @@
       "path": "packages/util"
     },
     {
-      "name": "📦 react",
+      "name": "📦 react (p:react)",
       "path": "packages/react"
+    },
+    {
+      "name": "📦 vue (p:vue)",
+      "path": "packages/vue"
     },
     {
       "name": "========= 🎮 =",
@@ -63,6 +67,14 @@
     {
       "name": "🎮 nextjs",
       "path": "playgrounds/nextjs"
+    },
+    {
+      "name": "🎮 vue",
+      "path": "playgrounds/vue"
+    },
+    {
+      "name": "🎮 nuxt",
+      "path": "playgrounds/nuxt"
     }
   ],
   "settings": {

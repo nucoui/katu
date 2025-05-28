@@ -116,7 +116,7 @@ describe("functionalDeclarativeCustomElement", () => {
     const css = "div { color: red; }";
     const result = functionalDeclarativeCustomElement(({ render }) => {
       render(() => DummyJSX());
-    }, { style: css });
+    }, { styles: css });
 
     const template = result.children[0] as Element;
     expect(template.children).toHaveLength(2); // style要素とcontent要素
@@ -132,7 +132,7 @@ describe("functionalDeclarativeCustomElement", () => {
     const css2 = "p { font-size: 16px; }";
     const result = functionalDeclarativeCustomElement(({ render }) => {
       render(() => DummyJSX());
-    }, { style: [css1, css2] });
+    }, { styles: [css1, css2] });
 
     const template = result.children[0] as Element;
     expect(template.children).toHaveLength(3); // 2つのstyle要素とcontent要素

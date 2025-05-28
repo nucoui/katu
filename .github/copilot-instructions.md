@@ -1,7 +1,7 @@
 # Project Overview
 
 ## About This Project
-This project is named `chatora`, which means "Tiger" in Japanese. This project provides a library that utilizes JSX/TSX syntax to generate custom element classes for Web components and static HTML code for SSR.
+This project is named `chatora`, which means "Red tabby" in Japanese. This project provides a library that utilizes JSX/TSX syntax to generate custom element classes for Web components and static HTML code for SSR.
 This project leverages JSX/TSX syntax to provide a library that generates custom element classes for Web components and static HTML code for SSR.
 
 ## Purpose
@@ -19,6 +19,7 @@ Below are instructions for you when developing this project. These instructions 
 
 ## Absolute Instructions
 The instructions in this section must be followed absolutely. These are non-negotiable.
+- Don't hesitate to give it your all!.
 - You must always follow the *absolute instructions*.
 - You must always follow the *compliance instructions*.
 - You are recommended to follow the *recommended instructions*.

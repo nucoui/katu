@@ -22,7 +22,7 @@ const functionalDeclarativeCustomElement = (
   const {
     shadowRoot = true,
     shadowRootMode = "open",
-    style,
+    styles,
     props: initialProps,
   } = options || {};
 
@@ -136,9 +136,9 @@ const functionalDeclarativeCustomElement = (
 
   // スタイル要素を作成（存在する場合）
   const styleElements: Element[] = [];
-  if (style) {
-    const styles = Array.isArray(style) ? style : [style];
-    for (const cssText of styles) {
+  if (styles) {
+    const styleArray = Array.isArray(styles) ? styles : [styles];
+    for (const cssText of styleArray) {
       styleElements.push({
         type: "element",
         tagName: "style",

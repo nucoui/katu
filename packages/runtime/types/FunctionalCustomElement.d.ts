@@ -33,7 +33,7 @@ export type FunctionalCustomElementOptions = {
    * 文字列または文字列の配列を指定可能
    * Can specify a string or an array of strings
    */
-  style?: string | string[];
+  styles?: string | string[];
 } & ({
   shadowRoot: true;
   /**

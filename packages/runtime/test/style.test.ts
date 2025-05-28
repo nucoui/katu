@@ -32,7 +32,7 @@ describe("style Support", () => {
         // 接続時の処理
       });
       render(() => DummyJSX());
-    }, { shadowRoot: true, style: css });
+    }, { shadowRoot: true, styles: css });
 
     if (!customElements.get(tagName))
       customElements.define(tagName, CustomElement);
@@ -63,7 +63,7 @@ describe("style Support", () => {
 
     const CustomElement = functionalCustomElement(({ render }) => {
       render(() => DummyJSX());
-    }, { shadowRoot: true, style: cssArray });
+    }, { shadowRoot: true, styles: cssArray });
 
     if (!customElements.get(tagName))
       customElements.define(tagName, CustomElement);

@@ -22,7 +22,7 @@ const functionalCustomElement: FunctionalCustomElement = (
     shadowRoot = true,
     shadowRootMode,
     isFormAssociated,
-    style,
+    styles,
   } = options || {};
 
   return class extends HTMLElement {
@@ -315,8 +315,8 @@ const functionalCustomElement: FunctionalCustomElement = (
         if (shadowRoot) {
           const shadowRootInstance = this.attachShadow({ mode: shadowRootMode ?? "open" });
           // スタイルがある場合のみ適用処理を実行
-          if (style) {
-            applyStyles(shadowRootInstance, style);
+          if (styles) {
+            applyStyles(shadowRootInstance, styles);
           }
         }
 

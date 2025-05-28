@@ -1,0 +1,59 @@
+{
+  "name": "@chatora/vue",
+  "type": "module",
+  "version": "0.0.1-beta.14",
+  "private": false,
+  "description": "Framework for creating custom elements with JSX function components",
+  "author": "nuco <takuma-ru@takumaru.dev> (https://github.com/takuma-ru/)",
+  "license": "MPL-2.0",
+  "homepage": "https://github.com/nucoui/chatora",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nucoui/chatora"
+  },
+  "bugs": {
+    "url": "https://github.com/nucoui/chatora/issues",
+    "email": "takuma-ru@takumaru.dev"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/types/main.d.ts",
+      "import": "./dist/main.js",
+      "require": "./dist/main.cjs"
+    },
+    "./components/ChatoraWrapper.vue": {
+      "types": "./dist/types/components/ChatoraWrapper.vue.d.ts",
+      "import": "./dist/components/ChatoraWrapper.vue.js",
+      "require": "./dist/components/ChatoraWrapper.vue.cjs"
+    }
+  },
+  "scripts": {
+    "build": "vite build",
+    "lint": "eslint .",
+    "test": "vitest run --coverage",
+    "release": "rlse",
+    "release:test": "rlse -l patch -k config,commit-changes,create-release-branch --dry-run"
+  },
+  "peerDependencies": {
+    "chatora": "*",
+    "vue": ">=3.5.13"
+  },
+  "devDependencies": {
+    "@chatora/config": "workspace:*",
+    "@takuma-ru/rlse": "catalog:",
+    "@vitejs/plugin-vue": "^5.2.3",
+    "@vitejs/plugin-vue-jsx": "^4.2.0",
+    "@vue/tsconfig": "^0.7.0",
+    "chatora": "workspace:*",
+    "eslint": "catalog:",
+    "rollup-preserve-directives": "^1.1.3",
+    "typescript": "catalog:",
+    "unplugin-vue-macros": "^2.14.5",
+    "vite": "catalog:",
+    "vite-plugin-dts": "^4.5.4",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vue": "^3.5.13",
+    "vue-macros": "3.0.0-beta.12",
+    "vue-tsc": "^2.2.8"
+  }
+}

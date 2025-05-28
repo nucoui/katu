@@ -77,6 +77,7 @@ jobs:
           pnpm p:rt release --level fix --release-version ${{ steps.get-package-info.outputs.PACKAGE_VERSION }} -k create-release-branch,build
           pnpm p:ut release --level fix --release-version ${{ steps.get-package-info.outputs.PACKAGE_VERSION }} -k create-release-branch,build
           pnpm p:react release --level fix --release-version ${{ steps.get-package-info.outputs.PACKAGE_VERSION }} -k create-release-branch,build
+          pnpm p:vue release --level fix --release-version ${{ steps.get-package-info.outputs.PACKAGE_VERSION }} -k create-release-branch,build
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
