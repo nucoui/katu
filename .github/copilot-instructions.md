@@ -1,9 +1,6 @@
 # Project Overview
 
-## About - When generating a commit message, be sure to output it in English. Also, output the message in the format `<gitmoji>> Summary of changes in 100 characters or less. For `<gitmoji>`, choose a Gitmoji that corresponds to your changes; see [here](https://gitmoji.dev/) for a list of Gitmojis. The second line should be blank. The third and succeeding lines should contain the details of the change in English. The second and subsequent lines are not mandatory. Do not use the notation `feat:` or `hotfix: `.
-- All code must be written as ESM modules.
-- All code must be written in TypeScript. It cannot be written in JavaScript.
-- When "action:translate" is entered, translate the contents of `copilot-instructions-ja.md` into English and output to `copilot-instructions.md`. Project
+## About This Project
 This project is named `chatora`, which means "Tiger" in Japanese. This project provides a library that utilizes JSX/TSX syntax to generate custom element classes for Web components and static HTML code for SSR.
 This project leverages JSX/TSX syntax to provide a library that generates custom element classes for Web components and static HTML code for SSR.
 
@@ -30,10 +27,11 @@ The instructions in this section must be followed absolutely. These are non-nego
 - All instructions must be written in Japanese.
 - All instructions must be output in Japanese.
 - You may think in English, but you must always output in Japanese.
-- When generating a commit message, be sure to output it in English. Also, output the message in the format `<gitmoji>> Summary of changes in 100 characters or less. For `<gitmoji>`, choose a Gitmoji that corresponds to your changes; see [here](https://gitmoji.dev/) for a list of Gitmojis. The third and succeeding lines should be written in English with the details of the change. Do not use the notation `feat:` or `hotfix: `.
+- When generating a commit message, be sure to output it in English. Also, output the message in the format `<gitmoji> Summary of changes in 100 characters or less`. For `<gitmoji>`, choose a Gitmoji that corresponds to your changes; see [here](https://gitmoji.dev/) for a list of Gitmojis. The second line should be blank. The third and succeeding lines should contain the details of the change in English. The second and subsequent lines are not mandatory. Do not use the notation `feat:` or `hotfix: `.
 - All code must be written as ESM modules.
 - All code must be written in TypeScript. It cannot be written in JavaScript.
-- When “action:translate” is entered, translate the contents of `copilot-instructions-ja.md` into English and output to `copilot-instructions.md`.
+- When "action:translate" is entered, translate the contents of `copilot-instructions-ja.md` into English and output to `copilot-instructions.md`.
+- When "action:gen-commit-msg" is entered, run `git diff --staged | cat` and generate a commit message based on the results. The commit message should be output in English.
 
 ## Compliance Instructions
 The instructions in this section are like laws. Follow them unless there are special exceptions. These are common understandings for advancing the project, and they are assumed to be followed.
@@ -54,7 +52,6 @@ Please understand the following knowledge. These are assumed to be known when pr
     - `<root>/packages/core`: Core package of the project. Users will use this package.
     - `<root>/packages/reactivity`: Package to make variables used in JSX syntax reactive. Uses alien-signals, customized to provide our own implementation.
     - `<root>/packages/runtime`: Package providing functionality to convert JSX syntax to custom element classes. Also includes implementation to make code transpiled by tsc's react-jsx reactive using packages/reactivity.
-    - `<root>/packages/transpiler`: Package to convert JSX syntax to custom element classes. Uses babel to convert JSX syntax to custom element classes. (Not currently used)
     - `<root>/packages/util`: Package providing utility functions for the project. This package is used by other packages.
   - `<root>/playgrounds/**`: Sample code for the project. Stores sample code that works using @chatora/core.
 - This project uses ESLint for linting and formatting.
