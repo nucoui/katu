@@ -27,9 +27,13 @@ export const ChatoraWrapper = <P extends Record<string, unknown>>({ tag, compone
   const id = useId();
 
   const { props: filteredProps, emits } = splitProps(props || {});
+
   const hast = functionalDeclarativeCustomElement(
     component,
-    option,
+    {
+      ...option,
+      props: filteredProps as Record<string, string | null>,
+    },
   );
 
   const [isDefined, setIsDefined] = useState(false);

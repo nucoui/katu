@@ -8,17 +8,26 @@ export type Props = {
   type: "button" | "submit" | "reset";
 }
 
-export const Button: ChatoraComponent = ({ defineProps, defineEmits, render }) => {
+export const Button: ChatoraComponent = ({ reactivity: { signal }, defineProps, defineEmits, render }) => {
   const props = defineProps<DefineProps<Props>>({
     type: (v) => toMatched(v, ["button", "submit", "reset"]) || "button",
   });
 
   const emits = defineEmits<DefineEmits<Emits>>(["on-click", "on-hover"]);
 
+  const [clickCount, setClickCount] = signal(0);
+
   render(() => {
     return (
-      <button type={props().type} onClick={() => emits("on-click")}>
+      <button
+        type={props().type}
+        onClick={() => {
+          setClickCount((count) => count + 1);
+          emits("on-click", { count: clickCount()
+        });
+      }}>
         aaaa
+        <span>Click count: {clickCount()}</span>
         <slot />
         <slot name="slot1" />
       </button>

@@ -17,16 +17,17 @@ import { computed, effect, endBatch, signal, startBatch } from "@chatora/reactiv
  */
 const functionalDeclarativeCustomElement = (
   callback: ChatoraComponent,
-  options?: FunctionalCustomElementOptions,
+  options?: FunctionalCustomElementOptions & { props?: Record<string, string | null> },
 ): Root => {
   const {
     shadowRoot = true,
     shadowRootMode = "open",
     style,
+    props: initialProps,
   } = options || {};
 
   // プロパティやステートの初期化
-  const props = signal<Record<string, string | null>>({});
+  const props = signal<Record<string, string | null>>(initialProps || {});
   let jsxResult: ChatoraNode | null = null;
 
   // コールバック関数を実行し、レンダリング関数などを取得
@@ -57,7 +58,11 @@ const functionalDeclarativeCustomElement = (
           // 対応する変換関数で初期値を生成
           emptyProps[key] = propsNamesOrTransformers[key](null);
         }
-        return () => emptyProps as any;
+        for (const key of Object.keys(props[0]())) {
+          emptyProps[key] = props[0]()[key];
+        }
+
+        return () => emptyProps;
       }
     },
     /**
