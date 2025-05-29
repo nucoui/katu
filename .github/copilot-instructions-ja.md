@@ -31,8 +31,8 @@
 - コミットメッセージを生成する際は、必ず英語で出力してください。また `<gitmoji> 変更の概要を100文字以内で`の形式で出力してください。`<gitmoji>`は、変更内容に応じたGitmojiを選択してください。Gitmojiの一覧は[こちら](https://gitmoji.dev/)を参照してください。2行目以降は、変更内容の詳細を英語で記述してください。2行目は空行にしてください。3行目以降は、変更内容の詳細を英語で記述してください。2行目以降は必須ではありません。 `feat:`や`hotfix: `のような記法は使わないでください
 - コードは全てESMモジュールとして記述してください。
 - コードは全てTypeScriptで記述してください。JavaScriptで記述することはできません。
-- 「action:translate」が入力された時、`copilot-instructions-ja.md`の内容を英語に翻訳して、`copilot-instructions.md`に出力してください。
-- 「action:gen-commit-msg」が入力された時、`git diff --staged | cat`を実行し、その結果を元にコミットメッセージを生成してください。コミットメッセージは英語で出力してください。
+- 「action:translate」が入力された時、`git diff .github/copilot-instructions-ja.md | cat`を実行して、取得した差分部分を再度英語に翻訳し直して、`.github/copilot-instructions.md`に翻訳した内容箇所のみを反映してください
+- 「action:gen-commit-msg」が入力された時、`git diff --staged | cat`を実行し、その結果を元にコミットメッセージをmd形式のコードブロック(` ```md /.../ ``` `)で生成してください。コミットメッセージは英語で出力してください。
 
 ## 遵守命令
 このセクションの命令は法律のようなものです。特例がない限り守ってください。これはプロジェクトを進める上での共通認識で、これらは基本的に守られている前提となっています。
