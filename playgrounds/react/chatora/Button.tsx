@@ -1,5 +1,5 @@
 import { toMatched } from "@chatora/util";
-import type { ChatoraComponent } from "chatora";
+import type { CC } from "chatora";
 import type { DefineEmits, DefineProps } from "@chatora/util";
 
 export type Emits = "on-click" | "on-hover";
@@ -8,7 +8,7 @@ export type Props = {
   type: "button" | "submit" | "reset";
 }
 
-export const Button: ChatoraComponent = ({ reactivity: { signal }, defineProps, defineEmits, render }) => {
+export const Button: CC = ({ reactivity: { signal }, defineProps, defineEmits, render }) => {
   const props = defineProps<DefineProps<Props>>({
     type: (v) => toMatched(v, ["button", "submit", "reset"]) || "button",
   });

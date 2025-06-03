@@ -1,6 +1,6 @@
-const toString = (value: string | null): string | null => {
-  if (value === null || value === "") {
-    return null;
+const toString = (value: string | undefined): string | undefined => {
+  if (value === undefined || value === "") {
+    return undefined;
   }
 
   return String(value);

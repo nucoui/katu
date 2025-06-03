@@ -1,6 +1,6 @@
-import { functionalCustomElement, ChatoraComponent } from "chatora";
+import { functionalCustomElement, CC } from "chatora";
 
-const Mini: ChatoraComponent = ({ reactivity: { signal }, render }) => {
+const Mini: CC = ({ reactivity: { signal }, render }) => {
   const [count, setCount] = signal(0);
 
   render(() => {

@@ -79,11 +79,13 @@ describe("functionalCustomElement", () => {
     const tagName = "x-test-el-emits";
     let receivedDetail: any = null;
     const CustomElement = functionalCustomElement(({ defineEmits, render }) => {
-      const emits = defineEmits(["on-foo", "on-bar"]);
+      const emits = defineEmits({
+        "on-foo": (_detail: any) => {},
+        "on-bar": (_detail: any) => {},
+      });
       render(() => DummyJSX());
       // テスト用にemitを公開
-      (window as any).emitFoo = emits.foo;
-      (window as any).emitBar = emits.bar;
+      (window as any).emit = emits;
     }, {});
     if (!customElements.get(tagName))
       customElements.define(tagName, CustomElement);
@@ -93,14 +95,14 @@ describe("functionalCustomElement", () => {
       receivedDetail = e.detail;
     });
     // emit関数を呼び出してイベントが発火するか
-    (window as any).emitFoo({ hello: "world" });
+    (window as any).emit("on-foo", { hello: "world" });
     expect(receivedDetail).toEqual({ hello: "world" });
     // barイベントも同様に
     let barReceived = false;
     el.addEventListener("on-bar", () => {
       barReceived = true;
     });
-    (window as any).emitBar();
+    (window as any).emit("on-bar");
     expect(barReceived).toBe(true);
   });
 
@@ -110,7 +112,10 @@ describe("functionalCustomElement", () => {
     let receivedDetail: any = null;
     const CustomElement = functionalCustomElement(({ defineEmits, render }) => {
       // 型推論が効くかどうかのテスト
-      const emit = defineEmits(["on-foo", "on-bar"] as const);
+      const emit = defineEmits({
+        "on-foo": (_detail: any) => {},
+        "on-bar": (_detail: any) => {},
+      });
       render(() => DummyJSX());
       (window as any).emit = emit;
     }, {});

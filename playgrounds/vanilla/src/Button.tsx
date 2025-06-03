@@ -1,16 +1,28 @@
 import { functionalCustomElement } from "chatora";
-import type { ChatoraComponent } from "chatora";
+import type { CC } from "chatora";
 import style from "./Button.scss?raw";
 import { clsx } from "clsx";
 import { toBoolean, toMatched } from "@chatora/util";
 
-const Button: ChatoraComponent = ({
-  reactivity: { signal, effect, computed },
+type Props = {
+  type?: "anchor" | "submit" | "reset" | "toggle" | "button";
+  variant?: string;
+  size?: string;
+  disabled?: boolean;
+  href?: string;
+  target?: string;
+  width?: "auto" | "full";
+}
+
+type Emits = {
+  "on-click": { count: number };
+  "on-hover": MouseEvent;
+}
+
+const Button: CC<Props, Emits> = ({
+  reactivity: { computed },
   defineProps,
   defineEmits,
-  onConnected,
-  onDisconnected,
-  onAttributeChanged,
   render,
   getHost
 }) => {
@@ -21,9 +33,12 @@ const Button: ChatoraComponent = ({
     disabled: (v) => toBoolean(v) ?? false,
     href: (v) => v,
     target: (v) => v,
-    width: (v) => v
+    width: (v) => toMatched(v, ["auto", "full"]) ?? "auto",
   });
-  const emits = defineEmits(["on-click"]);
+  const emits = defineEmits({
+    "on-click": () => {},
+    "on-hover": () => {},
+  });
 
   const handleClick = (e: MouseEvent) => {
     if (props().disabled) {
@@ -32,7 +47,7 @@ const Button: ChatoraComponent = ({
       return;
     }
 
-    emits("on-click", e);
+    emits("on-click", { count: e.detail });
 
     if (props().type === "submit") {
       getHost().closest("form")?.requestSubmit();
@@ -91,7 +106,7 @@ const Button: ChatoraComponent = ({
   })
 }
 
-export const ButtonElement = functionalCustomElement(Button, { style: [ style ] });
+export const ButtonElement = functionalCustomElement(Button, { styles: [ style ] });
 
 customElements.define("n-button", ButtonElement);
 

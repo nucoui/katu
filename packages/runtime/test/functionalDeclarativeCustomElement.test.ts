@@ -284,7 +284,10 @@ describe("functionalDeclarativeCustomElement", () => {
 
   it("definePropsが動作する", () => {
     const result = functionalDeclarativeCustomElement(({ defineProps, render }) => {
-      const props = defineProps(["name", "age"]);
+      const props = defineProps({
+        name: v => v,
+        age: v => v,
+      });
       render(() => ({
         tag: "div",
         props: {
@@ -305,19 +308,16 @@ describe("functionalDeclarativeCustomElement", () => {
   it("defineEmitsがダミー関数を返す", () => {
     let emitFunction: any;
     functionalDeclarativeCustomElement(({ defineEmits, render }) => {
-      emitFunction = defineEmits(["on-click", "on-change"]);
+      emitFunction = defineEmits({
+        "on-click": (_detail: any) => {},
+        "on-change": (_detail: any) => {},
+      });
       render(() => DummyJSX());
     }, {});
 
     // 関数として呼び出せること
     expect(typeof emitFunction).toBe("function");
-    // click()メソッドがアクセス可能であること
-    expect(typeof emitFunction.click).toBe("function");
-    // change()メソッドがアクセス可能であること
-    expect(typeof emitFunction.change).toBe("function");
-
     // 実行してもエラーが発生しないこと
     expect(() => emitFunction("on-click", { data: "test" })).not.toThrow();
-    expect(() => emitFunction.click({ data: "test" })).not.toThrow();
   });
 });

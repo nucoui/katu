@@ -4,11 +4,13 @@ import ChatoraWrapper from "@chatora/vue/components/ChatoraWrapper.vue"
 
 const props = defineProps<Props>()
 
-const emits = defineEmits<{
+type Emits = {
   click: [Event]
   hover: [Event]
   event: [Event]
-}>()
+}
+
+const emits = defineEmits<Emits>()
 </script>
 
 <template>

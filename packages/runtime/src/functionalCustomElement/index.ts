@@ -44,7 +44,7 @@ const functionalCustomElement: FunctionalCustomElement = (
      * 属性値を保持するリアクティブなprops
      * Reactive props holding attribute values
      */
-    props = signal<Record<string, string | null>>({});
+    props = signal<Record<string, string | undefined>>({});
 
     _vnode: VNode | null = null;
 
@@ -71,75 +71,59 @@ const functionalCustomElement: FunctionalCustomElement = (
           endBatch,
         },
         /**
-         * 属性名リストまたは属性変換関数オブジェクトを受け取り、属性値を取得するgetter関数を返します。
-         * Accepts a list of attribute names or an object of attribute transformer functions and returns a getter function for attribute values.
-         * @param props - 属性名の配列または属性変換関数オブジェクト (Array of attribute names or object of attribute transformer functions)
+         * 属性変換関数オブジェクトを受け取り、属性値を取得するgetter関数を返します。
+         * Accepts an object of attribute transformer functions and returns a getter function for attribute values.
+         * @param props - 属性変換関数オブジェクト (Object of attribute transformer functions)
          * @returns 属性値を取得するgetter関数 (Getter function for attribute values)
          */
-        defineProps: (props: string[] | Record<string, (value: string | null) => any>) => {
-          // 配列の場合
-          if (Array.isArray(props)) {
-            this.observedAttributes = props;
+        defineProps: (props: Record<string, (value: string | undefined) => any>) => {
+          // 属性名のリストを抽出
+          const propNames = Object.keys(props);
+          this.observedAttributes = propNames;
 
-            // インスタンスが持つ全属性値をバッチで一度に初期化
-            const initialProps: Record<string, string | null> = {};
-            for (const name of props) {
-              initialProps[name] = this.getAttribute(name) || null;
-            }
-
-            // 一度の更新処理でpropsを設定（バッチ処理）
-            this.props[1](prev => ({ ...prev, ...initialProps }));
-
-            return this.props[0] as any;
+          // インスタンスが持つ全属性値をバッチで一度に初期化
+          const initialProps: Record<string, string | undefined> = {};
+          for (const name of propNames) {
+            initialProps[name] = this.getAttribute(name) || undefined;
           }
 
-          // オブジェクトの場合- 変換関数を使用
-          else {
-            // 属性名のリストを抽出
-            const propNames = Object.keys(props);
-            this.observedAttributes = propNames;
+          // 一度の更新処理でpropsを設定（バッチ処理）
+          this.props[1](prev => ({ ...prev, ...initialProps }));
 
-            // インスタンスが持つ全属性値をバッチで一度に初期化
-            const initialProps: Record<string, string | null> = {};
-            for (const name of propNames) {
-              initialProps[name] = this.getAttribute(name) || null;
+          // 変換関数を適用してgetter関数を返す
+          return () => {
+            const rawProps = this.props[0]();
+            const transformedProps: Record<string, any> = {};
+
+            for (const [key, transformer] of Object.entries(props) as Array<[string, (value: string | undefined) => any]>) {
+              transformedProps[key] = transformer(rawProps[key]);
             }
 
-            // 一度の更新処理でpropsを設定（バッチ処理）
-            this.props[1](prev => ({ ...prev, ...initialProps }));
-
-            // 変換関数を適用してgetter関数を返す
-            return () => {
-              const rawProps = this.props[0]();
-              const transformedProps: Record<string, any> = {};
-
-              for (const [key, transformer] of Object.entries(props) as Array<[string, (value: string | null) => any]>) {
-                transformedProps[key] = transformer(rawProps[key]);
-              }
-
-              return transformedProps as any;
-            };
-          }
+            return transformedProps as any;
+          };
         },
         /**
-         * イベント名リストを受け取り、イベントを発火する関数を返します。
-         * Accepts a list of event names and returns a function to emit events.
-         * @param events - イベント名の配列 (Array of event names)
+         * イベントハンドラオブジェクトを受け取り、イベントを発火する関数を返します。
+         * Accepts an object with event handlers and returns a function to emit events.
+         * @param events - イベントハンドラオブジェクト (Object with event handlers)
          * @returns イベントを発火する関数 (Function to emit events)
          */
-        defineEmits: (events) => {
+        defineEmits: (events: Record<`on-${string}`, (detail: any) => void>) => {
           // デフォルトのイベントオプション（一度だけ作成）
           const defaultOptions = { bubbles: true, composed: true, cancelable: true };
 
+          // イベント名の配列を取得
+          const eventNames = Object.keys(events);
+
           // イベント名からメソッド名へのマッピングを事前に作成（on-foo → foo）
-          const methodMap = new Map(events.map(event => [
+          const methodMap = new Map(eventNames.map(event => [
             event,
             event.replace(/^on-/, ""),
           ]));
 
           // イベント発火の基本関数
           const emit = (type: any, detail: any, options?: { bubbles?: boolean; composed?: boolean; cancelable?: boolean }) => {
-            if (events.includes(type)) {
+            if (eventNames.includes(type)) {
               // オプションをマージするよりもスプレッド構文の方が効率的
               this.dispatchEvent(
                 new CustomEvent(type, {
@@ -282,7 +266,7 @@ const functionalCustomElement: FunctionalCustomElement = (
           this.props[1]((prev) => {
             const newProps = { ...prev };
             for (const [name, { newValue }] of Object.entries(changedAttributes)) {
-              newProps[name] = newValue;
+              newProps[name] = newValue === null ? undefined : newValue;
             }
             return newProps;
           });

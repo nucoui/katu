@@ -1,12 +1,12 @@
 import { hastToJsx } from "@/utils/hastToJsx";
-import { type ChatoraComponent, functionalCustomElement, type FunctionalCustomElementOptions, functionalDeclarativeCustomElement } from "chatora";
+import { type CC, functionalCustomElement, type FunctionalCustomElementOptions, functionalDeclarativeCustomElement } from "chatora";
 import { type PropsWithChildren, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { jsx } from "react/jsx-runtime";
 
 export type Props<P extends Record<string, unknown>> = PropsWithChildren<{
   props: P;
   tag: string;
-  component: ChatoraComponent;
+  component: CC;
 } & FunctionalCustomElementOptions>;
 
 const splitProps = (props: Record<string, unknown>) => {
@@ -32,7 +32,7 @@ export const ChatoraWrapper = <P extends Record<string, unknown>>({ tag, compone
     component,
     {
       ...option,
-      props: filteredProps as Record<string, string | null>,
+      props: filteredProps as Record<string, string | undefined>,
     },
   );
 

@@ -50,7 +50,17 @@ export type FunctionalCustomElementOptions = {
   shadowRootMode?: never;
 });
 
-export type ChatoraComponent = (params: {
+type AsFunctionType<T> = {
+  [K in keyof T]: (v: string | undefined) => T[K];
+};
+
+// CCの短縮型を定義
+export type CC<
+  P extends Record<string, any> = Record<string, never>,
+  E extends Record<`on-${string}`, any> = Record<never, never>,
+> = ChatoraComponent<P, E>;
+
+export type ChatoraComponent<P extends Record<string, any> = Record<string, never>, E extends Record<`on-${string}`, any> = Record<`on-${string}`, never>> = (params: {
   reactivity: {
     signal: typeof import("@chatora/reactivity").signal;
     computed: typeof import("@chatora/reactivity").computed;
@@ -63,30 +73,27 @@ export type ChatoraComponent = (params: {
    * Define the props
    *
    * @example
-   *   // 文字列配列を使用
-   *   const props = defineProps(["foo", "bar"])
-   *   // props(): { foo: string | null, bar: string | null }
-   *
    *   // 変換関数を使用
    *   const props = defineProps({
    *     disabled: toBoolean,
    *     value: (v) => v
    *   })
-   *   // props(): { disabled: boolean | null, value: string | null }
+   *   // props(): { disabled: boolean | undefined, value: string | undefined }
    */
-  defineProps: {
-    <const T extends readonly string[] = readonly string[]>(props: T): () => { [K in T[number]]: string | null };
-    <T extends Record<string, (value: string | null) => any>>(props: T): () => { [K in keyof T]: ReturnType<T[K]> };
-  };
+  defineProps: <T extends AsFunctionType<P>>(props: T) => () => { [K in keyof T]: ReturnType<T[K]> };
   /**
    * Emitsの定義を行う関数
    * Define the emits
    *
    * @example
-   *   const emits = defineEmits(["click", "change"])
-   *   emits("click", { foo: "bar" }) // CustomEventで発火
+   *   // 型安全なイベント定義
+   *   const emits = defineEmits({
+   *     "on-click": (detail: { count: number }) => {},
+   *     "on-change": (detail: string) => {}
+   *   })
+   *   emits("on-click", { count: 1 }) // 型安全なCustomEventで発火
    */
-  defineEmits: <const U extends readonly `on-${string}`[] = readonly `on-${string}`[]>(events: U) => (type: U[number], detail?: any, options?: EventInit) => void;
+  defineEmits: <T extends { [K in keyof E]: (detail: E[K]) => void }>(events: T) => <K extends keyof E>(type: K, detail?: E[K], options?: EventInit) => void;
   /**
    * connectedCallback時のフック登録
    * Register hook for connectedCallback
@@ -116,8 +123,11 @@ export type ChatoraComponent = (params: {
   render: (cb: () => ChatoraNode) => void;
 }) => void;
 
-export type FunctionalCustomElement = (
-  component: ChatoraComponent,
+export type FunctionalCustomElement = <
+  P extends Record<string, any> = Record<string, never>,
+  E extends Record<`on-${string}`, any> = Record<`on-${string}`, never>,
+>(
+  component: ChatoraComponent<P, E>,
   options: FunctionalCustomElementOptions
 ) => {
   new (): HTMLElement;

@@ -1,4 +1,4 @@
-import type { ChatoraComponent, FunctionalCustomElementOptions } from "@root/types/FunctionalCustomElement";
+import type { CC, FunctionalCustomElementOptions } from "@root/types/FunctionalCustomElement";
 import type { ChatoraJSXElement, ChatoraNode } from "@root/types/JSX.namespace";
 import type { Element, ElementContent, Root } from "hast";
 import { computed, effect, endBatch, signal, startBatch } from "@chatora/reactivity";
@@ -16,8 +16,8 @@ import { computed, effect, endBatch, signal, startBatch } from "@chatora/reactiv
  * @returns hastオブジェクト (HTML Abstract Syntax Tree)
  */
 const functionalDeclarativeCustomElement = (
-  callback: ChatoraComponent,
-  options?: FunctionalCustomElementOptions & { props?: Record<string, string | null> },
+  callback: CC,
+  options?: FunctionalCustomElementOptions & { props?: Record<string, string | undefined> },
 ): Root => {
   const {
     shadowRoot = true,
@@ -27,7 +27,7 @@ const functionalDeclarativeCustomElement = (
   } = options || {};
 
   // プロパティやステートの初期化
-  const props = signal<Record<string, string | null>>(initialProps || {});
+  const props = signal<Record<string, string | undefined>>(initialProps || {});
   let jsxResult: ChatoraNode | null = null;
 
   // コールバック関数を実行し、レンダリング関数などを取得
@@ -40,46 +40,40 @@ const functionalDeclarativeCustomElement = (
       endBatch,
     },
     /**
-     * 属性名リストまたは属性変換関数オブジェクトを受け取り、属性値を取得するgetter関数を返します。
+     * 属性変換関数オブジェクトを受け取り、属性値を取得するgetter関数を返します。
      * SSRでは初期値のみを返します。
      *
-     * @param propsNamesOrTransformers - 属性名の配列または属性変換関数オブジェクト
+     * @param propsTransformers - 属性変換関数オブジェクト
      * @returns 属性値を取得するgetter関数
      */
-    defineProps: (propsNamesOrTransformers: string[] | Record<string, (value: string | null) => any>) => {
-      // SSRでは空のプロップを返す（実際の値はクライアント側で注入される）
-      if (Array.isArray(propsNamesOrTransformers)) {
-        return props[0] as any;
+    defineProps: <T extends Record<string, (value: string | undefined) => any>>(propsTransformers: T) => {
+      // オブジェクトに対して空オブジェクトを返す
+      const emptyProps: Record<string, any> = {};
+      for (const key of Object.keys(propsTransformers)) {
+        // 対応する変換関数で初期値を生成
+        emptyProps[key] = propsTransformers[key as keyof T](undefined);
       }
-      else {
-        // オブジェクトの場合も同様に空オブジェクトを返す
-        const emptyProps: Record<string, any> = {};
-        for (const key of Object.keys(propsNamesOrTransformers)) {
-          // 対応する変換関数で初期値を生成
-          emptyProps[key] = propsNamesOrTransformers[key](null);
-        }
-        for (const key of Object.keys(props[0]())) {
-          emptyProps[key] = props[0]()[key];
-        }
+      for (const key of Object.keys(props[0]())) {
+        emptyProps[key] = props[0]()[key];
+      }
 
-        return () => emptyProps;
-      }
+      return () => emptyProps as { [K in keyof T]: ReturnType<T[K]> };
     },
     /**
-     * イベント名リストを受け取り、イベントを発火する関数を返します。
+     * イベントハンドラオブジェクトを受け取り、イベントを発火する関数を返します。
      * SSRではイベントは実行されないためダミー関数を返します。
      *
-     * @param events - イベント名の配列
+     * @param events - イベントハンドラオブジェクト
      * @returns イベントを発火する関数（SSRではダミー）
      */
-    defineEmits: (events) => {
+    defineEmits: (events: Record<`on-${string}`, (detail: any) => void>) => {
       // SSRモードではイベントは機能しないためダミー関数を返す
       const dummyEmit = (_type: any, _detail: any, _options?: any) => {
         // SSRではイベントは動作しない
       };
 
       // イベント名からメソッド名へのマッピング (on-foo → foo)
-      for (const event of events) {
+      for (const event of Object.keys(events)) {
         const methodName = event.replace(/^on-/, "");
         (dummyEmit as any)[methodName] = (_detail: any, _options?: any) => {
           // SSRではイベントは動作しない

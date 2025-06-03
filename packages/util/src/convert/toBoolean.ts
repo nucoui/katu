@@ -1,13 +1,13 @@
-const toBoolean = (value: string | null): boolean | null => {
+const toBoolean = (value: string | undefined): boolean | undefined => {
   if (value === "" || value === "true") {
     return true;
   }
 
-  if (value === null || value === "false") {
+  if (value === undefined || value === "false") {
     return false;
   }
 
-  return null;
+  return undefined;
 };
 
 export { toBoolean };

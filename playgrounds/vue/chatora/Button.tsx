@@ -1,19 +1,26 @@
 import { toMatched } from "@chatora/util";
-import type { ChatoraComponent } from "chatora";
+import { signal, type CC } from "chatora";
 import type { DefineEmits, DefineProps } from "@chatora/util";
-
-export type Emits = "on-click" | "on-hover" | "on-event"
+import { render } from "vue";
 
 export type Props = {
   type: "button" | "submit" | "reset";
 }
 
-export const Button: ChatoraComponent = ({ reactivity: { signal }, defineProps, defineEmits, render }) => {
-  const props = defineProps<DefineProps<Props>>({
+export type Emits = {
+  "on-click": { count: number };
+  "on-event": { type: string; detail: { count: number } };
+}
+
+export const Button: CC<Props, Emits> = ({ reactivity: { signal }, defineProps, defineEmits, render }) => {
+  const props = defineProps({
     type: (v) => toMatched(v, ["button", "submit", "reset"]) || "button",
   });
 
-  const emits = defineEmits<DefineEmits<Emits>>(["on-click", "on-hover", "on-event"]);
+  const emits = defineEmits({
+    "on-click": (_detail: { count: number }) => {},
+    "on-event": (_detail: { type: string; detail: { count: number } }) => {}
+  });
 
   const [clickCount, setClickCount] = signal(0);
 

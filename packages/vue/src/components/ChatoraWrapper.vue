@@ -1,12 +1,12 @@
 <script setup lang="tsx">
-import { type ChatoraComponent, functionalCustomElement, type FunctionalCustomElementOptions, functionalDeclarativeCustomElement } from "chatora";
+import { type CC, functionalCustomElement, type FunctionalCustomElementOptions, functionalDeclarativeCustomElement } from "chatora";
 import { defineProps, h, onMounted, ref, useId, useSlots } from "vue";
 import { hastToJsx } from "../utils/hastToJsx";
 
 type Props<P extends Record<string, unknown>> = {
   props: P;
   tag: string;
-  component: ChatoraComponent;
+  component: CC;
 } & FunctionalCustomElementOptions;
 
 const {
@@ -18,7 +18,9 @@ const {
 
 const isDefined = ref(false);
 const id = useId();
-const slots = useSlots();
+const slots = useSlots() as {
+  default?: () => any[];
+};
 
 const tagRef = ref<HTMLElement | null>(null);
 
@@ -42,7 +44,7 @@ const hast = functionalDeclarativeCustomElement(
   component,
   {
     ...options,
-    props: props as Record<string, string | null>,
+    props: props as Record<string, string | undefined>,
   },
 );
 
