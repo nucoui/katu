@@ -5,7 +5,7 @@ import { Button, ButtonStyle } from "../../chatora/Button"
 import { ChatoraWrapper } from "@chatora/react/components/ChatoraWrapper";
 import type { Props as ButtonProps, Emits } from "../../chatora/Button";
 
-type Props = PropsWithChildren<ButtonProps & Partial<Record<Emits, (event: Event) => void>>>
+type Props = PropsWithChildren<ButtonProps & Partial<Emits>>
 
 export const NButton = ({ children, ...props }: Props) => {
   return (
@@ -15,7 +15,7 @@ export const NButton = ({ children, ...props }: Props) => {
         props={props}
         component={Button}
         children={children}
-        style={[ButtonStyle]}
+        styles={[ButtonStyle]}
       />
     </>
   )

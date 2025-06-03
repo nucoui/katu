@@ -1,19 +1,24 @@
 import { toMatched } from "@chatora/util";
 import type { CC } from "chatora";
-import type { DefineEmits, DefineProps } from "@chatora/util";
 
-export type Emits = "on-click" | "on-hover";
+export type Emits = {
+  "on-click": { count: number };
+  "on-hover": MouseEvent;
+}
 
 export type Props = {
   type: "button" | "submit" | "reset";
 }
 
-export const Button: CC = ({ reactivity: { signal }, defineProps, defineEmits, render }) => {
-  const props = defineProps<DefineProps<Props>>({
+export const Button: CC<Props, Emits> = ({ reactivity: { signal }, defineProps, defineEmits, render }) => {
+  const props = defineProps({
     type: (v) => toMatched(v, ["button", "submit", "reset"]) || "button",
   });
 
-  const emits = defineEmits<DefineEmits<Emits>>(["on-click", "on-hover"]);
+  const emits = defineEmits({
+    "on-click": (detail) => detail,
+    "on-hover": (event) => event,
+  });
 
   const [clickCount, setClickCount] = signal(0);
 
@@ -23,9 +28,9 @@ export const Button: CC = ({ reactivity: { signal }, defineProps, defineEmits, r
         type={props().type}
         onClick={() => {
           setClickCount((count) => count + 2);
-          emits("on-click", { count: clickCount()
-        });
-      }}>
+          emits("on-click", {count: clickCount()});
+        }}
+      >
         <span>Click count: {clickCount()}</span>
         <br></br>
         <slot />
@@ -37,13 +42,9 @@ export const Button: CC = ({ reactivity: { signal }, defineProps, defineEmits, r
 
 export const ButtonStyle = `
   button {
-    color: red;
-    background-color: yellow;
-    border: 1px solid black;
-    padding: 10px;
-    border-radius: 5px;
-    }
-    button:hover {
-    background-color: orange;
+    border: none;
+    border-radius: calc(infinity * 1px);
+    padding: 0.75em 2em;
+    cursor: pointer;
   }
 `

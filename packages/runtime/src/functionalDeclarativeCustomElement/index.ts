@@ -1,7 +1,6 @@
 import type { CC, FunctionalCustomElementOptions } from "@root/types/FunctionalCustomElement";
 import type { ChatoraJSXElement, ChatoraNode } from "@root/types/JSX.namespace";
 import type { Element, ElementContent, Root } from "hast";
-import { computed, effect, endBatch, signal, startBatch } from "@chatora/reactivity";
 
 /**
  * JSX/TSXを使用してDeclarative Shadow DOMのHTML要素を作成する関数です。
@@ -26,18 +25,28 @@ const functionalDeclarativeCustomElement = (
     props: initialProps,
   } = options || {};
 
-  // プロパティやステートの初期化
-  const props = signal<Record<string, string | undefined>>(initialProps || {});
+  // プロパティの初期化（SSRでは静的なため、signalは不要）
+  const _propsData = initialProps || {};
   let jsxResult: ChatoraNode | null = null;
 
-  // コールバック関数を実行し、レンダリング関数などを取得
+  // SSR用の軽量化されたreactivity実装
+  const ssrSignal = <T>(value: T): [() => T, (newValue: T | ((prev: T) => T)) => void] => {
+    const getter = () => value;
+    const setter = () => {}; // SSRでは更新不要
+    return [getter, setter];
+  };
+
+  const ssrComputed = <T>(fn: () => T) => () => fn();
+  const ssrEffect = () => () => {}; // SSRでは副作用不要
+  const noop = () => {};
+
   callback({
     reactivity: {
-      signal,
-      effect,
-      computed,
-      startBatch,
-      endBatch,
+      signal: ssrSignal,
+      effect: ssrEffect,
+      computed: ssrComputed,
+      startBatch: noop,
+      endBatch: noop,
     },
     /**
      * 属性変換関数オブジェクトを受け取り、属性値を取得するgetter関数を返します。
@@ -47,116 +56,92 @@ const functionalDeclarativeCustomElement = (
      * @returns 属性値を取得するgetter関数
      */
     defineProps: <T extends Record<string, (value: string | undefined) => any>>(propsTransformers: T) => {
-      // オブジェクトに対して空オブジェクトを返す
-      const emptyProps: Record<string, any> = {};
+      // プロパティ値を事前計算（SSRでは変更されない）
+      const computedProps: Record<string, any> = {};
+
+      // 変換関数でデフォルト値を生成
       for (const key of Object.keys(propsTransformers)) {
-        // 対応する変換関数で初期値を生成
-        emptyProps[key] = propsTransformers[key as keyof T](undefined);
-      }
-      for (const key of Object.keys(props[0]())) {
-        emptyProps[key] = props[0]()[key];
+        computedProps[key] = propsTransformers[key as keyof T](undefined);
       }
 
-      return () => emptyProps as { [K in keyof T]: ReturnType<T[K]> };
+      // 初期プロパティで上書き
+      for (const key of Object.keys(_propsData)) {
+        if (key in propsTransformers) {
+          computedProps[key] = propsTransformers[key as keyof T](_propsData[key]);
+        }
+      }
+
+      return () => computedProps as { [K in keyof T]: ReturnType<T[K]> };
     },
     /**
      * イベントハンドラオブジェクトを受け取り、イベントを発火する関数を返します。
      * SSRではイベントは実行されないためダミー関数を返します。
      *
-     * @param events - イベントハンドラオブジェクト
+     * @param _events - イベントハンドラオブジェクト（SSRでは使用しない）
      * @returns イベントを発火する関数（SSRではダミー）
      */
-    defineEmits: (events: Record<`on-${string}`, (detail: any) => void>) => {
-      // SSRモードではイベントは機能しないためダミー関数を返す
-      const dummyEmit = (_type: any, _detail: any, _options?: any) => {
-        // SSRではイベントは動作しない
-      };
-
-      // イベント名からメソッド名へのマッピング (on-foo → foo)
-      for (const event of Object.keys(events)) {
-        const methodName = event.replace(/^on-/, "");
-        (dummyEmit as any)[methodName] = (_detail: any, _options?: any) => {
-          // SSRではイベントは動作しない
-        };
-      }
-
-      return dummyEmit;
+    defineEmits: (_events: Record<`on-${string}`, (detail: any) => void>) => {
+      // SSRでは最小限のダミー関数を返す
+      const dummyEmit = () => {};
+      return dummyEmit as any;
     },
-    // ライフサイクルフックはSSRでは実行されないためダミー関数を返す
-    onConnected: () => {},
-    onDisconnected: () => {},
-    onAttributeChanged: () => {},
-    onAdopted: () => {},
+    // ライフサイクルフックはSSRでは不要
+    onConnected: noop,
+    onDisconnected: noop,
+    onAttributeChanged: noop,
+    onAdopted: noop,
     /**
      * ホスト要素（このカスタム要素自身）を取得します
-     * SSRではダミーオブジェクトを返します
-     *
-     * @returns ダミーのホスト要素
+     * SSRでは空オブジェクトを返します
      */
-    getHost: () => {
-      return {} as HTMLElement;
-    },
+    getHost: () => ({} as HTMLElement),
     /**
      * ShadowRootを取得します
      * SSRではnullを返します
-     *
-     * @returns null
      */
-    getShadowRoot: () => {
-      return null;
-    },
+    getShadowRoot: () => null,
     /**
      * レンダリング関数を実行し、JSX結果を保存します
-     * functionalCustomElementとは異なり、effectは使用せず単純に結果を保存します
-     *
-     * @param cb - レンダリングコールバック関数
+     * SSRでは単純に結果を保存するだけです
      */
     render: (cb) => {
-      // レンダリングコールバックを実行してJSX要素を取得
       jsxResult = cb();
     },
   });
 
   // jsxResultがなければ空のDOM要素を生成
-  if (!jsxResult && jsxResult !== 0) {
-    return {
-      type: "root",
-      children: [],
-    };
+  if (jsxResult === null || jsxResult === undefined) {
+    return { type: "root", children: [] };
   }
 
   // JSX結果をhastに変換
   const contentElement = jsxToHast(jsxResult);
 
-  // スタイル要素を作成（存在する場合）
-  const styleElements: Element[] = [];
-  if (styles) {
-    const styleArray = Array.isArray(styles) ? styles : [styles];
-    for (const cssText of styleArray) {
-      styleElements.push({
+  // スタイル要素を事前に生成（存在する場合）
+  const styleElements: Element[] = styles
+    ? (Array.isArray(styles) ? styles : [styles]).map(cssText => ({
         type: "element",
         tagName: "style",
         properties: {},
         children: [{ type: "text", value: cssText }],
-      });
-    }
-  }
+      }))
+    : [];
 
   // Declarative Shadow DOMのtemplate要素を作成 (shadowRoot=trueの場合のみ)
   if (shadowRoot) {
-    const templateElement: Element = {
-      type: "element",
-      tagName: "template",
-      properties: { shadowroot: shadowRootMode },
-      children: [
-        ...styleElements,
-        ...(Array.isArray(contentElement) ? contentElement : [contentElement]),
-      ].filter(Boolean) as ElementContent[],
-    };
+    const templateChildren = [
+      ...styleElements,
+      ...(Array.isArray(contentElement) ? contentElement : [contentElement]),
+    ].filter(Boolean) as ElementContent[];
 
     return {
       type: "root",
-      children: [templateElement],
+      children: [{
+        type: "element",
+        tagName: "template",
+        properties: { shadowroot: shadowRootMode },
+        children: templateChildren,
+      }],
     };
   }
 
@@ -169,12 +154,10 @@ const functionalDeclarativeCustomElement = (
 
 /**
  * ChatoraNode (JSX結果) をhast要素に変換する関数
- *
- * @param node - 変換対象のChatoraNode
- * @returns 変換後のhast要素
+ * SSR用に最適化された軽量版
  */
 function jsxToHast(node: ChatoraNode): ElementContent | ElementContent[] {
-  // nullやundefinedの場合は空のテキストノードを返す
+  // nullやundefinedの場合は空のテキストノード
   if (node === null || node === undefined) {
     return { type: "text", value: "" };
   }
@@ -186,7 +169,7 @@ function jsxToHast(node: ChatoraNode): ElementContent | ElementContent[] {
 
   // 配列の場合は各要素を変換
   if (Array.isArray(node)) {
-    return node.map(item => jsxToHast(item)).flat();
+    return node.flatMap(item => jsxToHast(item));
   }
 
   // ChatoraJSXElementの場合
@@ -196,7 +179,7 @@ function jsxToHast(node: ChatoraNode): ElementContent | ElementContent[] {
     // タグが関数の場合は実行結果を変換
     if (typeof jsxElement.tag === "function") {
       const result = jsxElement.tag(jsxElement.props || {});
-      // Promise型の場合は非同期処理が必要だがSSRでは対応しないためundefinedを返す
+      // Promise型の場合は警告を出してスキップ
       if (result instanceof Promise) {
         console.warn("Promise-based components are not supported in SSR mode");
         return { type: "text", value: "" };
@@ -206,42 +189,24 @@ function jsxToHast(node: ChatoraNode): ElementContent | ElementContent[] {
 
     // タグが文字列の場合はhast要素に変換
     const tagName = jsxElement.tag as string;
-    const props = { ...jsxElement.props };
-    const children = props.children;
-    delete props.children;
+    const { children, ...props } = jsxElement.props || {};
 
-    // onXXX系のイベントハンドラプロパティを削除
-    Object.keys(props).forEach((key) => {
-      if (key.startsWith("on") && key.length > 2 && key[2] === key[2].toUpperCase()) {
-        delete props[key];
-      }
-    });
-
-    // プロパティをhast形式に変換
-    const properties: Record<string, any> = {};
+    // イベントハンドラプロパティを除去（SSRでは不要）
+    const filteredProps: Record<string, any> = {};
     for (const [key, value] of Object.entries(props)) {
-      // class → className 変換
-      if (key === "className") {
-        properties.class = value;
-      }
-      // 通常のプロパティ
-      else {
-        properties[key] = value;
+      if (!(key.startsWith("on") && key.length > 2 && key[2] === key[2].toUpperCase())) {
+        filteredProps[key === "className" ? "class" : key] = value;
       }
     }
 
     return {
       type: "element",
       tagName,
-      properties,
+      properties: filteredProps,
       children: children
         ? (Array.isArray(children)
-            ? children.map(child => jsxToHast(child)).flat()
-          // childrenがオブジェクトでもChatoraNodeとして扱える場合のみ変換
-            : typeof children === "string" || typeof children === "number"
-              || (typeof children === "object" && children !== null && ("tag" in children || Array.isArray(children)))
-              ? [jsxToHast(children as ChatoraNode)]
-              : []
+            ? children.flatMap(child => jsxToHast(child as ChatoraNode))
+            : [jsxToHast(children as ChatoraNode)]
           ).filter(Boolean) as ElementContent[]
         : [],
     };

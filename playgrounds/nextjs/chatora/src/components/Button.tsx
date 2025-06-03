@@ -1,6 +1,5 @@
 import { toMatched } from "@chatora/util";
 import type { CC } from "chatora";
-import type { DefineEmits, DefineProps } from "@chatora/util";
 
 export type Emits = {
   "on-click": { count: number };

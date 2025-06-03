@@ -37,7 +37,7 @@ The instructions in this section must be followed absolutely. These are non-nego
 ## Compliance Instructions
 The instructions in this section are like laws. Follow them unless there are special exceptions. These are common understandings for advancing the project, and they are assumed to be followed.
 - When changing code, check that there are no TypeScript type errors or ESLint errors in the file after changes. If there are errors, continue making changes until there are no errors.
-- Use JSDoc to describe functions and classes in English. In particular, clearly describe the types of arguments and return values.
+- Use JSDoc to describe functions and classes exclusively in English. In particular, clearly describe the types of arguments and return values.
 
 ## Recommended Instructions
 The instructions in this section are recommended. It's not a problem if you don't follow them, but it's better if you do.

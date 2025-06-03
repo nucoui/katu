@@ -88,17 +88,20 @@ export function createVNode(tag: string, props: Record<string, any>): VNode {
  */
 export function mount(vnode: VNode): Node {
   const el = document.createElement(vnode.tag);
-  const eventRegex = /^on[A-Z]/;
 
-  for (const [k, v] of Object.entries(vnode.props)) {
+  // props処理の最適化：事前にエントリ配列を取得してfor文で処理
+  const propsEntries = Object.entries(vnode.props);
+  for (let i = 0; i < propsEntries.length; i++) {
+    const [k, v] = propsEntries[i];
     if (v == null)
       continue;
 
     // 内部属性（_tora_internal_:プレフィックスを持つ）はDOMに反映しない
-    if (k.startsWith(_INTERNAL_ATTRIBUTES))
+    if (k.length > _INTERNAL_ATTRIBUTES.length && k.startsWith(_INTERNAL_ATTRIBUTES))
       continue;
 
-    if (eventRegex.test(k) && typeof v === "function") {
+    // イベントハンドラの判定を最適化（正規表現を避ける）
+    if (k.length > 2 && k.charCodeAt(0) === 111 && k.charCodeAt(1) === 110 && k.charCodeAt(2) >= 65 && k.charCodeAt(2) <= 90 && typeof v === "function") { // 'o'=111, 'n'=110, 'A'-'Z'=65-90
       // onClickなどはイベントリスナーとして登録
       const event = k.slice(2).toLowerCase();
       el.addEventListener(event, v);
@@ -110,7 +113,11 @@ export function mount(vnode: VNode): Node {
       el.setAttribute(k, String(v));
     }
   }
-  for (const child of Array.isArray(vnode.children) ? vnode.children : []) {
+
+  // children処理の最適化
+  const children = vnode.children;
+  for (let i = 0; i < children.length; i++) {
+    const child = children[i];
     el.appendChild(
       typeof child === "string" ? document.createTextNode(child) : mount(child),
     );
@@ -140,23 +147,24 @@ export function patch(parent: Node, oldVNode: VNode, newVNode: VNode, index = 0)
   const oldEventListeners = new Map<string, EventListenerOrEventListenerObject>();
   const newEventListeners = new Map<string, EventListenerOrEventListenerObject>();
 
-  // 正規表現を一度だけコンパイル
-  const eventRegex = /^on[A-Z]/;
-
-  // 古いイベントリスナーを収集
-  for (const [k, v] of Object.entries(oldVNode.props)) {
-    if (eventRegex.test(k) && typeof v === "function") {
+  // 古いイベントリスナーを収集（正規表現を避けて最適化）
+  const oldPropsEntries = Object.entries(oldVNode.props);
+  for (let i = 0; i < oldPropsEntries.length; i++) {
+    const [k, v] = oldPropsEntries[i];
+    if (k.length > 2 && k.charCodeAt(0) === 111 && k.charCodeAt(1) === 110 && k.charCodeAt(2) >= 65 && k.charCodeAt(2) <= 90 && typeof v === "function") { // 'o'=111, 'n'=110, 'A'-'Z'=65-90
       oldEventListeners.set(k.slice(2).toLowerCase(), v);
     }
   }
 
-  // 新しいpropsを適用
-  for (const [k, v] of Object.entries(newVNode.props)) {
+  // 新しいpropsを適用（最適化版）
+  const newPropsEntries = Object.entries(newVNode.props);
+  for (let i = 0; i < newPropsEntries.length; i++) {
+    const [k, v] = newPropsEntries[i];
     // 内部属性（_tora_internal_:プレフィックスを持つ）はDOMに反映しない
     if (k.startsWith(_INTERNAL_ATTRIBUTES))
       continue;
 
-    if (eventRegex.test(k) && typeof v === "function") {
+    if (k.length > 2 && k.charCodeAt(0) === 111 && k.charCodeAt(1) === 110 && k.charCodeAt(2) >= 65 && k.charCodeAt(2) <= 90 && typeof v === "function") { // 'o'=111, 'n'=110, 'A'-'Z'=65-90
       // イベントリスナーの処理
       const event = k.slice(2).toLowerCase();
       newEventListeners.set(event, v);
@@ -193,10 +201,11 @@ export function patch(parent: Node, oldVNode: VNode, newVNode: VNode, index = 0)
     }
   }
 
-  // 削除された属性を処理
-  for (const k of Object.keys(oldVNode.props)) {
+  // 削除された属性を処理（最適化版）
+  for (let i = 0; i < oldPropsEntries.length; i++) {
+    const [k] = oldPropsEntries[i];
     // 内部属性と既に処理されたイベントリスナーは無視
-    if (k.startsWith(_INTERNAL_ATTRIBUTES) || (eventRegex.test(k) && typeof oldVNode.props[k] === "function"))
+    if (k.startsWith(_INTERNAL_ATTRIBUTES) || (k.length > 2 && k.charCodeAt(0) === 111 && k.charCodeAt(1) === 110 && k.charCodeAt(2) >= 65 && k.charCodeAt(2) <= 90 && typeof oldVNode.props[k] === "function"))
       continue;
 
     if (!(k in newVNode.props)) {
@@ -247,8 +256,11 @@ export function patch(parent: Node, oldVNode: VNode, newVNode: VNode, index = 0)
   // 2. 古い要素で余分なものを削除（後ろから削除することで、インデックスのズレを防ぐ）
   if (newChildren.length < oldChildren.length) {
     // 削除すべき余分な子要素を効率的に削除
-    while (el.childNodes.length > newChildren.length) {
-      el.removeChild(el.childNodes[newChildren.length]);
+    for (let i = oldChildren.length - 1; i >= newChildren.length; i--) {
+      const childToRemove = el.childNodes[i];
+      if (childToRemove) {
+        el.removeChild(childToRemove);
+      }
     }
   }
 }
