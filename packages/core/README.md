@@ -5,28 +5,32 @@
 ![License](https://img.shields.io/github/license/nucoui/chatora?color=green)
 ![Vitest](https://img.shields.io/badge/tested%20with-vitest-6E9F18.svg?logo=vitest)
 
+```bash
+npm install chatora
+```
+
 ## Description
 It is a framework that allows you to implement custom elements in a React-like manner.
 Usually, knowledge of classes is required, but since the implementation is function-based, this knowledge is not necessary!
 
 ## Features
 
-✨ **Intuitive Web Components with JSX/TSX**<br>
+#### ✨ **Intuitive Web Components with JSX/TSX**<br>
 Easily create custom elements and static HTML for SSR using familiar JSX/TSX syntax.
 
-🧩 **No Classes Required, Simple Function-Based Implementation**<br>
+#### 🧩 **No Classes Required, Simple Function-Based Implementation**<br>
 Build custom elements with just functions—no complex class knowledge needed.
 
-🔒 **Type-Safe Development**<br>
+#### 🔒 **Type-Safe Development**<br>
 Full TypeScript support ensures safe and reliable code.
 
-⚡ **Ultra-Fast Reactivity**<br>
+#### ⚡ **Ultra-Fast Reactivity**<br>
 Powered by a unique reactivity system based on alien-signals, delivering state management and rendering up to 2x faster than Solid.js and over 10x faster than Angular.
 
-🌐 **SSR/CSR Ready**<br>
+#### 🌐 **SSR/CSR Ready**<br>
 Supports both server-side rendering and client-side rendering out of the box.
 
-🔗 **Easy Integration with Major Frameworks**<br>
+#### 🔗 **Easy Integration with Major Frameworks**<br>
 Seamlessly works in SSR/CSR environments of various frameworks.
 
 **Supported Frameworks:**<br>
@@ -43,10 +47,10 @@ Seamlessly works in SSR/CSR environments of various frameworks.
 
 ✅: Supported 🚧: Coming soon
 
-🛠️ **Flexible Customization**<br>
+#### 🛠️ **Flexible Customization**<br>
 Utility functions, props management, and event handling are all highly customizable.
 
-💡 **Lightweight & High Performance**<br>
+#### 💡 **Lightweight & High Performance**<br>
 Minimal footprint with a focus on speed and efficiency.
 
 # Installation
