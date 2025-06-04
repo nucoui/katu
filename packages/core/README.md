@@ -15,7 +15,7 @@ Usually, knowledge of classes is required, but since the implementation is funct
 
 ## Features
 
-- ✨ **Intuitive Web Components with JSX/TSX**
+- ✨ **Intuitive Web Components with JSX/TSX**<br>
   Easily create custom elements and static HTML for SSR using familiar JSX/TSX syntax.
 - 🧩 **No Classes Required, Simple Function-Based Implementation**<br>
   Build custom elements with just functions—no complex class knowledge needed.
