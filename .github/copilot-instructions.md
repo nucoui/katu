@@ -31,8 +31,8 @@ The instructions in this section must be followed absolutely. These are non-nego
 - When generating a commit message, be sure to output it in English. Also, output the message in the format `<gitmoji> Summary of changes in 100 characters or less`. For `<gitmoji>`, choose a Gitmoji that corresponds to your changes; see [here](https://gitmoji.dev/) for a list of Gitmojis. The second line should be blank. The third and succeeding lines should contain the details of the change in English. The second and subsequent lines are not mandatory. Do not use the notation `feat:` or `hotfix: `.
 - All code must be written as ESM modules.
 - All code must be written in TypeScript. It cannot be written in JavaScript.
-- When “action:translate” is entered, run `git diff .github/copilot-instructions-en.md | cat` to re-translate the acquired diff into English, and add it to `.github/copilot-instructions .md` to reflect only the translated parts.
-- When “action:gen-commit-msg” is entered, run `git diff --staged | cat` and use the results to generate a commit message in md format code block (` ```md /... / ``` `). The commit message should be output in English.
+- When "act:translate" is entered, run `git diff .github/copilot-instructions-ja.md | cat` to re-translate the acquired diff into English, and add it to `.github/copilot-instructions.md` to reflect only the translated parts.
+- When "act:cmm" is entered, run `git diff --staged | cat` and use the results to generate a commit message in md format code block (` ```md /... / ``` `). The commit message should be output in English.
 
 ## Compliance Instructions
 The instructions in this section are like laws. Follow them unless there are special exceptions. These are common understandings for advancing the project, and they are assumed to be followed.
