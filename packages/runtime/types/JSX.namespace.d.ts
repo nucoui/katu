@@ -35,336 +35,181 @@ interface ChatoraEventHandlers {
   // 必要に応じて他のonXXXイベントもここに追加可能
 }
 
+/**
+ * Global attributes for all HTML elements (WHATWG HTML spec 3.2.6)
+ * https://html.spec.whatwg.org/multipage/dom.html#global-attributes
+ */
 interface ChatoraIntrinsicElements extends ChatoraEventHandlers {
   /**
-   * 要素のID属性
-   * id attribute for the element
+   * Specifies a shortcut key to activate/focus the element
    */
-  id?: string;
+  accesskey?: string;
   /**
-   * 子ノード
-   * Children nodes
+   * Controls whether and how text input is automatically capitalized
    */
-  children?: ChatoraNode;
+  autocapitalize?: string;
   /**
-   * class属性
-   * class attribute for the element
+   * Indicates whether the element should automatically get focus
+   */
+  autofocus?: boolean;
+  /**
+   * Assigns a class name or set of class names to the element
    */
   class?: string;
   /**
-   * style属性（インラインスタイル）
-   * style attribute (inline styles)
+   * Indicates whether the element is editable
    */
-  style?: string | Record<string, string | number>;
+  contenteditable?: boolean | "true" | "false";
   /**
-   * title属性（ツールチップなど）
-   * title attribute (tooltip, etc.)
+   * Specifies the text direction for the content in the element
    */
-  title?: string;
+  dir?: "ltr" | "rtl" | "auto";
   /**
-   * tabIndex属性
-   * tabIndex attribute
+   * Specifies whether the element is draggable
    */
-  tabIndex?: number;
+  draggable?: boolean | "true" | "false";
   /**
-   * role属性（アクセシビリティ）
-   * role attribute (accessibility)
+   * Hints at the type of enter key to display
    */
-  role?: string;
+  enterkeyhint?: string;
   /**
-   * hidden属性（非表示）
-   * hidden attribute (hidden element)
+   * Hides the element
    */
   hidden?: boolean;
   /**
-   * 任意のdata-*属性
+   * Specifies a unique id for the element
+   */
+  id?: string;
+  /**
+   * Provides a hint to browsers for devices with onscreen keyboards
+   */
+  inputmode?: string;
+  /**
+   * Allows custom elements to be defined
+   */
+  is?: string;
+  /**
+   * Microdata: Global attribute for microdata item id
+   */
+  itemid?: string;
+  /**
+   * Microdata: Global attribute for microdata property
+   */
+  itemprop?: string;
+  /**
+   * Microdata: Global attribute for microdata reference
+   */
+  itemref?: string;
+  /**
+   * Microdata: Global attribute for microdata scope
+   */
+  itemscope?: boolean;
+  /**
+   * Microdata: Global attribute for microdata type
+   */
+  itemtype?: string;
+  /**
+   * Language of the element's content
+   */
+  lang?: string;
+  /**
+   * Cryptographic nonce used in Content Security Policy
+   */
+  nonce?: string;
+  /**
+   * Assigns a part name to the element for styling
+   */
+  part?: string;
+  /**
+   * Indicates the element is a popover
+   */
+  popover?: boolean | "auto";
+  /**
+   * Defines a role for the element (accessibility)
+   */
+  role?: string;
+  /**
+   * Assigns a slot in a shadow DOM
+   */
+  slot?: string;
+  /**
+   * Indicates whether spell checking is allowed
+   */
+  spellcheck?: boolean | "true" | "false";
+  /**
+   * Inline CSS styles
+   */
+  style?: string | Record<string, string | number>;
+  /**
+   * Specifies the tab order of the element
+   */
+  tabindex?: number;
+  /**
+   * Text to display in a tooltip
+   */
+  title?: string;
+  /**
+   * Specifies whether the element's content is translated
+   */
+  translate?: "yes" | "no";
+  /**
    * Any data-* attribute
    */
   [dataAttr: `data-${string}`]: string | undefined;
   /**
-   * 任意のaria-*属性
    * Any aria-* attribute
    */
   [ariaAttr: `aria-${string}`]: string | undefined;
+  /**
+   * Children nodes
+   */
+  children?: ChatoraNode;
 }
 
 /**
- * div要素の属性型
- * Attributes for div element
+ * Attributes for div element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/grouping-content.html#the-div-element
  */
 export interface DivChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
 /**
- * h1要素の属性型
- * Attributes for h1 element
+ * Attributes for h1 element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/sections.html#the-h1,-h2,-h3,-h4,-h5,-and-h6-elements
  */
 export interface H1ChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
 /**
- * p要素の属性型
- * Attributes for p element
+ * Attributes for p element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/paragraphs.html#the-p-element
  */
 export interface PChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
 /**
- * ul要素の属性型
- * Attributes for ul element
+ * Attributes for ul element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/grouping-content.html#the-ul-element
  */
 export interface UlChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
 /**
- * ol要素の属性型
- * Attributes for ol element
+ * Attributes for ol element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/grouping-content.html#the-ol-element
  */
 export interface OlChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
 /**
- * li要素の属性型
- * Attributes for li element
+ * Attributes for li element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/grouping-content.html#the-li-element
  */
-export interface LiChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface LiChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  /**
+   * Value attribute for li element
+   */
+  value?: number;
+}
 /**
- * span要素の属性型
- * Attributes for span element
+ * Attributes for span element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-span-element
  */
 export interface SpanChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
 /**
- * button要素の属性型
- * Attributes for button element
+ * Attributes for button element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/form-elements.html#the-button-element
  */
-export interface ButtonChatoraIntrinsicElement extends ChatoraIntrinsicElements {
-  type?: string;
-  disabled?: boolean;
-  autofocus?: boolean;
-  form?: string;
-  name?: string;
-  value?: string | number;
-}
-/**
- * a要素の属性型
- * Attributes for a element
- */
-export interface AChatoraIntrinsicElement extends ChatoraIntrinsicElements {
-  href?: string;
-  target?: string;
-  rel?: string;
-}
-/**
- * img要素の属性型
- * Attributes for img element
- */
-export interface ImgChatoraIntrinsicElement extends ChatoraIntrinsicElements {
-  src?: string;
-  alt?: string;
-  width?: number | string;
-  height?: number | string;
-}
-/**
- * input要素の属性型
- * Attributes for input element
- */
-export interface InputChatoraIntrinsicElement extends ChatoraIntrinsicElements {
-  type?: string;
-  value?: string | number;
-  checked?: boolean;
-  placeholder?: string;
-  name?: string;
-  disabled?: boolean;
-  readonly?: boolean;
-  autofocus?: boolean;
-}
-/**
- * textarea要素の属性型
- * Attributes for textarea element
- */
-export interface TextareaChatoraIntrinsicElement extends ChatoraIntrinsicElements {
-  value?: string;
-  placeholder?: string;
-  name?: string;
-  disabled?: boolean;
-  readonly?: boolean;
-  autofocus?: boolean;
-  rows?: number;
-  cols?: number;
-}
-/**
- * form要素の属性型
- * Attributes for form element
- */
-export interface FormChatoraIntrinsicElement extends ChatoraIntrinsicElements {
-  action?: string;
-  method?: string;
-  enctype?: string;
-  autocomplete?: string;
-}
-/**
- * label要素の属性型
- * Attributes for label element
- */
-export interface LabelChatoraIntrinsicElement extends ChatoraIntrinsicElements {
-  for?: string;
-}
-/**
- * td要素の属性型
- * Attributes for td element
- */
-export interface TdChatoraIntrinsicElement extends ChatoraIntrinsicElements {
-  colspan?: number;
-  rowspan?: number;
-}
-/**
- * th要素の属性型
- * Attributes for th element
- */
-export interface ThChatoraIntrinsicElement extends ChatoraIntrinsicElements {
-  colspan?: number;
-  rowspan?: number;
-  scope?: string;
-}
-/**
- * svg要素の属性型
- * Attributes for svg element
- */
-export interface SvgChatoraIntrinsicElement extends ChatoraIntrinsicElements {
-  width?: number | string;
-  height?: number | string;
-  viewBox?: string;
-  fill?: string;
-  stroke?: string;
-}
-/**
- * path要素の属性型
- * Attributes for path element
- */
-export interface PathChatoraIntrinsicElement extends ChatoraIntrinsicElements {
-  d?: string;
-  fill?: string;
-  stroke?: string;
-}
-/**
- * circle要素の属性型
- * Attributes for circle element
- */
-export interface CircleChatoraIntrinsicElement extends ChatoraIntrinsicElements {
-  cx?: number | string;
-  cy?: number | string;
-  r?: number | string;
-  fill?: string;
-  stroke?: string;
-}
-/**
- * rect要素の属性型
- * Attributes for rect element
- */
-export interface RectChatoraIntrinsicElement extends ChatoraIntrinsicElements {
-  x?: number | string;
-  y?: number | string;
-  width?: number | string;
-  height?: number | string;
-  fill?: string;
-  stroke?: string;
-}
-/**
- * line要素の属性型
- * Attributes for line element
- */
-export interface LineChatoraIntrinsicElement extends ChatoraIntrinsicElements {
-  x1?: number | string;
-  y1?: number | string;
-  x2?: number | string;
-  y2?: number | string;
-  stroke?: string;
-}
-/**
- * polyline要素の属性型
- * Attributes for polyline element
- */
-export interface PolylineChatoraIntrinsicElement extends ChatoraIntrinsicElements {
-  points?: string;
-  fill?: string;
-  stroke?: string;
-}
-/**
- * polygon要素の属性型
- * Attributes for polygon element
- */
-export interface PolygonChatoraIntrinsicElement extends ChatoraIntrinsicElements {
-  points?: string;
-  fill?: string;
-  stroke?: string;
-}
-/**
- * ellipse要素の属性型
- * Attributes for ellipse element
- */
-export interface EllipseChatoraIntrinsicElement extends ChatoraIntrinsicElements {
-  cx?: number | string;
-  cy?: number | string;
-  rx?: number | string;
-  ry?: number | string;
-  fill?: string;
-  stroke?: string;
-}
-/**
- * text要素の属性型
- * Attributes for text element
- */
-export interface TextChatoraIntrinsicElement extends ChatoraIntrinsicElements {
-  x?: number | string;
-  y?: number | string;
-  fill?: string;
-  stroke?: string;
-}
-
-/**
- * slot要素の属性型
- * Attributes for slot element
- */
-export interface SlotChatoraIntrinsicElement extends ChatoraIntrinsicElements {
-  name?: string;
-  /**
-   * @deprecated
-   * @description Deprecated: Use `name` attribute instead.
-   */
-  slot?: string;
-}
-
-/**
- * 全HTML要素の属性型（MDNリファレンス準拠）
- * https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements
- */
-export interface AbbrChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
-export interface AddressChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
-export interface AreaChatoraIntrinsicElement extends ChatoraIntrinsicElements {
-  alt?: string;
-  coords?: string;
-  shape?: string;
-  href?: string;
-  target?: string;
-  download?: string;
-  rel?: string;
-  referrerpolicy?: string;
-}
-export interface ArticleChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
-export interface AsideChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
-export interface AudioChatoraIntrinsicElement extends ChatoraIntrinsicElements {
-  src?: string;
-  controls?: boolean;
-  autoplay?: boolean;
-  loop?: boolean;
-  muted?: boolean;
-  preload?: "none" | "metadata" | "auto";
-  crossorigin?: "anonymous" | "use-credentials";
-}
-export interface BaseChatoraIntrinsicElement extends ChatoraIntrinsicElements {
-  href?: string;
-  target?: string;
-}
-export interface BChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
-export interface BdiChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
-export interface BdoChatoraIntrinsicElement extends ChatoraIntrinsicElements {
-  dir?: string;
-}
-export interface BlockquoteChatoraIntrinsicElement extends ChatoraIntrinsicElements {
-  cite?: string;
-}
-export interface BodyChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
-export interface BrChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
 export interface ButtonChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   autofocus?: boolean;
   disabled?: boolean;
@@ -378,54 +223,142 @@ export interface ButtonChatoraIntrinsicElement extends ChatoraIntrinsicElements 
   type?: "button" | "submit" | "reset";
   value?: string | number;
 }
+/**
+ * Attributes for canvas element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/canvas.html#the-canvas-element
+ */
 export interface CanvasChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   width?: number | string;
   height?: number | string;
 }
+/**
+ * Attributes for caption element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/tables.html#the-caption-element
+ */
 export interface CaptionChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for cite element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-cite-element
+ */
 export interface CiteChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for code element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-code-element
+ */
 export interface CodeChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for col element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/tables.html#the-col-element
+ */
 export interface ColChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   span?: number;
   width?: number | string;
 }
+/**
+ * Attributes for colgroup element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/tables.html#the-colgroup-element
+ */
 export interface ColgroupChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   span?: number;
 }
+/**
+ * Attributes for data element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-data-element
+ */
 export interface DataChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   value?: string | number;
 }
+/**
+ * Attributes for datalist element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/form-elements.html#the-datalist-element
+ */
 export interface DatalistChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for dd element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/grouping-content.html#the-dd-element
+ */
 export interface DdChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for del element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/edits.html#the-del-element
+ */
 export interface DelChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   cite?: string;
   datetime?: string;
 }
+/**
+ * Attributes for details element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/interactive-elements.html#the-details-element
+ */
 export interface DetailsChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   open?: boolean;
 }
+/**
+ * Attributes for dfn element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-dfn-element
+ */
 export interface DfnChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for dialog element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/interactive-elements.html#the-dialog-element
+ */
 export interface DialogChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   open?: boolean;
   returnValue?: string;
 }
+/**
+ * Attributes for dl element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/grouping-content.html#the-dl-element
+ */
 export interface DlChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for dt element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/grouping-content.html#the-dt-element
+ */
 export interface DtChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for em element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-em-element
+ */
 export interface EmChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for embed element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/embedded-content.html#the-embed-element
+ */
 export interface EmbedChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   src?: string;
   type?: string;
   width?: number | string;
   height?: number | string;
 }
+/**
+ * Attributes for fieldset element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/form-elements.html#the-fieldset-element
+ */
 export interface FieldsetChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   disabled?: boolean;
   form?: string;
   name?: string;
 }
+/**
+ * Attributes for figcaption element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/grouping-content.html#the-figcaption-element
+ */
 export interface FigcaptionChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for figure element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/grouping-content.html#the-figure-element
+ */
 export interface FigureChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for footer element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/sections.html#the-footer-element
+ */
 export interface FooterChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for form element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/form-elements.html#the-form-element
+ */
 export interface FormChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   acceptCharset?: string;
   action?: string;
@@ -437,14 +370,42 @@ export interface FormChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   rel?: string;
   target?: string;
 }
+/**
+ * Attributes for head element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/semantics.html#the-head-element
+ */
 export interface HeadChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for header element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/sections.html#the-header-element
+ */
 export interface HeaderChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for hgroup element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/sections.html#the-hgroup-element
+ */
 export interface HgroupChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for hr element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/grouping-content.html#the-hr-element
+ */
 export interface HrChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for html element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/semantics.html#the-html-element
+ */
 export interface HtmlChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   manifest?: string;
 }
+/**
+ * Attributes for i element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-i-element
+ */
 export interface IChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for iframe element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/iframe-embed-object.html#the-iframe-element
+ */
 export interface IframeChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   allow?: string;
   allowfullscreen?: boolean;
@@ -458,6 +419,10 @@ export interface IframeChatoraIntrinsicElement extends ChatoraIntrinsicElements 
   srcdoc?: string;
   width?: number | string;
 }
+/**
+ * Attributes for img element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element
+ */
 export interface ImgChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   alt?: string;
   src?: string;
@@ -472,6 +437,10 @@ export interface ImgChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   usemap?: string;
   ismap?: boolean;
 }
+/**
+ * Attributes for input element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/input.html#the-input-element
+ */
 export interface InputChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   accept?: string;
   alt?: string;
@@ -506,11 +475,23 @@ export interface InputChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   value?: string | number | readonly string[];
   width?: number | string;
 }
+/**
+ * Attributes for ins element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/edits.html#the-ins-element
+ */
 export interface InsChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   cite?: string;
   datetime?: string;
 }
+/**
+ * Attributes for kbd element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-kbd-element
+ */
 export interface KbdChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for keygen element (WHATWG HTML spec, obsolete)
+ * https://html.spec.whatwg.org/multipage/form-elements.html#the-keygen-element
+ */
 export interface KeygenChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   autofocus?: boolean;
   challenge?: string;
@@ -519,14 +500,30 @@ export interface KeygenChatoraIntrinsicElement extends ChatoraIntrinsicElements 
   keytype?: string;
   name?: string;
 }
+/**
+ * Attributes for label element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/form-elements.html#the-label-element
+ */
 export interface LabelChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   for?: string;
   form?: string;
 }
+/**
+ * Attributes for legend element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/form-elements.html#the-legend-element
+ */
 export interface LegendChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for li element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/grouping-content.html#the-li-element
+ */
 export interface LiChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   value?: number;
 }
+/**
+ * Attributes for link element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/semantics.html#the-link-element
+ */
 export interface LinkChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   as?: string;
   crossorigin?: string;
@@ -543,21 +540,45 @@ export interface LinkChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   title?: string;
   type?: string;
 }
+/**
+ * Attributes for main element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/sections.html#the-main-element
+ */
 export interface MainChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for map element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/image-maps.html#the-map-element
+ */
 export interface MapChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   name?: string;
 }
+/**
+ * Attributes for mark element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-mark-element
+ */
 export interface MarkChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for menu element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/interactive-elements.html#the-menu-element
+ */
 export interface MenuChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   type?: string;
   label?: string;
 }
+/**
+ * Attributes for meta element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/semantics.html#the-meta-element
+ */
 export interface MetaChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   charset?: string;
   content?: string;
   httpEquiv?: string;
   name?: string;
 }
+/**
+ * Attributes for meter element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/form-elements.html#the-meter-element
+ */
 export interface MeterChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   value?: number;
   min?: number;
@@ -566,8 +587,20 @@ export interface MeterChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   high?: number;
   optimum?: number;
 }
+/**
+ * Attributes for nav element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/sections.html#the-nav-element
+ */
 export interface NavChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for noscript element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/scripting.html#the-noscript-element
+ */
 export interface NoscriptChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for object element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/embedded-content.html#the-object-element
+ */
 export interface ObjectChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   data?: string;
   form?: string;
@@ -578,45 +611,109 @@ export interface ObjectChatoraIntrinsicElement extends ChatoraIntrinsicElements 
   usemap?: string;
   width?: number | string;
 }
+/**
+ * Attributes for ol element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/grouping-content.html#the-ol-element
+ */
 export interface OlChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   reversed?: boolean;
   start?: number;
   type?: string;
 }
+/**
+ * Attributes for optgroup element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/form-elements.html#the-optgroup-element
+ */
 export interface OptgroupChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   disabled?: boolean;
   label?: string;
 }
+/**
+ * Attributes for option element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/form-elements.html#the-option-element
+ */
 export interface OptionChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   disabled?: boolean;
   label?: string;
   selected?: boolean;
   value?: string | number;
 }
+/**
+ * Attributes for output element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/form-elements.html#the-output-element
+ */
 export interface OutputChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   for?: string;
   form?: string;
   name?: string;
 }
+/**
+ * Attributes for p element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/paragraphs.html#the-p-element
+ */
 export interface PChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for param element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/embedded-content.html#the-param-element
+ */
 export interface ParamChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   name?: string;
   value?: string | number;
 }
+/**
+ * Attributes for picture element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/embedded-content.html#the-picture-element
+ */
 export interface PictureChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for pre element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/grouping-content.html#the-pre-element
+ */
 export interface PreChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for progress element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/form-elements.html#the-progress-element
+ */
 export interface ProgressChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   max?: number;
   value?: number;
 }
+/**
+ * Attributes for q element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-q-element
+ */
 export interface QChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   cite?: string;
 }
+/**
+ * Attributes for rp element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/semantics.html#the-rp-element
+ */
 export interface RpChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for rt element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/semantics.html#the-rt-element
+ */
 export interface RtChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for ruby element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/semantics.html#the-ruby-element
+ */
 export interface RubyChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for s element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-s-element
+ */
 export interface SChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for samp element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-samp-element
+ */
 export interface SampChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for script element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/scripting.html#the-script-element
+ */
 export interface ScriptChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   async?: boolean;
   charset?: string;
@@ -629,7 +726,15 @@ export interface ScriptChatoraIntrinsicElement extends ChatoraIntrinsicElements 
   src?: string;
   type?: string;
 }
+/**
+ * Attributes for section element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/sections.html#the-section-element
+ */
 export interface SectionChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for select element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/form-elements.html#the-select-element
+ */
 export interface SelectChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   autofocus?: boolean;
   disabled?: boolean;
@@ -639,7 +744,15 @@ export interface SelectChatoraIntrinsicElement extends ChatoraIntrinsicElements 
   required?: boolean;
   size?: number;
 }
+/**
+ * Attributes for small element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-small-element
+ */
 export interface SmallChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for source element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/embedded-content.html#the-source-element
+ */
 export interface SourceChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   media?: string;
   sizes?: string;
@@ -647,27 +760,71 @@ export interface SourceChatoraIntrinsicElement extends ChatoraIntrinsicElements 
   srcset?: string;
   type?: string;
 }
+/**
+ * Attributes for span element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-span-element
+ */
 export interface SpanChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for strong element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-strong-element
+ */
 export interface StrongChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for style element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/semantics.html#the-style-element
+ */
 export interface StyleChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   media?: string;
   nonce?: string;
   scoped?: boolean;
   type?: string;
 }
+/**
+ * Attributes for sub element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-sub-and-sup-elements
+ */
 export interface SubChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for summary element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/interactive-elements.html#the-summary-element
+ */
 export interface SummaryChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for sup element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-sub-and-sup-elements
+ */
 export interface SupChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for table element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/tables.html#the-table-element
+ */
 export interface TableChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   border?: number | string;
 }
+/**
+ * Attributes for tbody element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/tables.html#the-tbody-element
+ */
 export interface TbodyChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for td element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/tables.html#the-td-element
+ */
 export interface TdChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   colspan?: number;
   headers?: string;
   rowspan?: number;
 }
+/**
+ * Attributes for template element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/scripting.html#the-template-element
+ */
 export interface TemplateChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for textarea element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/form-elements.html#the-textarea-element
+ */
 export interface TextareaChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   autofocus?: boolean;
   cols?: number;
@@ -683,7 +840,15 @@ export interface TextareaChatoraIntrinsicElement extends ChatoraIntrinsicElement
   rows?: number;
   wrap?: string;
 }
+/**
+ * Attributes for tfoot element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/tables.html#the-tfoot-element
+ */
 export interface TfootChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for th element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/tables.html#the-th-element
+ */
 export interface ThChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   abbr?: string;
   colspan?: number;
@@ -691,12 +856,32 @@ export interface ThChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   rowspan?: number;
   scope?: string;
 }
+/**
+ * Attributes for thead element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/tables.html#the-thead-element
+ */
 export interface TheadChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for time element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-time-element
+ */
 export interface TimeChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   datetime?: string;
 }
+/**
+ * Attributes for title element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/semantics.html#the-title-element
+ */
 export interface TitleChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for tr element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/tables.html#the-tr-element
+ */
 export interface TrChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for track element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/media.html#the-track-element
+ */
 export interface TrackChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   default?: boolean;
   kind?: string;
@@ -704,9 +889,25 @@ export interface TrackChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   src?: string;
   srclang?: string;
 }
+/**
+ * Attributes for u element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-u-element
+ */
 export interface UChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for ul element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/grouping-content.html#the-ul-element
+ */
 export interface UlChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for var element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-var-element
+ */
 export interface VarChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for video element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/media.html#the-video-element
+ */
 export interface VideoChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   autoplay?: boolean;
   controls?: boolean;
@@ -720,10 +921,60 @@ export interface VideoChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   width?: number | string;
   crossorigin?: "anonymous" | "use-credentials";
 }
+/**
+ * Attributes for wbr element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-wbr-element
+ */
 export interface WbrChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+
+/**
+ * Attributes for a element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-a-element
+ */
+export interface AChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  /**
+   * Address of the hyperlink
+   */
+  href?: string;
+  /**
+   * Name of target browsing context
+   */
+  target?: string;
+  /**
+   * Relationship of the linked URL as space-separated link types
+   */
+  rel?: string;
+  /**
+   * Hints at the language of the referenced resource
+   */
+  hreflang?: string;
+  /**
+   * Hint for the type of the referenced resource
+   */
+  type?: string;
+  /**
+   * Download attribute (filename or boolean)
+   */
+  download?: string | boolean;
+  /**
+   * Referrer policy for fetches initiated by the element
+   */
+  referrerpolicy?: string;
+  /**
+   * Coordinates for use with image maps
+   */
+  coords?: string;
+  /**
+   * The shape of the area (for image maps)
+   */
+  shape?: string;
+}
 
 declare global {
   namespace JSX {
+    /**
+     * Intrinsic elements mapping for JSX (WHATWG HTML/SVG spec)
+     */
     interface IntrinsicElements {
       div: DivChatoraIntrinsicElement;
       h1: H1ChatoraIntrinsicElement;
@@ -733,37 +984,106 @@ declare global {
       li: LiChatoraIntrinsicElement;
       span: SpanChatoraIntrinsicElement;
       button: ButtonChatoraIntrinsicElement;
-      a: AChatoraIntrinsicElement;
+      canvas: CanvasChatoraIntrinsicElement;
+      caption: CaptionChatoraIntrinsicElement;
+      cite: CiteChatoraIntrinsicElement;
+      code: CodeChatoraIntrinsicElement;
+      col: ColChatoraIntrinsicElement;
+      colgroup: ColgroupChatoraIntrinsicElement;
+      data: DataChatoraIntrinsicElement;
+      datalist: DatalistChatoraIntrinsicElement;
+      dd: DdChatoraIntrinsicElement;
+      del: DelChatoraIntrinsicElement;
+      details: DetailsChatoraIntrinsicElement;
+      dfn: DfnChatoraIntrinsicElement;
+      dialog: DialogChatoraIntrinsicElement;
+      dl: DlChatoraIntrinsicElement;
+      dt: DtChatoraIntrinsicElement;
+      em: EmChatoraIntrinsicElement;
+      embed: EmbedChatoraIntrinsicElement;
+      fieldset: FieldsetChatoraIntrinsicElement;
+      figcaption: FigcaptionChatoraIntrinsicElement;
+      figure: FigureChatoraIntrinsicElement;
+      footer: FooterChatoraIntrinsicElement;
+      form: FormChatoraIntrinsicElement;
+      head: HeadChatoraIntrinsicElement;
+      header: HeaderChatoraIntrinsicElement;
+      hgroup: HgroupChatoraIntrinsicElement;
+      hr: HrChatoraIntrinsicElement;
+      html: HtmlChatoraIntrinsicElement;
+      i: IChatoraIntrinsicElement;
+      iframe: IframeChatoraIntrinsicElement;
       img: ImgChatoraIntrinsicElement;
       input: InputChatoraIntrinsicElement;
-      textarea: TextareaChatoraIntrinsicElement;
-      form: FormChatoraIntrinsicElement;
+      ins: InsChatoraIntrinsicElement;
+      kbd: KbdChatoraIntrinsicElement;
+      keygen: KeygenChatoraIntrinsicElement; // 廃止要素: HTML Living Standardでは非推奨
       label: LabelChatoraIntrinsicElement;
-      table: ChatoraIntrinsicElements;
-      tr: ChatoraIntrinsicElements;
+      legend: LegendChatoraIntrinsicElement;
+      link: LinkChatoraIntrinsicElement;
+      main: MainChatoraIntrinsicElement;
+      map: MapChatoraIntrinsicElement;
+      mark: MarkChatoraIntrinsicElement;
+      menu: MenuChatoraIntrinsicElement;
+      meta: MetaChatoraIntrinsicElement;
+      meter: MeterChatoraIntrinsicElement;
+      nav: NavChatoraIntrinsicElement;
+      noscript: NoscriptChatoraIntrinsicElement;
+      object: ObjectChatoraIntrinsicElement;
+      optgroup: OptgroupChatoraIntrinsicElement;
+      option: OptionChatoraIntrinsicElement;
+      output: OutputChatoraIntrinsicElement;
+      param: ParamChatoraIntrinsicElement;
+      picture: PictureChatoraIntrinsicElement;
+      pre: PreChatoraIntrinsicElement;
+      progress: ProgressChatoraIntrinsicElement;
+      q: QChatoraIntrinsicElement;
+      rp: RpChatoraIntrinsicElement;
+      rt: RtChatoraIntrinsicElement;
+      ruby: RubyChatoraIntrinsicElement;
+      s: SChatoraIntrinsicElement;
+      samp: SampChatoraIntrinsicElement;
+      script: ScriptChatoraIntrinsicElement;
+      section: SectionChatoraIntrinsicElement;
+      select: SelectChatoraIntrinsicElement;
+      small: SmallChatoraIntrinsicElement;
+      source: SourceChatoraIntrinsicElement;
+      strong: StrongChatoraIntrinsicElement;
+      style: StyleChatoraIntrinsicElement;
+      sub: SubChatoraIntrinsicElement;
+      summary: SummaryChatoraIntrinsicElement;
+      sup: SupChatoraIntrinsicElement;
+      table: TableChatoraIntrinsicElement;
+      tbody: TbodyChatoraIntrinsicElement;
       td: TdChatoraIntrinsicElement;
+      template: TemplateChatoraIntrinsicElement;
+      textarea: TextareaChatoraIntrinsicElement;
+      tfoot: TfootChatoraIntrinsicElement;
       th: ThChatoraIntrinsicElement;
-      thead: ChatoraIntrinsicElements;
-      tbody: ChatoraIntrinsicElements;
-      tfoot: ChatoraIntrinsicElements;
-      section: ChatoraIntrinsicElements;
-      article: ChatoraIntrinsicElements;
-      nav: ChatoraIntrinsicElements;
-      header: ChatoraIntrinsicElements;
-      footer: ChatoraIntrinsicElements;
-      aside: ChatoraIntrinsicElements;
-      main: ChatoraIntrinsicElements;
-      strong: ChatoraIntrinsicElements;
-      em: ChatoraIntrinsicElements;
-      b: ChatoraIntrinsicElements;
-      i: ChatoraIntrinsicElements;
-      u: ChatoraIntrinsicElements;
-      s: ChatoraIntrinsicElements;
-      pre: ChatoraIntrinsicElements;
-      code: ChatoraIntrinsicElements;
-      blockquote: ChatoraIntrinsicElements;
-      hr: ChatoraIntrinsicElements;
-      br: ChatoraIntrinsicElements;
+      thead: TheadChatoraIntrinsicElement;
+      time: TimeChatoraIntrinsicElement;
+      title: TitleChatoraIntrinsicElement;
+      tr: TrChatoraIntrinsicElement;
+      track: TrackChatoraIntrinsicElement;
+      u: UChatoraIntrinsicElement;
+      ul: UlChatoraIntrinsicElement;
+      var: VarChatoraIntrinsicElement;
+      video: VideoChatoraIntrinsicElement;
+      wbr: WbrChatoraIntrinsicElement;
+      a: AChatoraIntrinsicElement;
+      abbr: AbbrChatoraIntrinsicElement;
+      address: AddressChatoraIntrinsicElement;
+      area: AreaChatoraIntrinsicElement;
+      article: ArticleChatoraIntrinsicElement;
+      aside: AsideChatoraIntrinsicElement;
+      audio: AudioChatoraIntrinsicElement;
+      base: BaseChatoraIntrinsicElement;
+      b: BChatoraIntrinsicElement;
+      bdi: BdiChatoraIntrinsicElement;
+      bdo: BdoChatoraIntrinsicElement;
+      blockquote: BlockquoteChatoraIntrinsicElement;
+      body: BodyChatoraIntrinsicElement;
+      br: BrChatoraIntrinsicElement;
       svg: SvgChatoraIntrinsicElement;
       path: PathChatoraIntrinsicElement;
       circle: CircleChatoraIntrinsicElement;
