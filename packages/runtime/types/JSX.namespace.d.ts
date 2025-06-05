@@ -324,6 +324,404 @@ export interface SlotChatoraIntrinsicElement extends ChatoraIntrinsicElements {
   slot?: string;
 }
 
+/**
+ * 全HTML要素の属性型（MDNリファレンス準拠）
+ * https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements
+ */
+export interface AbbrChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface AddressChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface AreaChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  alt?: string;
+  coords?: string;
+  shape?: string;
+  href?: string;
+  target?: string;
+  download?: string;
+  rel?: string;
+  referrerpolicy?: string;
+}
+export interface ArticleChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface AsideChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface AudioChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  src?: string;
+  controls?: boolean;
+  autoplay?: boolean;
+  loop?: boolean;
+  muted?: boolean;
+  preload?: "none" | "metadata" | "auto";
+  crossorigin?: "anonymous" | "use-credentials";
+}
+export interface BaseChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  href?: string;
+  target?: string;
+}
+export interface BChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface BdiChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface BdoChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  dir?: string;
+}
+export interface BlockquoteChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  cite?: string;
+}
+export interface BodyChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface BrChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface ButtonChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  autofocus?: boolean;
+  disabled?: boolean;
+  form?: string;
+  formaction?: string;
+  formenctype?: string;
+  formmethod?: string;
+  formnovalidate?: boolean;
+  formtarget?: string;
+  name?: string;
+  type?: "button" | "submit" | "reset";
+  value?: string | number;
+}
+export interface CanvasChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  width?: number | string;
+  height?: number | string;
+}
+export interface CaptionChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface CiteChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface CodeChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface ColChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  span?: number;
+  width?: number | string;
+}
+export interface ColgroupChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  span?: number;
+}
+export interface DataChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  value?: string | number;
+}
+export interface DatalistChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface DdChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface DelChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  cite?: string;
+  datetime?: string;
+}
+export interface DetailsChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  open?: boolean;
+}
+export interface DfnChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface DialogChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  open?: boolean;
+  returnValue?: string;
+}
+export interface DlChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface DtChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface EmChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface EmbedChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  src?: string;
+  type?: string;
+  width?: number | string;
+  height?: number | string;
+}
+export interface FieldsetChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  disabled?: boolean;
+  form?: string;
+  name?: string;
+}
+export interface FigcaptionChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface FigureChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface FooterChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface FormChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  acceptCharset?: string;
+  action?: string;
+  autocomplete?: string;
+  enctype?: string;
+  method?: string;
+  name?: string;
+  novalidate?: boolean;
+  rel?: string;
+  target?: string;
+}
+export interface HeadChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface HeaderChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface HgroupChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface HrChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface HtmlChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  manifest?: string;
+}
+export interface IChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface IframeChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  allow?: string;
+  allowfullscreen?: boolean;
+  allowpaymentrequest?: boolean;
+  height?: number | string;
+  loading?: "eager" | "lazy";
+  name?: string;
+  referrerpolicy?: string;
+  sandbox?: string;
+  src?: string;
+  srcdoc?: string;
+  width?: number | string;
+}
+export interface ImgChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  alt?: string;
+  src?: string;
+  srcset?: string;
+  width?: number | string;
+  height?: number | string;
+  decoding?: "async" | "sync" | "auto";
+  loading?: "eager" | "lazy";
+  referrerpolicy?: string;
+  sizes?: string;
+  crossorigin?: "anonymous" | "use-credentials";
+  usemap?: string;
+  ismap?: boolean;
+}
+export interface InputChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  accept?: string;
+  alt?: string;
+  autocomplete?: string;
+  autofocus?: boolean;
+  capture?: boolean | string;
+  checked?: boolean;
+  dirname?: string;
+  disabled?: boolean;
+  form?: string;
+  formaction?: string;
+  formenctype?: string;
+  formmethod?: string;
+  formnovalidate?: boolean;
+  formtarget?: string;
+  height?: number | string;
+  list?: string;
+  max?: number | string;
+  maxlength?: number;
+  min?: number | string;
+  minlength?: number;
+  multiple?: boolean;
+  name?: string;
+  pattern?: string;
+  placeholder?: string;
+  readonly?: boolean;
+  required?: boolean;
+  size?: number;
+  src?: string;
+  step?: number | string;
+  type?: string;
+  value?: string | number | readonly string[];
+  width?: number | string;
+}
+export interface InsChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  cite?: string;
+  datetime?: string;
+}
+export interface KbdChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface KeygenChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  autofocus?: boolean;
+  challenge?: string;
+  disabled?: boolean;
+  form?: string;
+  keytype?: string;
+  name?: string;
+}
+export interface LabelChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  for?: string;
+  form?: string;
+}
+export interface LegendChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface LiChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  value?: number;
+}
+export interface LinkChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  as?: string;
+  crossorigin?: string;
+  disabled?: boolean;
+  href?: string;
+  hreflang?: string;
+  imagesizes?: string;
+  imagesrcset?: string;
+  integrity?: string;
+  media?: string;
+  referrerpolicy?: string;
+  rel?: string;
+  sizes?: string;
+  title?: string;
+  type?: string;
+}
+export interface MainChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface MapChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  name?: string;
+}
+export interface MarkChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface MenuChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  type?: string;
+  label?: string;
+}
+export interface MetaChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  charset?: string;
+  content?: string;
+  httpEquiv?: string;
+  name?: string;
+}
+export interface MeterChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  value?: number;
+  min?: number;
+  max?: number;
+  low?: number;
+  high?: number;
+  optimum?: number;
+}
+export interface NavChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface NoscriptChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface ObjectChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  data?: string;
+  form?: string;
+  height?: number | string;
+  name?: string;
+  type?: string;
+  typemustmatch?: boolean;
+  usemap?: string;
+  width?: number | string;
+}
+export interface OlChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  reversed?: boolean;
+  start?: number;
+  type?: string;
+}
+export interface OptgroupChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  disabled?: boolean;
+  label?: string;
+}
+export interface OptionChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  disabled?: boolean;
+  label?: string;
+  selected?: boolean;
+  value?: string | number;
+}
+export interface OutputChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  for?: string;
+  form?: string;
+  name?: string;
+}
+export interface PChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface ParamChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  name?: string;
+  value?: string | number;
+}
+export interface PictureChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface PreChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface ProgressChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  max?: number;
+  value?: number;
+}
+export interface QChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  cite?: string;
+}
+export interface RpChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface RtChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface RubyChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface SChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface SampChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface ScriptChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  async?: boolean;
+  charset?: string;
+  crossorigin?: string;
+  defer?: boolean;
+  integrity?: string;
+  nomodule?: boolean;
+  nonce?: string;
+  referrerpolicy?: string;
+  src?: string;
+  type?: string;
+}
+export interface SectionChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface SelectChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  autofocus?: boolean;
+  disabled?: boolean;
+  form?: string;
+  multiple?: boolean;
+  name?: string;
+  required?: boolean;
+  size?: number;
+}
+export interface SmallChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface SourceChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  media?: string;
+  sizes?: string;
+  src?: string;
+  srcset?: string;
+  type?: string;
+}
+export interface SpanChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface StrongChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface StyleChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  media?: string;
+  nonce?: string;
+  scoped?: boolean;
+  type?: string;
+}
+export interface SubChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface SummaryChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface SupChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface TableChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  border?: number | string;
+}
+export interface TbodyChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface TdChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  colspan?: number;
+  headers?: string;
+  rowspan?: number;
+}
+export interface TemplateChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface TextareaChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  autofocus?: boolean;
+  cols?: number;
+  dirname?: string;
+  disabled?: boolean;
+  form?: string;
+  maxlength?: number;
+  minlength?: number;
+  name?: string;
+  placeholder?: string;
+  readonly?: boolean;
+  required?: boolean;
+  rows?: number;
+  wrap?: string;
+}
+export interface TfootChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface ThChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  abbr?: string;
+  colspan?: number;
+  headers?: string;
+  rowspan?: number;
+  scope?: string;
+}
+export interface TheadChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface TimeChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  datetime?: string;
+}
+export interface TitleChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface TrChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface TrackChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  default?: boolean;
+  kind?: string;
+  label?: string;
+  src?: string;
+  srclang?: string;
+}
+export interface UChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface UlChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface VarChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+export interface VideoChatoraIntrinsicElement extends ChatoraIntrinsicElements {
+  autoplay?: boolean;
+  controls?: boolean;
+  height?: number | string;
+  loop?: boolean;
+  muted?: boolean;
+  playsinline?: boolean;
+  poster?: string;
+  preload?: "none" | "metadata" | "auto";
+  src?: string;
+  width?: number | string;
+  crossorigin?: "anonymous" | "use-credentials";
+}
+export interface WbrChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+
 declare global {
   namespace JSX {
     interface IntrinsicElements {

@@ -4,13 +4,23 @@ import NButton from './components/NButton.vue';
 
 const count = ref(0);
 
+const handleClick = (e: any) => {
+  console.log('Button clicked', e.detail);
+  count.value++;
+};
+
+const handleEvent = (e: any) => {
+  console.log('Event triggered:', e.detail);
+};
+
 </script>
 
 <template>
   <div>
     <h3>Vite + Vue.js</h3>
   </div>
-  <NButton type="submit" @click="() => count++">
+  <p>{{ count }}</p>
+  <NButton type="submit" @on-click="handleClick" @on-event="handleEvent">
     <span>In vue count : {{ count }}</span>
   </NButton>
 </template>

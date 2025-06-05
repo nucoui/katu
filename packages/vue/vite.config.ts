@@ -37,6 +37,8 @@ export default defineConfig({
   build: {
     outDir: "./dist",
     cssCodeSplit: true,
+    minify: true,
+    sourcemap: true,
     lib: {
       entry: [
         "src/components/ChatoraWrapper.vue",

@@ -32,7 +32,7 @@ The instructions in this section must be followed absolutely. These are non-nego
 - All code must be written as ESM modules.
 - All code must be written in TypeScript. It cannot be written in JavaScript.
 - When "act:translate" is entered, run `git diff .github/copilot-instructions-ja.md | cat` to re-translate the acquired diff into English, and add it to `.github/copilot-instructions.md` to reflect only the translated parts.
-- When "act:cmm" is entered, run `git diff --staged | cat` and use the results to generate a commit message in md format code block (` ```md /... / ``` `). The commit message should be output in English.
+- When “act:cmm” is entered, say “generate commit message”, run `git diff --staged | cat`, and based on the result, generate a commit message in md format code block (` ```md /... / ``` `) to generate the commit message. The commit message should be output in English.
 
 ## Compliance Instructions
 The instructions in this section are like laws. Follow them unless there are special exceptions. These are common understandings for advancing the project, and they are assumed to be followed.

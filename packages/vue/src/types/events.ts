@@ -1,30 +1,21 @@
 /**
- * `on-` プレフィックスを取り除いたイベント名の型を生成するユーティリティ型
+ * Converts an object type with `on-xxx` keys and payload types
+ * to a Vue-style emits type with event names and tuple payloads.
  *
- * @example
- * ```ts
- * type Emits = "on-click" | "on-hover";
- * type NormalizedEmits = StripOnPrefix<Emits>; // "click" | "hover"
- * ```
- */
-export type StripOnPrefix<T extends string> = T extends `on-${infer R}` ? R : never;
-
-/**
- * `on-` プレフィックスを取り除いたイベントハンドラーの型を生成するユーティリティ型
+ * Example:
+ *   type Emits = {
+ *     "on-click": { count: number };
+ *     "on-event": { type: string; detail: { count: number } };
+ *   }
+ *   type VueEmits = ToVueEmits<Emits>;
+ *   // VueEmits is:
+ *   // {
+ *   //   click: [{ count: number }];
+ *   //   event: [{ type: string; detail: { count: number } }];
+ *   // }
  *
- * @example
- * ```ts
- * type Handlers = {
- *   "on-click": (event: Event) => void;
- *   "on-hover": (event: Event) => void;
- * };
- * type NormalizedHandlers = StripOnPrefixHandlers<Handlers>;
- * // {
- * //   click: (event: Event) => void;
- * //   hover: (event: Event) => void;
- * // }
- * ```
+ * @template T - The original emits type with `on-xxx` keys.
  */
-export type StripOnPrefixHandlers<T extends string> = {
-  [K in T as StripOnPrefix<K>]: [value: Event];
+export type ToVueEmits<T> = {
+  [K in keyof T]: [T[K]]
 };
