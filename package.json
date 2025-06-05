@@ -10,6 +10,8 @@
     "p:react": "pnpm -C packages/react",
     "p:vue": "pnpm -C packages/vue",
 
+    "cfg": "pnpm -C config",
+
     "pg:nextjs:app": "pnpm -C playgrounds/nextjs/app",
     "pg:nextjs:chatora": "pnpm -C playgrounds/nextjs/chatora",
     "pg:react": "pnpm -C playgrounds/react",

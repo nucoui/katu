@@ -2,8 +2,8 @@ import { toMatched } from "@chatora/util";
 import type { CC } from "chatora";
 
 export type Emits = {
-  "on-click": { count: number };
-  "on-hover": MouseEvent;
+  "on-click"?: { count: number };
+  "on-hover"?: MouseEvent;
 }
 
 export type Props = {

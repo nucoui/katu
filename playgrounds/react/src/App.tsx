@@ -24,7 +24,7 @@ function App() {
         </button>
         <NButton
           type="reset"
-          on-click={() => setCount((count) => count + 1)}
+          onClick={() => {setCount((count) => count + 1)}}
         >
           count is {count}
         </NButton>
