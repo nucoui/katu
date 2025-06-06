@@ -67,6 +67,9 @@
     - `pnpm p:rtv`: `<root>/packages/reactivity`のコマンドを実行します。
     - `pnpm p:rt`: `<root>/packages/runtime`のコマンドを実行します。
     - `pnpm p:ut`: `<root>/packages/util`のコマンドを実行します。
+    - `pnpm p:react`: `<root>/packages/react`のコマンドを実行します。
+    - `pnpm p:vue`: `<root>/packages/vue`のコマンドを実行します。
+    - `pnpm p:svelte`: `<root>/packages/svelte`のコマンドを実行します。
     - `pnpm pg:<project-name>`: `<root>/playgrounds/<project-name>`のコマンドを実行します。
 
 # 達成目標
@@ -81,3 +84,6 @@
 - @chatora/util
   このパッケージでは、プロジェクト全体で使用するユーティリティ関数を提供することができること。
   具体的には、chatoraを使用して、実装を行う利用者にとって便利なユーティリティ関数を提供することができること。
+- @chatora/{react, vue, svelte}
+  このパッケージでは、React, Vue, SvelteのSSR/CSRでchatoraを使用するためのラッパーコンポーネントと機能を提供することができること。
+  具体的には、React, Vue, SvelteのSSR/CSRでchatoraを使用するためのラッパーコンポーネントと機能を提供することができること。

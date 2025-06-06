@@ -35,7 +35,7 @@ Usually, knowledge of classes is required, but since the implementation is funct
   | Next.js   | ✅     |
   | Vue.js    | ✅     |
   | Nuxt      | ✅     |
-  | Svelte    | 🚧     |
+  | Svelte    | ✅     |
   | Solid.js  | 🚧     |
   | Angular   | 🚧     |
   | Lit       | 🚧     |
@@ -118,6 +118,7 @@ export const MiniElement = functionalCustomElement(Comp, {
 | @chatora/util | Package providing utility functions for the project. This package is used by other packages. | [@chatora/util](https://www.npmjs.com/package/@chatora/util) |
 | @chatora/react | Package that provides wrapper components and functionality to make Chatora.js work with React's SSR/CSR | [@chatora/react](https://www.npmjs.com/package/@chatora/react) |
 | @chatora/vue | Package that provides wrapper components and functionality to make Chatora.js work with Vue's SSR/CSR | [@chatora/vue](https://www.npmjs.com/package/@chatora/vue) |
+| @chatora/svelte | Package that provides wrapper components and functionality to make Chatora.js work with Svelte's SSR/CSR | [@chatora/svelte](https://www.npmjs.com/package/@chatora/svelte) |
 
 ### Eponym
 **chatora**(*/t͡ɕa toɾa/*) means tabby in Japanese

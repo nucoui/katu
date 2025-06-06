@@ -67,6 +67,9 @@ Please understand the following knowledge. These are assumed to be known when pr
     - `pnpm p:rtv`: Executes commands for `<root>/packages/reactivity`.
     - `pnpm p:rt`: Executes commands for `<root>/packages/runtime`.
     - `pnpm p:ut`: Executes commands for `<root>/packages/util`.
+    - `pnpm p:react`: Executes commands for `<root>/packages/react`.
+    - `pnpm p:vue`: Executes commands for `<root>/packages/vue`.
+    - `pnpm p:svelte`: Executes commands for `<root>/packages/svelte`.
     - `pnpm pg:<project-name>`: Executes commands for `<root>/playgrounds/<project-name>`.
 
 # Achievement Goals
@@ -81,3 +84,6 @@ Please understand the following knowledge. These are assumed to be known when pr
 - @chatora/util
   This package should provide utility functions used throughout the project.
   Specifically, it should provide convenient utility functions for users implementing with chatora.
+- @chatora/{react, vue, svelte}
+  This package should provide wrapper components and features for using chatora in SSR/CSR with React, Vue, and Svelte.
+  Specifically, it should provide wrapper components and features for using chatora in SSR/CSR with React, Vue, and Svelte.
