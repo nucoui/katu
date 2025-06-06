@@ -53,6 +53,10 @@
       "path": "packages/vue"
     },
     {
+      "name": "📦 svelte (p:svelte)",
+      "path": "packages/svelte"
+    },
+    {
       "name": "========= 🎮 =",
       "path": "🎮"
     },
@@ -75,7 +79,11 @@
     {
       "name": "🎮 nuxt",
       "path": "playgrounds/nuxt"
-    }
+    },
+    {
+      "name": "🎮 svelte",
+      "path": "playgrounds/svelte"
+    },
   ],
   "settings": {
     "prettier.enable": false,
@@ -102,6 +110,11 @@
       }
     },
     "[vue]": {
+      "editor.codeActionsOnSave": {
+        "source.addMissingImports": "explicit",
+      }
+    },
+    "[svelte]": {
       "editor.codeActionsOnSave": {
         "source.addMissingImports": "explicit",
       }

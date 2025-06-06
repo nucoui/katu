@@ -1,0 +1,73 @@
+{
+  "name": "@chatora/svelte",
+  "type": "module",
+  "version": "0.0.1-beta.18",
+  "private": false,
+  "description": "Framework for creating custom elements with JSX function components",
+  "author": "nuco <takuma-ru@takumaru.dev> (https://github.com/takuma-ru/)",
+  "license": "MPL-2.0",
+  "homepage": "https://github.com/nucoui/chatora",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nucoui/chatora"
+  },
+  "bugs": {
+    "url": "https://github.com/nucoui/chatora/issues",
+    "email": "takuma-ru@takumaru.dev"
+  },
+  "keywords": [
+    "svelte"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "svelte": "./dist/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/",
+    "provenance": true
+  },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "!dist/**/*.spec.*",
+    "!dist/**/*.test.*",
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build && npm run prepack",
+    "preview": "vite preview",
+    "prepare": "svelte-kit sync || echo ''",
+    "prepack": "svelte-kit sync && svelte-package && publint",
+    "lint": "eslint .",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "release": "rlse",
+    "release:test": "rlse -l patch -k config,commit-changes,create-release-branch --dry-run"
+  },
+  "svelte": "./dist/index.js",
+  "peerDependencies": {
+    "chatora": "*",
+    "svelte": "^5.0.0"
+  },
+  "devDependencies": {
+    "@chatora/config": "workspace:*",
+    "@sveltejs/adapter-auto": "^6.0.0",
+    "@sveltejs/kit": "^2.16.0",
+    "@sveltejs/package": "^2.0.0",
+    "@sveltejs/vite-plugin-svelte": "^5.0.0",
+    "@takuma-ru/rlse": "catalog:",
+    "chatora": "workspace:*",
+    "eslint": "catalog:",
+    "publint": "^0.3.2",
+    "svelte": "^5.0.0",
+    "svelte-check": "^4.0.0",
+    "typescript": "^5.0.0",
+    "vite": "^6.2.6"
+  }
+}
