@@ -56,7 +56,7 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Release
+      - name: Release @chatora/reactivity
         run: |
           if [ "${{ github.event.inputs.pre }}" == "true" ]; then
             pnpm p:core release --level ${{ github.event.inputs.level }} --pre
@@ -69,13 +69,18 @@ jobs:
       - name: Get Current package info
         id: get-package-info
         run: |
-          echo "PACKAGE_VERSION=$(node -p "require('./packages/core/package.json').version")" >> $GITHUB_OUTPUT
+          echo "PACKAGE_VERSION=$(node -p "require('./packages/reactivity/package.json').version")" >> $GITHUB_OUTPUT
 
-      - name: Release depended libraries
+      - name: Release Core libraries
         run: |
-          pnpm p:rtv release --level fix --release-version ${{ steps.get-package-info.outputs.PACKAGE_VERSION }} -k create-release-branch,build
           pnpm p:rt release --level fix --release-version ${{ steps.get-package-info.outputs.PACKAGE_VERSION }} -k create-release-branch,build
           pnpm p:ut release --level fix --release-version ${{ steps.get-package-info.outputs.PACKAGE_VERSION }} -k create-release-branch,build
+          pnpm p:core release --level fix --release-version ${{ steps.get-package-info.outputs.PACKAGE_VERSION }} -k create-release-branch,build
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Release Framework libraries
+        run: |
           pnpm p:react release --level fix --release-version ${{ steps.get-package-info.outputs.PACKAGE_VERSION }} -k create-release-branch,build
           pnpm p:vue release --level fix --release-version ${{ steps.get-package-info.outputs.PACKAGE_VERSION }} -k create-release-branch,build
           pnpm p:svelte release --level fix --release-version ${{ steps.get-package-info.outputs.PACKAGE_VERSION }} -k create-release-branch,build
