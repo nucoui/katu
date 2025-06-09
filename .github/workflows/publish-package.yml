@@ -59,9 +59,9 @@ jobs:
       - name: Release @chatora/reactivity
         run: |
           if [ "${{ github.event.inputs.pre }}" == "true" ]; then
-            pnpm p:core release --level ${{ github.event.inputs.level }} --pre
+            pnpm p:rtv release --level ${{ github.event.inputs.level }} --pre
           else
-            pnpm p:core release --level ${{ github.event.inputs.level }}
+            pnpm p:rtv release --level ${{ github.event.inputs.level }}
           fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
