@@ -71,7 +71,7 @@ const functionalDeclarativeCustomElement = (
         }
       }
 
-      return () => computedProps as { [K in keyof T]: ReturnType<T[K]> };
+      return () => computedProps as any;
     },
     /**
      * イベントハンドラオブジェクトを受け取り、イベントを発火する関数を返します。

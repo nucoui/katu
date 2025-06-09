@@ -4,15 +4,20 @@ import style from "./Button.scss?raw";
 import { clsx } from "clsx";
 import { toBoolean, toMatched } from "@chatora/util";
 
-type Props = {
-  type?: "anchor" | "submit" | "reset" | "toggle" | "button";
-  variant?: string;
-  size?: string;
+export type Props = {
+  variant?: "primary" | "secondary" | "tertiary" | "error";
   disabled?: boolean;
+  width?: "auto" | "stretch";
+  size?: "small" | "medium" | "large";
+} & ({
+  type?: "anchor";
   href?: string;
   target?: string;
-  width?: "auto" | "full";
-}
+} | {
+  type?: "submit" | "reset" | "button" | "toggle";
+  href?: never;
+  target?: never;
+});
 
 type Emits = {
   "on-click": { count: number };
@@ -27,14 +32,15 @@ const Button: CC<Props, Emits> = ({
   getHost
 }) => {
   const props = defineProps({
-    type: (v) => toMatched(v, ["anchor", "submit", "reset", "toggle", "button"]) ?? "button",
-    variant: (v) => v,
-    size: (v) => v,
+    type: (v) => toMatched(v, ["anchor", "submit", "reset", "button", "toggle"]) ?? "button",
+    variant: (v) => toMatched(v, ["primary", "secondary", "tertiary", "error"]) ?? "primary",
+    size: (v) => toMatched(v, ["small", "medium", "large"]) ?? "medium",
     disabled: (v) => toBoolean(v) ?? false,
     href: (v) => v,
     target: (v) => v,
-    width: (v) => toMatched(v, ["auto", "full"]) ?? "auto",
+    width: (v) => toMatched(v, ["auto", "stretch"]) ?? "auto",
   });
+
   const emits = defineEmits({
     "on-click": () => {},
     "on-hover": () => {},
@@ -66,7 +72,9 @@ const Button: CC<Props, Emits> = ({
   }))
 
   render(() => {
-    if (props().type === "anchor") {
+    const type = props().type
+
+    if (type === "anchor") {
       return (
         <a
           href={props().href ?? "#"}
@@ -80,10 +88,10 @@ const Button: CC<Props, Emits> = ({
       );
     }
 
-    if (props().type === "submit") {
+    if (type === "toggle") {
       return (
         <button
-          type="submit"
+          type="button"
           {...commonAttr()}
         >
           <span class="contents">
@@ -95,7 +103,7 @@ const Button: CC<Props, Emits> = ({
 
     return (
       <button
-        type={props().type}
+        type={type}
         {...commonAttr()}
       >
         <span class="contents">

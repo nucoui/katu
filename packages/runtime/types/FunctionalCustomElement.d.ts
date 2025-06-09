@@ -1,3 +1,5 @@
+// @ts-check
+
 /**
  * functionalCustomElement の型定義ファイル
  *
@@ -50,9 +52,11 @@ export type FunctionalCustomElementOptions = {
   shadowRootMode?: never;
 });
 
-type AsFunctionType<T> = {
-  [K in keyof T]: (v: string | undefined) => T[K];
-};
+type UnionKeys<T> = T extends T ? keyof T : never;
+
+export type AsFunctionType<T> = [T] extends [object]
+  ? { [K in UnionKeys<T>]: (v: string | undefined) => T[K]; }
+  : never;
 
 // CCの短縮型を定義
 export type CC<
@@ -80,7 +84,11 @@ export type ChatoraComponent<P extends Record<string, any> = Record<string, neve
    *   })
    *   // props(): { disabled: boolean | undefined, value: string | undefined }
    */
-  defineProps: <T extends AsFunctionType<P>>(props: T) => () => { [K in keyof T]: ReturnType<T[K]> };
+  defineProps: <const T extends AsFunctionType<P>>(props: T) => () => {
+    [K in keyof T]: undefined extends ReturnType<T[K]>
+      ? P[K]
+      : Required<P[K]>
+  };
   /**
    * Emitsの定義を行う関数
    * Define the emits
