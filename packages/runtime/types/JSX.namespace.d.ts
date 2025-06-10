@@ -177,6 +177,31 @@ export interface DivChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
  */
 export interface H1ChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
 /**
+ * Attributes for h2 element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/sections.html#the-h1,-h2,-h3,-h4,-h5,-and-h6-elements
+ */
+export interface H2ChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for h3 element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/sections.html#the-h1,-h2,-h3,-h4,-h5,-and-h6-elements
+ */
+export interface H3ChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for h4 element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/sections.html#the-h1,-h2,-h3,-h4,-h5,-and-h6-elements
+ */
+export interface H4ChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for h5 element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/sections.html#the-h1,-h2,-h3,-h4,-h5,-and-h6-elements
+ */
+export interface H5ChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
+ * Attributes for h6 element (WHATWG HTML spec)
+ * https://html.spec.whatwg.org/multipage/sections.html#the-h1,-h2,-h3,-h4,-h5,-and-h6-elements
+ */
+export interface H6ChatoraIntrinsicElement extends ChatoraIntrinsicElements {}
+/**
  * Attributes for p element (WHATWG HTML spec)
  * https://html.spec.whatwg.org/multipage/paragraphs.html#the-p-element
  */
@@ -978,6 +1003,11 @@ declare global {
     interface IntrinsicElements {
       div: DivChatoraIntrinsicElement;
       h1: H1ChatoraIntrinsicElement;
+      h2: H2ChatoraIntrinsicElement;
+      h3: H3ChatoraIntrinsicElement;
+      h4: H4ChatoraIntrinsicElement;
+      h5: H5ChatoraIntrinsicElement;
+      h6: H6ChatoraIntrinsicElement;
       p: PChatoraIntrinsicElement;
       ul: UlChatoraIntrinsicElement;
       ol: OlChatoraIntrinsicElement;

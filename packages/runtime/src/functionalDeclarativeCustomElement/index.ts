@@ -14,8 +14,11 @@ import type { Element, ElementContent, Root } from "hast";
  * @param options - ShadowRootやForm関連のオプション
  * @returns hastオブジェクト (HTML Abstract Syntax Tree)
  */
-const functionalDeclarativeCustomElement = (
-  callback: CC,
+const functionalDeclarativeCustomElement = <
+  P extends Record<string, any> = Record<string, never>,
+  E extends Record<`on-${string}`, any> = Record<`on-${string}`, never>,
+>(
+  callback: CC<P, E>,
   options?: FunctionalCustomElementOptions & { props?: Record<string, string | undefined> },
 ): Root => {
   const {

@@ -140,3 +140,15 @@ export type FunctionalCustomElement = <
 ) => {
   new (): HTMLElement;
 };
+
+/**
+ * Extracts the Props type from a CC<Props, Emits> component.
+ * @template T - The component type.
+ */
+export type ComponentProps<T> = T extends CC<infer P, any> ? P : never;
+
+/**
+ * Extracts the Emits type from a CC<Props, Emits> component.
+ * @template T - The component type.
+ */
+export type ComponentEmits<T> = T extends CC<any, infer E> ? E : never;

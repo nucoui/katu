@@ -13,12 +13,14 @@
   },
   "dependencies": {
     "@chatora/util": "workspace:*",
-    "chatora": "workspace:*"
+    "chatora": "workspace:*",
+    "hast": "^1.0.0"
   },
   "devDependencies": {
-    "tsup": "catalog:",
-    "typescript": "catalog:",
+    "@types/hast": "^3.0.4",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "tsup": "catalog:",
+    "typescript": "catalog:"
   }
 }

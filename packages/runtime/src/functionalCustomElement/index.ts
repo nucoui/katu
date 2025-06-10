@@ -25,6 +25,10 @@ const functionalCustomElement: FunctionalCustomElement = (
     styles,
   } = options || {};
 
+  if (typeof window === "undefined") {
+    throw new TypeError("functionalCustomElement is not supported in SSR environment.");
+  }
+
   return class extends HTMLElement {
     static formAssociated = isFormAssociated ?? false;
     /**

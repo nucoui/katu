@@ -1,5 +1,5 @@
 import { toMatched } from "@chatora/util";
-import type { CC } from "chatora";
+import { functionalCustomElement, functionalDeclarativeCustomElement, type CC } from "chatora";
 
 export type Emits = {
   "on-click": { count: number };
@@ -52,3 +52,6 @@ export const ButtonStyle = `
     background-color: orange;
   }
 `
+
+export const NButtonElement = functionalCustomElement(Button, { styles: [ButtonStyle] });
+export const NButtonHast = functionalDeclarativeCustomElement(Button, { styles: [ButtonStyle] });

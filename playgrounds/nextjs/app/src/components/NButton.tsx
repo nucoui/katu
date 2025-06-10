@@ -12,9 +12,7 @@ export const NButton = ({ children, ...props }: Props) => {
     <>
       <ChatoraWrapper
         tag="n-button"
-        props={{
-          type: props.type,
-        }}
+        props={props}
         component={Button}
         children={children}
         styles={[ButtonStyle]}
