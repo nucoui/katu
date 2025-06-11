@@ -43,7 +43,7 @@ const functionalDeclarativeCustomElement = <
   const ssrEffect = () => () => {}; // SSRでは副作用不要
   const noop = () => {};
 
-  callback({
+  const cb = callback({
     reactivity: {
       signal: ssrSignal,
       effect: ssrEffect,
@@ -105,14 +105,9 @@ const functionalDeclarativeCustomElement = <
      * SSRではnullを返します
      */
     getShadowRoot: () => null,
-    /**
-     * レンダリング関数を実行し、JSX結果を保存します
-     * SSRでは単純に結果を保存するだけです
-     */
-    render: (cb) => {
-      jsxResult = cb();
-    },
   });
+
+  jsxResult = cb();
 
   // jsxResultがなければ空のDOM要素を生成
   if (jsxResult === null || jsxResult === undefined) {
@@ -182,15 +177,15 @@ function jsxToHast(node: ChatoraNode): ElementContent | ElementContent[] {
     const jsxElement = node as ChatoraJSXElement;
 
     // タグが関数の場合は実行結果を変換
-    if (typeof jsxElement.tag === "function") {
-      const result = jsxElement.tag(jsxElement.props || {});
-      // Promise型の場合は警告を出してスキップ
-      if (result instanceof Promise) {
-        console.warn("Promise-based components are not supported in SSR mode");
-        return { type: "text", value: "" };
-      }
-      return jsxToHast(result);
-    }
+    // if (typeof jsxElement.tag === "function") {
+    //   const result = jsxElement.tag(jsxElement.props || {});
+    //   // Promise型の場合は警告を出してスキップ
+    //   if (result instanceof Promise) {
+    //     console.warn("Promise-based components are not supported in SSR mode");
+    //     return { type: "text", value: "" };
+    //   }
+    //   return jsxToHast(result);
+    // }
 
     // タグが文字列の場合はhast要素に変換
     const tagName = jsxElement.tag as string;

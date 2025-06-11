@@ -27,7 +27,6 @@ export const Button: CC<Props, Emits> = ({
   defineEmits,
   defineProps,
   getHost,
-  render,
 }) => {
   const props = defineProps({
     type: v => toMatched(v, ["anchor", "submit", "reset", "button", "toggle"]) ?? "button",
@@ -70,7 +69,7 @@ export const Button: CC<Props, Emits> = ({
     "onClick": props().disabled ? undefined : handleClick,
   }));
 
-  render(() => {
+  return () => {
     const type = props().type;
 
     switch (type) {
@@ -113,7 +112,7 @@ export const Button: CC<Props, Emits> = ({
         );
       }
     }
-  });
+  }
 };
 
 const ButtonElement = functionalCustomElement(Button, { styles: [style] });

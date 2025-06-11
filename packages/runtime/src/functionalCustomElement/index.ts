@@ -66,7 +66,7 @@ const functionalCustomElement: FunctionalCustomElement = (
 
     constructor() {
       super();
-      callback({
+      const cb = callback({
         reactivity: {
           signal,
           effect,
@@ -185,69 +185,69 @@ const functionalCustomElement: FunctionalCustomElement = (
         getShadowRoot: () => {
           return this.shadowRoot;
         },
-        render: (cb) => {
-          // 内部属性の値を一度だけ作成しておく（再利用）
-          const internalAttribute = `${_INTERNAL_ATTRIBUTES}data-chatora-internal`;
-
-          const renderCallback = () => {
-            const node = cb();
-            if (!node && node !== 0)
-              return;
-
-            let newVNode: VNode;
-
-            // JSX/TSXから返されたオブジェクトを適切なVNodeに変換
-            if (typeof node === "object" && node !== null && "tag" in node && "props" in node && typeof node.tag === "string") {
-              // オブジェクト生成を最小限に
-              const nodeProps = node.props || {};
-              const updatedProps = { ...nodeProps, [internalAttribute]: "" };
-              newVNode = createVNode(node.tag, updatedProps);
-            }
-            else {
-              // 文字列やプリミティブ値の場合はspanで包む
-              newVNode = createVNode("span", {
-                [internalAttribute]: "",
-                children: [String(node)],
-              });
-            }
-
-            // shadowRootが存在するかチェック
-            const shadowRootInstance = this.shadowRoot;
-            if (!shadowRootInstance)
-              return;
-
-            if (this._vnode == null) {
-              // 初回レンダリング: style要素を除いてコンテンツをクリア
-              const children = shadowRootInstance.children;
-              for (let i = children.length - 1; i >= 0; i--) {
-                if (children[i].tagName !== "STYLE") {
-                  shadowRootInstance.removeChild(children[i]);
-                }
-              }
-
-              // 新しい要素を追加
-              shadowRootInstance.appendChild(mount(newVNode));
-            }
-            else {
-              // 差分更新: 既存のDOM要素を更新
-              // DOM構造内での適切なインデックスを効率的に見つける
-              let domIndex = 0;
-              const childNodes = shadowRootInstance.childNodes;
-              for (let i = 0; i < childNodes.length; i++) {
-                const node = childNodes[i];
-                if (node.nodeType === Node.ELEMENT_NODE && (node as Element).tagName !== "STYLE") {
-                  domIndex = i;
-                  break;
-                }
-              }
-
-              patch(shadowRootInstance, this._vnode, newVNode, domIndex);
-            }
-            this._vnode = newVNode;
-          };
-          this._renderCallback = renderCallback;
-        },
       });
+
+      // 内部属性の値を一度だけ作成しておく（再利用）
+      const internalAttribute = `${_INTERNAL_ATTRIBUTES}data-chatora-internal`;
+
+      const renderCallback = () => {
+        const node = cb();
+        if (!node && node !== 0)
+          return;
+
+        let newVNode: VNode;
+
+        // JSX/TSXから返されたオブジェクトを適切なVNodeに変換
+        if (typeof node === "object" && node !== null && "tag" in node && "props" in node && typeof node.tag === "string") {
+          // オブジェクト生成を最小限に
+          const nodeProps = node.props || {};
+          const updatedProps = { ...nodeProps, [internalAttribute]: "" };
+          newVNode = createVNode(node.tag, updatedProps);
+        }
+        else {
+          // 文字列やプリミティブ値の場合はspanで包む
+          newVNode = createVNode("span", {
+            [internalAttribute]: "",
+            children: [String(node)],
+          });
+        }
+
+        // shadowRootが存在するかチェック
+        const shadowRootInstance = this.shadowRoot;
+        if (!shadowRootInstance)
+          return;
+
+        if (this._vnode == null) {
+          // 初回レンダリング: style要素を除いてコンテンツをクリア
+          const children = shadowRootInstance.children;
+          for (let i = children.length - 1; i >= 0; i--) {
+            if (children[i].tagName !== "STYLE") {
+              shadowRootInstance.removeChild(children[i]);
+            }
+          }
+
+          // 新しい要素を追加
+          shadowRootInstance.appendChild(mount(newVNode));
+        }
+        else {
+          // 差分更新: 既存のDOM要素を更新
+          // DOM構造内での適切なインデックスを効率的に見つける
+          let domIndex = 0;
+          const childNodes = shadowRootInstance.childNodes;
+          for (let i = 0; i < childNodes.length; i++) {
+            const node = childNodes[i];
+            if (node.nodeType === Node.ELEMENT_NODE && (node as Element).tagName !== "STYLE") {
+              domIndex = i;
+              break;
+            }
+          }
+
+          patch(shadowRootInstance, this._vnode, newVNode, domIndex);
+        }
+        this._vnode = newVNode;
+      };
+      this._renderCallback = renderCallback;
+
       // MutationObserverのセットアップ（バッチ処理を使って最適化）
       this._attributeObserver = new MutationObserver((mutationRecords) => {
         if (mutationRecords.length === 0)
