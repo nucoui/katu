@@ -124,12 +124,7 @@ export type ChatoraComponent<P extends Record<string, any> = Record<string, neve
   onAdopted: (cb: () => void) => void;
   getHost: () => HTMLElement;
   getShadowRoot: () => ShadowRoot | null;
-  /**
-   * レンダリング関数の登録
-   * Register render function
-   */
-  render: (cb: () => ChatoraNode) => void;
-}) => void;
+}) => () => ChatoraNode;
 
 export type FunctionalCustomElement = <
   P extends Record<string, any> = Record<string, never>,
