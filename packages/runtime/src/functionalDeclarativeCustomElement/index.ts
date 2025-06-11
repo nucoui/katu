@@ -1,4 +1,4 @@
-import type { CC, FunctionalCustomElementOptions } from "@root/types/FunctionalCustomElement";
+import type { AsFunctionType, CC, FunctionalCustomElementOptions } from "@root/types/FunctionalCustomElement";
 import type { ChatoraJSXElement, ChatoraNode } from "@root/types/JSX.namespace";
 import type { Element, ElementContent, Root } from "hast";
 
@@ -19,7 +19,7 @@ const functionalDeclarativeCustomElement = <
   E extends Record<`on-${string}`, any> = Record<`on-${string}`, never>,
 >(
   callback: CC<P, E>,
-  options?: FunctionalCustomElementOptions & { props?: Record<string, string | undefined> },
+  options?: FunctionalCustomElementOptions & { props?: P },
 ): Root => {
   const {
     shadowRoot = true,
@@ -58,7 +58,7 @@ const functionalDeclarativeCustomElement = <
      * @param propsTransformers - 属性変換関数オブジェクト
      * @returns 属性値を取得するgetter関数
      */
-    defineProps: <T extends Record<string, (value: string | undefined) => any>>(propsTransformers: T) => {
+    defineProps: <T extends AsFunctionType<P>>(propsTransformers: T) => {
       // プロパティ値を事前計算（SSRでは変更されない）
       const computedProps: Record<string, any> = {};
 
@@ -70,7 +70,9 @@ const functionalDeclarativeCustomElement = <
       // 初期プロパティで上書き
       for (const key of Object.keys(_propsData)) {
         if (key in propsTransformers) {
-          computedProps[key] = propsTransformers[key as keyof T](_propsData[key]);
+          computedProps[key] = propsTransformers[key as keyof T](
+            (_propsData as Record<string, any>)[key],
+          );
         }
       }
 
