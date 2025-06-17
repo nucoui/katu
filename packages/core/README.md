@@ -73,23 +73,36 @@ type Props = {
   name?: string;
 };
 
-const Comp: CC = ({ reactivity: { signal }, defineProps, render }) => {
+export type Emits = {
+  "on-click": Event;
+};
+
+const Comp: CC<Props, Emits> = ({ reactivity: { signal }, defineProps, defineEmits }) => {
     const props = defineProps({
-      name: v => toString(v)
+      name: v => toString(v),
+    });
+
+    const emits = defineEmits({
+      "on-click": () => {},
     });
 
     const [count, setCount] = signal(0);
 
-    render(() => {
+    const handleClick = () => {
+      setCount((c) => c + 1);
+      emits("on-click", new Event("click"));
+    };
+
+    return () => {
       return (
         <div>
           <h1>Hi {props().name}</h1>
           <p>Count: {count()}</p>
-          <button onClick={() => setCount((c) => c + 1)}>Increment</button>
+          <button onClick={handleClick}>Increment</button>
           <button onClick={() => setCount((c) => c - 1)}>Decrement</button>
         </div>
       );
-    });
+    };
   }
 
 export const MiniElement = functionalCustomElement(Comp, {
