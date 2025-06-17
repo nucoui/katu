@@ -1,6 +1,7 @@
 import type { AsFunctionType, CC, FunctionalCustomElementOptions } from "@root/types/FunctionalCustomElement";
-import type { ChatoraJSXElement, ChatoraNode } from "@root/types/JSX.namespace";
+import type { ChatoraNode } from "@root/types/JSX.namespace";
 import type { Element, ElementContent, Root } from "hast";
+import { genVNode } from "../functionalCustomElement/vNode";
 
 /**
  * JSX/TSXを使用してDeclarative Shadow DOMのHTML要素を作成する関数です。
@@ -109,13 +110,10 @@ const functionalDeclarativeCustomElement = <
 
   jsxResult = cb();
 
-  // jsxResultがなければ空のDOM要素を生成
-  if (jsxResult === null || jsxResult === undefined) {
-    return { type: "root", children: [] };
-  }
-
-  // JSX結果をhastに変換
-  const contentElement = jsxToHast(jsxResult);
+  // VNode化
+  const vnode = genVNode(jsxResult);
+  // VNode→hast変換
+  const contentElement = vNodeToHast(vnode);
 
   // スタイル要素を事前に生成（存在する場合）
   const styleElements: Element[] = styles
@@ -139,7 +137,7 @@ const functionalDeclarativeCustomElement = <
       children: [{
         type: "element",
         tagName: "template",
-        properties: { shadowroot: shadowRootMode },
+        properties: { shadowrootmode: shadowRootMode },
         children: templateChildren,
       }],
     };
@@ -154,65 +152,44 @@ const functionalDeclarativeCustomElement = <
 
 /**
  * ChatoraNode (JSX結果) をhast要素に変換する関数
- * SSR用に最適化された軽量版
+ * functionalCustomElementのVNode構造と一致するように変換
  */
-function jsxToHast(node: ChatoraNode): ElementContent | ElementContent[] {
-  // nullやundefinedの場合は空のテキストノード
-  if (node === null || node === undefined) {
+function vNodeToHast(node: any): ElementContent | ElementContent[] {
+  if (!node)
     return { type: "text", value: "" };
+  // #text, #empty, #fragment, #unknown, string, number, VNode, 配列
+  if (Array.isArray(node)) {
+    return node.flatMap(vNodeToHast);
   }
-
-  // プリミティブ値の場合はテキストノードに変換
-  if (typeof node === "string" || typeof node === "number" || typeof node === "boolean") {
+  if (typeof node === "string" || typeof node === "number") {
     return { type: "text", value: String(node) };
   }
-
-  // 配列の場合は各要素を変換
-  if (Array.isArray(node)) {
-    return node.flatMap(item => jsxToHast(item));
-  }
-
-  // ChatoraJSXElementの場合
-  if (typeof node === "object" && "tag" in node && "props" in node) {
-    const jsxElement = node as ChatoraJSXElement;
-
-    // タグが関数の場合は実行結果を変換
-    // if (typeof jsxElement.tag === "function") {
-    //   const result = jsxElement.tag(jsxElement.props || {});
-    //   // Promise型の場合は警告を出してスキップ
-    //   if (result instanceof Promise) {
-    //     console.warn("Promise-based components are not supported in SSR mode");
-    //     return { type: "text", value: "" };
-    //   }
-    //   return jsxToHast(result);
-    // }
-
-    // タグが文字列の場合はhast要素に変換
-    const tagName = jsxElement.tag as string;
-    const { children, ...props } = jsxElement.props || {};
-
-    // イベントハンドラプロパティを除去（SSRでは不要）
-    const filteredProps: Record<string, any> = {};
-    for (const [key, value] of Object.entries(props)) {
-      if (!(key.startsWith("on") && key.length > 2 && key[2] === key[2].toUpperCase())) {
-        filteredProps[key === "className" ? "class" : key] = value;
-      }
+  if (typeof node === "object" && node.tag) {
+    if (node.tag === "#text") {
+      return { type: "text", value: node.children[0] ?? "" };
     }
-
+    if (node.tag === "#empty") {
+      return { type: "text", value: "" };
+    }
+    if (node.tag === "#fragment") {
+      // fragmentは子要素を平坦化
+      return node.children.flatMap(vNodeToHast);
+    }
+    // 通常の要素
+    const props: Record<string, any> = {};
+    for (const [k, v] of Object.entries(node.props ?? {})) {
+      if (k === "className")
+        props.class = v;
+      else if (!/^on[A-Z]/.test(k))
+        props[k] = v;
+    }
     return {
       type: "element",
-      tagName,
-      properties: filteredProps,
-      children: children
-        ? (Array.isArray(children)
-            ? children.flatMap(child => jsxToHast(child as ChatoraNode))
-            : [jsxToHast(children as ChatoraNode)]
-          ).filter(Boolean) as ElementContent[]
-        : [],
+      tagName: node.tag,
+      properties: props,
+      children: node.children ? node.children.flatMap(vNodeToHast) : [],
     };
   }
-
-  // その他の場合は空のテキストノード
   return { type: "text", value: "" };
 }
 

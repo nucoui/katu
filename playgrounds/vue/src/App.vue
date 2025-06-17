@@ -20,9 +20,12 @@ const handleEvent = (e: any) => {
     <h3>Vite + Vue.js</h3>
   </div>
   <p>{{ count }}</p>
-  <NButton type="submit" @on-click="handleClick" @on-event="handleEvent">
-    <span>In vue count : {{ count }}</span>
-  </NButton>
+  <button @click="count++">Increment Count</button>
+  <div>
+    <NButton type="submit" @on-click="handleClick" @on-event="handleEvent">
+      <span>In vue count : {{ count }}</span>
+    </NButton>
+  </div>
 </template>
 
 <style scoped>

@@ -10,7 +10,7 @@ export type Emits = {
   "on-event": { type: string; detail: { count: number } };
 }
 
-export const Button: CC<Props, Emits> = ({ reactivity: { signal }, defineProps, defineEmits, render }) => {
+export const Button: CC<Props, Emits> = ({ reactivity: { signal }, defineProps, defineEmits }) => {
   const props = defineProps({
     type: (v) => toMatched(v, ["button", "submit", "reset"]) || "button",
   });
@@ -22,7 +22,7 @@ export const Button: CC<Props, Emits> = ({ reactivity: { signal }, defineProps, 
 
   const [clickCount, setClickCount] = signal(0);
 
-  render(() => {
+  return () => {
     return (
       <button
         type={props().type}
@@ -37,7 +37,7 @@ export const Button: CC<Props, Emits> = ({ reactivity: { signal }, defineProps, 
         <slot name="slot1" />
       </button>
     );
-  })
+  }
 }
 
 export const ButtonStyle = `

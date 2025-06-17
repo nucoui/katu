@@ -1,5 +1,5 @@
 import { toMatched } from "@chatora/util";
-import { functionalCustomElement, functionalDeclarativeCustomElement, type CC } from "chatora";
+import { type CC } from "chatora";
 
 export type Emits = {
   "on-click": { count: number };
@@ -10,7 +10,7 @@ export type Props = {
   type: "button" | "submit" | "reset";
 }
 
-export const Button: CC<Props, Emits> = ({ reactivity: { signal }, defineProps, defineEmits, render }) => {
+export const Button: CC<Props, Emits> = ({ reactivity: { signal }, defineProps, defineEmits }) => {
   const props = defineProps({
     type: (v) => toMatched(v, ["button", "submit", "reset"]) || "button",
   });
@@ -22,7 +22,7 @@ export const Button: CC<Props, Emits> = ({ reactivity: { signal }, defineProps, 
 
   const [clickCount, setClickCount] = signal(0);
 
-  render(() => {
+  return () => {
     return (
       <button
         type={props().type}
@@ -37,7 +37,7 @@ export const Button: CC<Props, Emits> = ({ reactivity: { signal }, defineProps, 
         <slot name="slot1" />
       </button>
     );
-  })
+  }
 }
 
 export const ButtonStyle = `
@@ -53,5 +53,5 @@ export const ButtonStyle = `
   }
 `
 
-export const NButtonElement = functionalCustomElement(Button, { styles: [ButtonStyle] });
-export const NButtonHast = functionalDeclarativeCustomElement(Button, { styles: [ButtonStyle] });
+// export const NButtonElement = functionalCustomElement(Button, { styles: [ButtonStyle] });
+// export const NButtonHast = functionalDeclarativeCustomElement(Button, { styles: [ButtonStyle] });

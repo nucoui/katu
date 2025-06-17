@@ -6,7 +6,7 @@ import { jsx } from "react/jsx-runtime";
 export type Props<P extends Record<string, unknown>> = PropsWithChildren<{
   props: P;
   tag: string;
-  component: CC;
+  component: CC<P>;
 } & FunctionalCustomElementOptions>;
 
 const splitProps = (props: Record<string, unknown>) => {
@@ -28,11 +28,11 @@ export const ChatoraWrapper = <P extends Record<string, unknown>>({ tag, compone
 
   const { props: filteredProps, emits } = useMemo(() => splitProps(props || {}), [props]);
 
-  const hast = functionalDeclarativeCustomElement(
+  const hast = functionalDeclarativeCustomElement<P>(
     component,
     {
       ...option,
-      props: filteredProps as Record<string, string | undefined>,
+      props: filteredProps as P,
     },
   );
 

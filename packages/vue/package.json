@@ -22,9 +22,9 @@
       "require": "./dist/main.cjs"
     },
     "./components/ChatoraWrapper.vue": {
-      "types": "./dist/types/components/ChatoraWrapper.vue.d.ts",
-      "import": "./dist/components/ChatoraWrapper.vue.js",
-      "require": "./dist/components/ChatoraWrapper.vue.cjs"
+      "types": "./dist/types/components/ChatoraWrapper.d.ts",
+      "import": "./dist/components/ChatoraWrapper.js",
+      "require": "./dist/components/ChatoraWrapper.cjs"
     }
   },
   "publishConfig": {
