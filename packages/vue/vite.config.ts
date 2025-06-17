@@ -41,7 +41,7 @@ export default defineConfig({
     sourcemap: true,
     lib: {
       entry: [
-        "src/components/ChatoraWrapper.vue",
+        "src/components/ChatoraWrapper.ts",
         "src/main.ts",
       ],
       name: "vue",
