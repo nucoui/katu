@@ -1,3 +1,4 @@
+import type { IC } from "@/main";
 import type {
   AbbrChatoraIntrinsicElement,
   AChatoraIntrinsicElement,
@@ -139,7 +140,7 @@ export interface HTMLElementEvent<T extends EventTarget> extends Event {
 }
 
 export interface ChatoraJSXElement {
-  tag: string | ((props: Record<string, unknown>) => FunctionComponentResult);
+  tag: string | IC;
   props: Record<string, unknown>;
 }
 
@@ -278,13 +279,15 @@ declare global {
     type Element = ChatoraJSXElement;
 
     // JSXで使えるタグ（HTMLタグ名または関数コンポーネント）の型
-    type ElementType = string | ((props: any) => () => FunctionComponentResult);
+    type ElementType<P = any> = string | IC<P>;
+
+    // props型補完のための型
+    type LibraryManagedAttributes<C, P> =
+      C extends (props: infer Props) => any ? Props : P;
 
     // JSX で子要素を props のどのプロパティ名で受け取るかを指定するための型
     interface ElementChildrenAttribute {
       children: unknown;
     }
-
-    type LibraryManagedAttributes<_F, P> = P & ChatoraIntrinsicElements;
   }
 }

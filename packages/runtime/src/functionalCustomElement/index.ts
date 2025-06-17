@@ -1,13 +1,10 @@
 import type { VNode } from "@/functionalCustomElement/vNode";
 import type { FunctionalCustomElement } from "@root/types/FunctionalCustomElement";
+import { mount } from "@/functionalCustomElement/mount";
 import { onAdopted, onAttributeChangedBase, onConnectedBase, onDisconnectedBase } from "@/functionalCustomElement/on";
+import { patch } from "@/functionalCustomElement/patch";
 import { applyStyles } from "@/functionalCustomElement/style";
-import {
-  _INTERNAL_ATTRIBUTES,
-  createVNode,
-  mount,
-  patch,
-} from "@/functionalCustomElement/vNode";
+import { genVNode } from "@/functionalCustomElement/vNode";
 import { computed, effect, endBatch, signal, startBatch } from "@chatora/reactivity";
 
 /**
@@ -187,30 +184,14 @@ const functionalCustomElement: FunctionalCustomElement = (
         },
       });
 
-      // 内部属性の値を一度だけ作成しておく（再利用）
-      const internalAttribute = `${_INTERNAL_ATTRIBUTES}data-chatora-internal`;
-
       const renderCallback = () => {
         const node = cb();
-        if (!node && node !== 0)
+
+        if (!node && node !== 0) {
           return;
-
-        let newVNode: VNode;
-
-        // JSX/TSXから返されたオブジェクトを適切なVNodeに変換
-        if (typeof node === "object" && node !== null && "tag" in node && "props" in node && typeof node.tag === "string") {
-          // オブジェクト生成を最小限に
-          const nodeProps = node.props || {};
-          const updatedProps = { ...nodeProps, [internalAttribute]: "" };
-          newVNode = createVNode(node.tag, updatedProps);
         }
-        else {
-          // 文字列やプリミティブ値の場合はspanで包む
-          newVNode = createVNode("span", {
-            [internalAttribute]: "",
-            children: [String(node)],
-          });
-        }
+
+        const newVNode = genVNode(node);
 
         // shadowRootが存在するかチェック
         const shadowRootInstance = this.shadowRoot;
@@ -227,22 +208,113 @@ const functionalCustomElement: FunctionalCustomElement = (
           }
 
           // 新しい要素を追加
-          shadowRootInstance.appendChild(mount(newVNode));
+          if (newVNode.tag === "#fragment") {
+            // fragmentの場合は子要素を個別にマウント
+            for (const child of newVNode.children) {
+              const childNode = typeof child === "string"
+                ? document.createTextNode(child)
+                : mount(child, shadowRootInstance);
+              shadowRootInstance.appendChild(childNode);
+            }
+          }
+          else {
+            shadowRootInstance.appendChild(mount(newVNode, shadowRootInstance));
+          }
         }
         else {
           // 差分更新: 既存のDOM要素を更新
-          // DOM構造内での適切なインデックスを効率的に見つける
-          let domIndex = 0;
-          const childNodes = shadowRootInstance.childNodes;
-          for (let i = 0; i < childNodes.length; i++) {
-            const node = childNodes[i];
-            if (node.nodeType === Node.ELEMENT_NODE && (node as Element).tagName !== "STYLE") {
-              domIndex = i;
-              break;
+          if (this._vnode.tag === "#fragment" && newVNode.tag === "#fragment") {
+            // 両方fragmentの場合は子要素レベルでpatch
+            const oldChildren = this._vnode.children;
+            const newChildren = newVNode.children;
+            const maxLen = Math.max(oldChildren.length, newChildren.length);
+
+            for (let i = 0; i < maxLen; i++) {
+              const oldChild = i < oldChildren.length ? oldChildren[i] : undefined;
+              const newChild = i < newChildren.length ? newChildren[i] : undefined;
+
+              if (oldChild && newChild) {
+                // 既存子要素の更新
+                const childNodes = shadowRootInstance.childNodes;
+                let targetNode: Node | null = null;
+                let nodeIndex = 0;
+                for (let j = 0; j < childNodes.length; j++) {
+                  const node = childNodes[j];
+                  if (node.nodeType === Node.ELEMENT_NODE && (node as Element).tagName !== "STYLE") {
+                    if (nodeIndex === i) {
+                      targetNode = node;
+                      break;
+                    }
+                    nodeIndex++;
+                  }
+                  else if (node.nodeType === Node.TEXT_NODE) {
+                    if (nodeIndex === i) {
+                      targetNode = node;
+                      break;
+                    }
+                    nodeIndex++;
+                  }
+                }
+                if (targetNode) {
+                  const oldVNode = typeof oldChild === "string"
+                    ? { tag: "#text", props: {}, children: [oldChild] }
+                    : oldChild;
+                  const newVNode = typeof newChild === "string"
+                    ? { tag: "#text", props: {}, children: [newChild] }
+                    : newChild;
+                  patch(oldVNode, newVNode, shadowRootInstance, targetNode);
+                }
+              }
+              else if (!oldChild && newChild) {
+                // 新しい子要素の追加
+                const childNode = typeof newChild === "string"
+                  ? document.createTextNode(newChild)
+                  : mount(newChild, shadowRootInstance);
+                shadowRootInstance.appendChild(childNode);
+              }
+              else if (oldChild && !newChild) {
+                // 古い子要素の削除
+                const childNodes = shadowRootInstance.childNodes;
+                let targetNode: Node | null = null;
+                let nodeIndex = 0;
+                for (let j = 0; j < childNodes.length; j++) {
+                  const node = childNodes[j];
+                  if (node.nodeType === Node.ELEMENT_NODE && (node as Element).tagName !== "STYLE") {
+                    if (nodeIndex === i) {
+                      targetNode = node;
+                      break;
+                    }
+                    nodeIndex++;
+                  }
+                  else if (node.nodeType === Node.TEXT_NODE) {
+                    if (nodeIndex === i) {
+                      targetNode = node;
+                      break;
+                    }
+                    nodeIndex++;
+                  }
+                }
+                if (targetNode) {
+                  shadowRootInstance.removeChild(targetNode);
+                }
+              }
             }
           }
+          else {
+            // 通常のpatch処理
+            // DOM構造内での適切なインデックスを効率的に見つける
+            let domIndex = 0;
+            const childNodes = shadowRootInstance.childNodes;
+            for (let i = 0; i < childNodes.length; i++) {
+              const node = childNodes[i];
+              if (node.nodeType === Node.ELEMENT_NODE && (node as Element).tagName !== "STYLE") {
+                domIndex = i;
+                break;
+              }
+            }
 
-          patch(shadowRootInstance, this._vnode, newVNode, domIndex);
+            patch(this._vnode, newVNode, shadowRootInstance, childNodes[domIndex]);
+          }
         }
         this._vnode = newVNode;
       };

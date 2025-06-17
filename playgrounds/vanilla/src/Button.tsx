@@ -13,7 +13,7 @@ export type Props = {
   href?: string;
   target?: string;
 } | {
-  type?: "submit" | "reset" | "button" | "toggle";
+  type?: "submit" | "reset" | "button";
   href?: never;
   target?: never;
 });
@@ -29,7 +29,7 @@ export const Button: CC<Props, Emits> = ({
   getHost,
 }) => {
   const props = defineProps({
-    type: v => toMatched(v, ["anchor", "submit", "reset", "button", "toggle"]) ?? "button",
+    type: v => toMatched(v, ["anchor", "submit", "reset", "button"]) ?? "button",
     variant: v => toMatched(v, ["primary", "secondary", "tertiary", "error"]) ?? "primary",
     disabled: v => toBoolean(v) ?? false,
     width: v => toMatched(v, ["auto", "stretch"]) ?? "auto",
@@ -60,7 +60,6 @@ export const Button: CC<Props, Emits> = ({
   const commonAttrs = computed(() => ({
     "class": clsx("n-button", `-${props().size}`, `-${props().variant}`, {
       "-anchor": props().type === "anchor",
-      "-toggle": props().type === "toggle",
       "-auto": props().width === "auto",
     }),
     "disabled": props().disabled,
@@ -87,18 +86,6 @@ export const Button: CC<Props, Emits> = ({
           </a>
         );
       }
-      case "toggle": {
-        return (
-          <button
-            {...commonAttrs()}
-            type="button"
-          >
-            <span class="contents">
-              <slot />
-            </span>
-          </button>
-        );
-      }
       default: {
         return (
           <button
@@ -121,12 +108,13 @@ if (customElements.get("n-button") === undefined) {
 }
 
 const button = document.createElement("n-button");
-button.setAttribute("type", "button");
+document.querySelector("#app")?.appendChild(button);
+button.setAttribute("type", "anchor");
 button.setAttribute("variant", "primary");
 button.setAttribute("size", "medium");
 button.setAttribute("width", "auto");
 button.setAttribute("disabled", "false");
 button.innerHTML = "Click Me";
-
-
-document.querySelector("#app")?.appendChild(button);
+button.addEventListener("on-click", (e: CustomEvent) => {
+  console.log("Button clicked:", e.detail);
+});

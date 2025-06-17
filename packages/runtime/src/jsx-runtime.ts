@@ -1,13 +1,18 @@
+import type { IC } from "@/main";
 import type { ChatoraJSXElement, ChatoraNode } from "../types/JSX.namespace";
 
 /**
  * JSX.Fragment用の関数コンポーネント実装
- * JSX Fragment as a function component
+ * JSX Fragment as a function component - #fragmentタグを返し、normalizeChildrenで平坦化される
  */
-export function Fragment({ children }: { children: ChatoraNode }): ChatoraNode {
-  // Fragmentはchildrenをそのまま返す（vNode化しない）
-  return children;
-}
+export const Fragment: IC<{ children: ChatoraNode }> = ({ children }) => {
+  return () => ({
+    tag: "#fragment",
+    props: {
+      children: Array.isArray(children) ? children : [children],
+    },
+  });
+};
 
 /**
  * クライアント用: vNodeを生成するJSXランタイム関数
@@ -17,7 +22,7 @@ export function Fragment({ children }: { children: ChatoraNode }): ChatoraNode {
  * @returns ChatoraJSXElement
  */
 export function jsx(
-  tag: string | ((props: Record<string, unknown>) => ChatoraNode),
+  tag: string | IC,
   props: Record<string, any>,
 ): ChatoraJSXElement {
   return { tag, props };
