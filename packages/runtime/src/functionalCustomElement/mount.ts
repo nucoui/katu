@@ -15,7 +15,20 @@ export function mount(vnode: VNode, _parent?: HTMLElement | ShadowRoot | Element
   // 最も頻繁なケースを最初に処理
   if (typeof tag === "string" && tag !== "#text" && tag !== "#empty" && tag !== "#fragment") {
     // 通常のHTML要素の高速パス
-    const el = document.createElement(tag);
+    const el = (() => {
+      if (tag === "svg") {
+        // SVG要素の作成
+        return document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      }
+      else if (tag === "math") {
+        // MathML要素の作成
+        return document.createElementNS("http://www.w3.org/1998/Math/MathML", "math");
+      }
+      else {
+        // 通常のHTML要素の作成
+        return document.createElement(tag);
+      }
+    })()
 
     // プロパティ設定の最適化
     if (props && props !== EMPTY_PROPS) {
