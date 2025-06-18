@@ -4,7 +4,10 @@
  * @module @chatora/reactivity
  */
 
-import * as alienSignals from "alien-signals";
+import {
+  createReactiveSystem,
+  ReactiveFlags,
+} from "alien-signals/system";
 
 /**
  * Represents a signal function type
@@ -21,43 +24,127 @@ export type Computed<T> = () => T;
  */
 export type Effect = () => void;
 
-/**
- * Starts a batch of updates. Changes made to signals within a batch will trigger effects only once at the end.
- */
-export function startBatch(): void {
-  alienSignals.startBatch();
+// --- Core system instance ---
+const {
+  link,
+  unlink,
+  propagate,
+  checkDirty,
+  endTracking,
+  startTracking,
+  shallowPropagate,
+} = createReactiveSystem({
+  update(node: any): boolean {
+    if ("getter" in node) {
+      return updateComputed(node);
+    }
+    else {
+      return updateSignal(node, node.value);
+    }
+  },
+  notify,
+  unwatched(node: any) {
+    if ("getter" in node) {
+      let toRemove = node.deps;
+      if (toRemove !== undefined) {
+        node.flags = (ReactiveFlags.Mutable | ReactiveFlags.Dirty) as number;
+        do {
+          toRemove = unlink(toRemove, node);
+        } while (toRemove !== undefined);
+      }
+    }
+    else if (!("previousValue" in node)) {
+      effectOper.call(node);
+    }
+  },
+});
+
+const EFFECT_FLAG_QUEUED = 1 << 6;
+
+let batchDepth = 0;
+let notifyIndex = 0;
+let queuedEffectsLength = 0;
+const queuedEffects: (any | undefined)[] = [];
+let activeSub: any;
+let activeScope: any;
+
+function setCurrentSub(sub: any) {
+  const prevSub = activeSub;
+  activeSub = sub;
+  return prevSub;
 }
 
-/**
- * Ends a batch of updates, triggering any pending effects.
- */
-export function endBatch(): void {
-  alienSignals.endBatch();
+export function startBatch(): void {
+  ++batchDepth;
 }
+
+export function endBatch(): void {
+  if (!--batchDepth) {
+    flush();
+  }
+}
+
+function flush(): void {
+  while (notifyIndex < queuedEffectsLength) {
+    const effect = queuedEffects[notifyIndex]!;
+    queuedEffects[notifyIndex++] = undefined;
+    run(effect, (effect.flags &= ~EFFECT_FLAG_QUEUED));
+  }
+  notifyIndex = 0;
+  queuedEffectsLength = 0;
+}
+
+// --- Chatora API ---
 
 /**
  * Creates a reactive signal with the given initial value.
  * Returns a tuple containing a getter function and a setter function.
- *
- * @param initialValue - The initial value for the signal.
- * @returns A tuple containing [getter, setter] for the signal.
  */
-export function signal<T>(initialValue: T): [() => T, (newValue: T | ((prev: T) => T)) => void] {
-  const s = alienSignals.signal(initialValue);
+export function signal<T>(initialValue: T): Signal<T> {
+  const node = {
+    previousValue: initialValue,
+    value: initialValue,
+    subs: undefined,
+    subsTail: undefined,
+    flags: ReactiveFlags.Mutable as number,
+  };
 
-  // Getter function
-  const get = () => s();
-
-  // Setter function that supports both direct value and updater function
-  const set = (newValue: T | ((prev: T) => T)) => {
-    if (typeof newValue === "function") {
-      // If an updater function is provided, call it with the current value
-      const updaterFn = newValue as (prev: T) => T;
-      s(updaterFn(get()));
+  // getter
+  const get = () => {
+    if (node.flags & ReactiveFlags.Dirty) {
+      if (updateSignal(node, node.value)) {
+        const subs = node.subs;
+        if (subs !== undefined) {
+          shallowPropagate(subs);
+        }
+      }
     }
-    else {
-      // Otherwise, set the value directly
-      s(newValue);
+
+    if (activeSub !== undefined) {
+      link(node, activeSub);
+    }
+    else if (activeScope !== undefined) {
+      link(node, activeScope);
+    }
+    return node.value;
+  };
+
+  // setter
+  const set = (newValue: T | ((prev: T) => T)) => {
+    const next = typeof newValue === "function"
+      ? (newValue as (prev: T) => T)(node.value)
+      : newValue;
+    const changed = node.value !== next;
+    node.value = next;
+    if (changed) {
+      node.flags = (ReactiveFlags.Mutable | ReactiveFlags.Dirty) as number;
+      const subs = node.subs;
+      if (subs !== undefined) {
+        propagate(subs);
+        if (!batchDepth) {
+          flush();
+        }
+      }
     }
   };
 
@@ -66,26 +153,156 @@ export function signal<T>(initialValue: T): [() => T, (newValue: T | ((prev: T) 
 
 /**
  * Creates a computed signal that derives its value from other signals.
- * The computed value is automatically updated when any of its dependencies change.
- *
- * @param getter - A function that computes the derived value.
- * @returns A getter function for the computed value.
  */
-export function computed<T>(getter: () => T): () => T {
-  const c = alienSignals.computed(getter);
+export function computed<T>(getter: () => T): Computed<T> {
+  const node = {
+    value: undefined as T | undefined,
+    subs: undefined,
+    subsTail: undefined,
+    deps: undefined,
+    depsTail: undefined,
+    flags: (ReactiveFlags.Mutable | ReactiveFlags.Dirty) as number,
+    getter: getter as (previousValue?: unknown) => unknown,
+  };
 
-  // Return a function that accesses the computed value
-  return () => c();
+  const get = () => {
+    const flags = node.flags;
+    if (
+      flags & ReactiveFlags.Dirty
+      || (flags & ReactiveFlags.Pending && checkDirty(node.deps!, node))
+    ) {
+      if (updateComputed(node)) {
+        const subs = node.subs;
+        if (subs !== undefined) {
+          shallowPropagate(subs);
+        }
+      }
+    }
+    else if (flags & ReactiveFlags.Pending) {
+      node.flags = flags & ~ReactiveFlags.Pending;
+    }
+
+    if (activeSub !== undefined) {
+      link(node, activeSub);
+    }
+    else if (activeScope !== undefined) {
+      link(node, activeScope);
+    }
+    return node.value!;
+  };
+
+  return get;
 }
 
 /**
  * Creates an effect that runs when its dependencies change.
- * The effect is automatically triggered when any signal accessed within the effect function changes.
- *
  * @param fn - The effect function to execute.
+ * @param options - Optional settings.
+ * @param options.immediate - If true, the effect runs immediately (Vue3 watch immediate equivalent). Default: true.
  * @returns A function that can be called to clean up the effect.
  */
-export function effect(fn: () => void): () => void {
-  // Create the effect and return the cleanup function
-  return alienSignals.effect(fn);
+export function effect(fn: () => void, options?: { immediate?: boolean }): () => void {
+  const node = {
+    fn,
+    subs: undefined,
+    subsTail: undefined,
+    deps: undefined,
+    depsTail: undefined,
+    flags: ReactiveFlags.Watching as number,
+  };
+
+  if (activeSub !== undefined) {
+    link(node, activeSub);
+  }
+  else if (activeScope !== undefined) {
+    link(node, activeScope);
+  }
+
+  const prev = setCurrentSub(node);
+  try {
+    if (options?.immediate === true) {
+      node.fn();
+    }
+  }
+  finally {
+    setCurrentSub(prev);
+  }
+  return effectOper.bind(node);
+}
+
+// --- helpers ---
+
+function updateComputed(node: any): boolean {
+  const prevSub = setCurrentSub(node);
+  startTracking(node);
+  try {
+    const oldValue = node.value;
+    return oldValue !== (node.value = node.getter(oldValue));
+  }
+  finally {
+    setCurrentSub(prevSub);
+    endTracking(node);
+  }
+}
+
+function updateSignal(node: any, value: any): boolean {
+  node.flags = ReactiveFlags.Mutable as number;
+  return node.previousValue !== (node.previousValue = value);
+}
+
+function notify(e: any) {
+  const flags = e.flags;
+  if (!(flags & EFFECT_FLAG_QUEUED)) {
+    e.flags = flags | EFFECT_FLAG_QUEUED;
+    const subs = e.subs;
+    if (subs !== undefined) {
+      notify(subs.sub);
+    }
+    else {
+      queuedEffects[queuedEffectsLength++] = e;
+    }
+  }
+}
+
+function run(e: any, flags: number): void {
+  if (
+    flags & ReactiveFlags.Dirty
+    || (flags & ReactiveFlags.Pending && checkDirty(e.deps!, e))
+  ) {
+    const prev = setCurrentSub(e);
+    startTracking(e);
+    try {
+      e.fn();
+    }
+    finally {
+      setCurrentSub(prev);
+      endTracking(e);
+    }
+    return;
+  }
+  else if (flags & ReactiveFlags.Pending) {
+    e.flags = flags & ~ReactiveFlags.Pending;
+  }
+
+  let linkNode = e.deps;
+  while (linkNode !== undefined) {
+    const dep = linkNode.dep;
+    const depFlags = dep.flags;
+    if (depFlags & EFFECT_FLAG_QUEUED) {
+      run(dep, (dep.flags = depFlags & ~EFFECT_FLAG_QUEUED));
+    }
+    linkNode = linkNode.nextDep;
+  }
+}
+
+function effectOper(this: any): void {
+  let dep = this.deps;
+  while (dep !== undefined) {
+    dep = unlink(dep, this);
+  }
+  const sub = this.subs;
+  if (sub !== undefined) {
+    unlink(sub);
+  }
+  this.flags = ReactiveFlags.None as number;
 }
