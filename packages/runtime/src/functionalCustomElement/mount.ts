@@ -3,6 +3,74 @@ import type { VNode } from "./vNode";
 // 空オブジェクトの参照
 const EMPTY_PROPS: Record<string, any> = {};
 
+// SVG要素名リスト（SVG 2 Appendix F: Element Indexより抜粋・網羅）
+const SVG_TAGS = new Set([
+  "a",
+  "animate",
+  "animateMotion",
+  "animateTransform",
+  "circle",
+  "clipPath",
+  "defs",
+  "desc",
+  "discard",
+  "ellipse",
+  "feBlend",
+  "feColorMatrix",
+  "feComponentTransfer",
+  "feComposite",
+  "feConvolveMatrix",
+  "feDiffuseLighting",
+  "feDisplacementMap",
+  "feDistantLight",
+  "feDropShadow",
+  "feFlood",
+  "feFuncA",
+  "feFuncB",
+  "feFuncG",
+  "feFuncR",
+  "feGaussianBlur",
+  "feImage",
+  "feMerge",
+  "feMergeNode",
+  "feMorphology",
+  "feOffset",
+  "fePointLight",
+  "feSpecularLighting",
+  "feSpotLight",
+  "feTile",
+  "feTurbulence",
+  "filter",
+  "foreignObject",
+  "g",
+  "image",
+  "line",
+  "linearGradient",
+  "marker",
+  "mask",
+  "metadata",
+  "mpath",
+  "path",
+  "pattern",
+  "polygon",
+  "polyline",
+  "radialGradient",
+  "rect",
+  "script",
+  "set",
+  "stop",
+  "style",
+  "svg",
+  "switch",
+  "symbol",
+  "text",
+  "textPath",
+  "title",
+  "tspan",
+  "use",
+  "view",
+]);
+
 /**
  * Generates a DOM node from a vNode. Boolean props are set as empty string for true, removed for false.
  * @param vnode vNode object
@@ -16,9 +84,9 @@ export function mount(vnode: VNode, _parent?: HTMLElement | ShadowRoot | Element
   if (typeof tag === "string" && tag !== "#text" && tag !== "#empty" && tag !== "#fragment") {
     // 通常のHTML要素の高速パス
     const el = (() => {
-      if (tag === "svg") {
+      if (SVG_TAGS.has(tag)) {
         // SVG要素の作成
-        return document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        return document.createElementNS("http://www.w3.org/2000/svg", tag);
       }
       else if (tag === "math") {
         // MathML要素の作成
@@ -28,7 +96,7 @@ export function mount(vnode: VNode, _parent?: HTMLElement | ShadowRoot | Element
         // 通常のHTML要素の作成
         return document.createElement(tag);
       }
-    })()
+    })();
 
     // プロパティ設定の最適化
     if (props && props !== EMPTY_PROPS) {
