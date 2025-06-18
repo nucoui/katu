@@ -124,6 +124,11 @@ export type ChatoraComponent<P extends Record<string, any> = Record<string, neve
   onAdopted: (cb: () => void) => void;
   getHost: () => HTMLElement;
   getShadowRoot: () => ShadowRoot | null;
+  /**
+   * ElementInternalsを取得します（formAssociated時のみ有効）
+   * Returns ElementInternals if formAssociated is enabled
+   */
+  getInternals: () => ElementInternals | undefined;
 }) => () => ChatoraNode;
 
 export type FunctionalCustomElement = <

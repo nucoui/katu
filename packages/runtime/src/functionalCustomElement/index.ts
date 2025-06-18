@@ -182,6 +182,20 @@ const functionalCustomElement: FunctionalCustomElement = (
         getShadowRoot: () => {
           return this.shadowRoot;
         },
+        /**
+         * ElementInternalsを取得します（formAssociated時のみ有効）
+         * Returns ElementInternals if formAssociated is enabled
+         * @returns ElementInternals または undefined
+         */
+        getInternals: (() => {
+          let internals: ElementInternals | undefined;
+          return () => {
+            if (!internals && (this.constructor as any).formAssociated && this.attachInternals) {
+              internals = this.attachInternals();
+            }
+            return internals;
+          };
+        })(),
       });
 
       const renderCallback = () => {

@@ -106,6 +106,11 @@ const functionalDeclarativeCustomElement = <
      * SSRではnullを返します
      */
     getShadowRoot: () => null,
+    /**
+     * ElementInternalsを取得します（SSRでは常にundefined）
+     * Returns undefined for SSR (no ElementInternals)
+     */
+    getInternals: () => undefined,
   });
 
   jsxResult = cb();
