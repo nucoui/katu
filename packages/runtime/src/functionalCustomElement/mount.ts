@@ -74,26 +74,29 @@ const SVG_TAGS = new Set([
 /**
  * Generates a DOM node from a vNode. Boolean props are set as empty string for true, removed for false.
  * @param vnode vNode object
- * @param _parent Parent DOM node (optional for compatibility)
+ * @param parent Parent DOM node (optional for compatibility)
  * @returns DOM node
  */
-export function mount(vnode: VNode, _parent?: HTMLElement | ShadowRoot | Element | DocumentFragment): Node {
+export function mount(vnode: VNode, parent?: HTMLElement | ShadowRoot | Element | DocumentFragment): Node {
   const { tag, props, children } = vnode;
 
-  // 最も頻繁なケースを最初に処理
+  const isSvgGroupElement = (() => {
+    if (parent instanceof Element) {
+      return SVG_TAGS.has(parent.tagName.toLowerCase());
+    }
+
+    return false;
+  })();
+
   if (typeof tag === "string" && tag !== "#text" && tag !== "#empty" && tag !== "#fragment") {
-    // 通常のHTML要素の高速パス
     const el = (() => {
-      if (SVG_TAGS.has(tag)) {
-        // SVG要素の作成
+      if ((SVG_TAGS.has(tag) && isSvgGroupElement) || tag === "svg") {
         return document.createElementNS("http://www.w3.org/2000/svg", tag);
       }
       else if (tag === "math") {
-        // MathML要素の作成
         return document.createElementNS("http://www.w3.org/1998/Math/MathML", "math");
       }
       else {
-        // 通常のHTML要素の作成
         return document.createElement(tag);
       }
     })();
@@ -125,7 +128,9 @@ export function mount(vnode: VNode, _parent?: HTMLElement | ShadowRoot | Element
       if (children.length === 1) {
         // 子要素が1つの場合の高速パス
         const child = children[0];
-        const node = typeof child === "string" ? document.createTextNode(child) : mount(child);
+        const node = typeof child === "string"
+          ? document.createTextNode(child)
+          : mount(child, el);
         el.appendChild(node);
       }
       else {
@@ -133,13 +138,14 @@ export function mount(vnode: VNode, _parent?: HTMLElement | ShadowRoot | Element
         const fragment = document.createDocumentFragment();
         for (let i = 0; i < children.length; i++) {
           const child = children[i];
-          const node = typeof child === "string" ? document.createTextNode(child) : mount(child);
+          const node = typeof child === "string"
+            ? document.createTextNode(child)
+            : mount(child, el);
           fragment.appendChild(node);
         }
         el.appendChild(fragment);
       }
     }
-
     return el;
   }
 

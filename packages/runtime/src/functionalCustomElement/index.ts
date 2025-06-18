@@ -393,7 +393,7 @@ const functionalCustomElement: FunctionalCustomElement = (
         effect(() => {
           this.props[0](); // props値の監視
           this._renderCallback!();
-        });
+        }, { immediate: true });
         this._effectInitialized = true;
       }
 
