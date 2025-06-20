@@ -27,6 +27,7 @@ export const Button: CC<Props, Emits> = ({
   defineEmits,
   defineProps,
   getHost,
+  getInternals,
 }) => {
   const props = defineProps({
     type: v => toMatched(v, ["anchor", "submit", "reset", "button"]) ?? "button",
@@ -43,6 +44,9 @@ export const Button: CC<Props, Emits> = ({
   });
 
   const host = getHost();
+  const internals = getInternals();
+
+  console.log(internals)
 
   const handleClick = (e: Event) => {
     emits("on-click", e);
@@ -68,41 +72,52 @@ export const Button: CC<Props, Emits> = ({
     "onClick": props().disabled ? undefined : handleClick,
   }));
 
-  return () => {
-    const type = props().type;
+  return {
+    render: () => {
+      const type = props().type;
 
-    switch (type) {
-      case "anchor": {
-        return (
-          <a
-            {...commonAttrs()}
-            tabindex={props().disabled ? -1 : 0}
-            href={props().disabled ? undefined : props().href}
-            target={props().target}
-          >
-            <span class="contents">
-              <slot />
-            </span>
-          </a>
-        );
+      switch (type) {
+        case "anchor": {
+          return (
+            <a
+              {...commonAttrs()}
+              tabindex={props().disabled ? -1 : 0}
+              href={props().disabled ? undefined : props().href}
+              target={props().target}
+            >
+              <span class="contents">
+                <slot />
+              </span>
+            </a>
+          );
+        }
+        default: {
+          return (
+            <button
+              {...commonAttrs()}
+              type={type}
+            >
+              <span class="contents">
+                <slot />
+              </span>
+            </button>
+          );
+        }
       }
-      default: {
-        return (
-          <button
-            {...commonAttrs()}
-            type={type}
-          >
-            <span class="contents">
-              <slot />
-            </span>
-          </button>
-        );
-      }
-    }
+    },
+    options: {
+      shadowRoot: true,
+      shadowRootMode: "open",
+      styles: [ style ],
+      isFormAssociated: true,
+    },
   }
 };
 
-const ButtonElement = functionalCustomElement(Button, { styles: [style] });
+class ButtonElement extends functionalCustomElement(Button) {
+  static formAssociated = true;
+}
+
 if (customElements.get("n-button") === undefined) {
   customElements.define("n-button", ButtonElement);
 }
@@ -118,3 +133,10 @@ button.innerHTML = "Click Me";
 button.addEventListener("on-click", (e: CustomEvent) => {
   console.log("Button clicked:", e.detail);
 });
+
+setInterval(() => {
+  const currentVariant = button.getAttribute("variant");
+  const nextVariant = currentVariant === "primary" ? "secondary" : "primary";
+  button.setAttribute("variant", nextVariant);
+  // console.log(`Button variant changed to: ${nextVariant}`);
+}, 1000);

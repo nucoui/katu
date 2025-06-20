@@ -21,8 +21,8 @@ const Mini: CC = ({ reactivity: { signal, effect } }) => {
     immediate: true
   });
 
-  return (() => {
-    return (
+  return {
+    render: () => (
       <>
         <h1>Mini</h1>
         <svg xmlns="http://www.w3.org/2000/svg" width="1.5rem" height="1.5rem" viewBox="0 0 24 24">
@@ -45,43 +45,29 @@ const Mini: CC = ({ reactivity: { signal, effect } }) => {
             </>
         }
       </>
-    );
-  });
+    ),
+    options: {
+      shadowRoot: true,
+      styles: [
+        `
+          button {
+            margin: 0 5px;
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+          }
+        `,
+      ]
+    },
+  }
 }
 
-const MiniElement = functionalCustomElement(Mini,{
-  shadowRoot: true,
-  styles: [
-    `
-      button {
-        margin: 0 5px;
-        padding: 5px 10px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-      }
-    `,
-  ],
-});
+const MiniElement = functionalCustomElement(Mini);
 
-console.log(functionalDeclarativeCustomElement(Mini, {
-  shadowRoot: true,
-  styles: [
-    `
-      button {
-        margin: 0 5px;
-        padding: 5px 10px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-      }
-    `,
-  ],
-}));
+console.log(functionalDeclarativeCustomElement(Mini));
 
 customElements.define("mini-element", MiniElement);
 
