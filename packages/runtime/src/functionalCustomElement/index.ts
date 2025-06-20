@@ -53,17 +53,14 @@ const functionalCustomElement: FunctionalCustomElement = (
      */
     _effectInitialized = false;
 
-    #shadowRoot?: boolean;
-    #shadowRootMode?: ShadowRootMode;
-    #styles?: string | string[];
+    #shadowRoot?: boolean = true;
+    #shadowRootMode?: ShadowRootMode = "open";
+    #style?: string | string[] = [];
 
     constructor() {
       super();
 
-      const {
-        options,
-        render,
-      } = callback({
+      const render = callback({
         reactivity: {
           signal,
           effect,
@@ -198,16 +195,6 @@ const functionalCustomElement: FunctionalCustomElement = (
         })(),
       });
 
-      const {
-        shadowRoot = true,
-        shadowRootMode,
-        styles,
-      } = options || {};
-
-      this.#shadowRoot = shadowRoot;
-      this.#shadowRootMode = shadowRootMode;
-      this.#styles = styles;
-
       const renderCallback = () => {
         const node = render();
 
@@ -216,24 +203,39 @@ const functionalCustomElement: FunctionalCustomElement = (
         }
 
         const newVNode = genVNode(node);
-
-        // shadowRootが存在するかチェック
         const shadowRootInstance = this.shadowRoot;
-        if (!shadowRootInstance)
+
+        if (!shadowRootInstance) {
+          this.#shadowRoot = newVNode.props.shadowRoot ?? true;
+          this.#shadowRootMode = newVNode.props.shadowRootMode ?? "open";
+          this.#style = newVNode.props.style;
+
           return;
+        };
 
         if (this._vnode == null) {
-          // 初回レンダリング: style要素を除いてコンテンツをクリア
           const children = shadowRootInstance.children;
+
           for (let i = children.length - 1; i >= 0; i--) {
             if (children[i].tagName !== "STYLE") {
               shadowRootInstance.removeChild(children[i]);
             }
           }
 
-          // 新しい要素を追加
           if (newVNode.tag === "#fragment") {
             // fragmentの場合は子要素を個別にマウント
+            for (const child of newVNode.children) {
+              const childNode = typeof child === "string"
+                ? document.createTextNode(child)
+                : mount(child, shadowRootInstance);
+              shadowRootInstance.appendChild(childNode);
+            }
+          }
+          else if (newVNode.tag === "#root") {
+            this.#shadowRoot = newVNode.props.shadowRoot ?? true;
+            this.#shadowRootMode = newVNode.props.shadowRootMode ?? "open";
+            this.#style = newVNode.props.style;
+
             for (const child of newVNode.children) {
               const childNode = typeof child === "string"
                 ? document.createTextNode(child)
@@ -246,8 +248,10 @@ const functionalCustomElement: FunctionalCustomElement = (
           }
         }
         else {
-          // 差分更新: 既存のDOM要素を更新
-          if (this._vnode.tag === "#fragment" && newVNode.tag === "#fragment") {
+          if (
+            (this._vnode.tag === "#fragment" && newVNode.tag === "#fragment")
+            || (this._vnode.tag === "#root" && newVNode.tag === "#root")
+          ) {
             // 両方fragmentの場合は子要素レベルでpatch
             const oldChildren = this._vnode.children;
             const newChildren = newVNode.children;
@@ -404,12 +408,14 @@ const functionalCustomElement: FunctionalCustomElement = (
 
       // 初回のみeffect/renderCallbackを登録
       if (!this._effectInitialized && this._renderCallback) {
+        this._renderCallback();
+
         // shadowRootの生成とスタイル適用を1回の処理にまとめる
         if (this.#shadowRoot) {
           const shadowRootInstance = this.attachShadow({ mode: this.#shadowRootMode ?? "open" });
           // スタイルがある場合のみ適用処理を実行
-          if (this.#styles) {
-            applyStyles(shadowRootInstance, this.#styles);
+          if (this.#style) {
+            applyStyles(shadowRootInstance, this.#style);
           }
         }
 
@@ -418,6 +424,7 @@ const functionalCustomElement: FunctionalCustomElement = (
           this.props[0](); // props値の監視
           this._renderCallback!();
         }, { immediate: true });
+
         this._effectInitialized = true;
       }
 

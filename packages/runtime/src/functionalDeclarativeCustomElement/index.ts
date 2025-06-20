@@ -41,14 +41,7 @@ const functionalDeclarativeCustomElement = <
   const ssrEffect = () => () => {}; // SSRでは副作用不要
   const noop = () => {};
 
-  const {
-    options: {
-      shadowRoot,
-      shadowRootMode,
-      styles,
-    },
-    render,
-  } = callback({
+  const render = callback({
     reactivity: {
       signal: ssrSignal,
       effect: ssrEffect,
@@ -124,6 +117,16 @@ const functionalDeclarativeCustomElement = <
   // VNode→hast変換
   const contentElement = vNodeToHast(vnode);
 
+  let styles: string | string[] = [];
+  let shadowRoot: boolean = true;
+  let shadowRootMode: "open" | "closed" = "open";
+
+  if (vnode.tag === "#root") {
+    shadowRoot = vnode.props.shadowRoot;
+    shadowRootMode = vnode.props.shadowRootMode;
+    styles = vnode.props.style;
+  }
+
   // スタイル要素を事前に生成（存在する場合）
   const styleElements: Element[] = styles
     ? (Array.isArray(styles) ? styles : [styles]).map(cssText => ({
@@ -180,7 +183,7 @@ function vNodeToHast(node: any): ElementContent | ElementContent[] {
     if (node.tag === "#empty") {
       return { type: "text", value: "" };
     }
-    if (node.tag === "#fragment") {
+    if (node.tag === "#fragment" || node.tag === "root") {
       // fragmentは子要素を平坦化
       return node.children.flatMap(vNodeToHast);
     }

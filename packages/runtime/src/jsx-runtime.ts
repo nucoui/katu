@@ -14,6 +14,28 @@ export const Fragment: IC<{ children: ChatoraNode }> = ({ children }) => {
   });
 };
 
+type HostProps = {
+  children: ChatoraNode;
+  shadowRoot?: boolean;
+  style?: string | string[];
+} & ({
+  shadowRoot?: true;
+  shadowRootMode?: "open" | "closed";
+} | {
+  shadowRoot?: false;
+  shadowRootMode?: never;
+});
+
+export const Host: IC<HostProps> = ({ children, ...rest }) => {
+  return () => ({
+    tag: "#root",
+    props: {
+      children: Array.isArray(children) ? children : [children],
+      ...rest,
+    },
+  });
+};
+
 /**
  * クライアント用: vNodeを生成するJSXランタイム関数
  * JSX runtime function for client: returns ChatoraJSXElement (VNode)

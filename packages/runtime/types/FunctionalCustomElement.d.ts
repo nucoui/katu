@@ -18,35 +18,6 @@
 
 import type { ChatoraNode } from "./JSX.namespace";
 
-export type FunctionalCustomElementOptions = {
-  /**
-   * ShadowRootを有効にするかどうか
-   * Enable ShadowRoot or not
-   */
-  shadowRoot?: boolean;
-  /**
-   * ShadowRoot用のスタイル（CSSコード）
-   * Style for ShadowRoot (CSS code)
-   * 文字列または文字列の配列を指定可能
-   * Can specify a string or an array of strings
-   */
-  styles?: string | string[];
-} & ({
-  shadowRoot: true;
-  /**
-   * ShadowRootのモード
-   *  ShadowRoot mode
-   * @default "open"
-   */
-  shadowRootMode?: "open" | "closed";
-} | {
-  /**
-   * @deprecated 未サポート
-   */
-  shadowRoot?: false;
-  shadowRootMode?: never;
-});
-
 type UnionKeys<T> = T extends T ? keyof T : never;
 
 export type AsFunctionType<T> = [T] extends [object]
@@ -124,10 +95,7 @@ export type ChatoraComponent<P extends Record<string, any> = Record<string, neve
    * Returns ElementInternals if formAssociated is enabled
    */
   getInternals: () => ElementInternals | undefined;
-}) => {
-  options: FunctionalCustomElementOptions;
-  render: () => ChatoraNode | ChatoraNode[];
-};
+}) => () => ChatoraNode | ChatoraNode[];
 
 export type FunctionalCustomElement = <
   P extends Record<string, any> = Record<string, never>,

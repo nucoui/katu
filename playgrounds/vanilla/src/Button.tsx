@@ -2,6 +2,7 @@ import { functionalCustomElement, type CC } from "chatora";
 import { toBoolean, toMatched, toString } from "@chatora/util";
 import clsx from "clsx";
 import style from "./Button.scss?raw";
+import { Host } from "chatora/jsx-runtime"
 
 export type Props = {
   variant?: "primary" | "secondary" | "tertiary" | "error";
@@ -72,46 +73,42 @@ export const Button: CC<Props, Emits> = ({
     "onClick": props().disabled ? undefined : handleClick,
   }));
 
-  return {
-    render: () => {
+  return () => {
       const type = props().type;
 
       switch (type) {
         case "anchor": {
           return (
-            <a
-              {...commonAttrs()}
-              tabindex={props().disabled ? -1 : 0}
-              href={props().disabled ? undefined : props().href}
-              target={props().target}
-            >
-              <span class="contents">
-                <slot />
-              </span>
-            </a>
+            <Host shadowRoot shadowRootMode="open" style={[style]}>
+              <a
+                {...commonAttrs()}
+                tabindex={props().disabled ? -1 : 0}
+                href={props().disabled ? undefined : props().href}
+                target={props().target}
+                >
+                <span class="contents">
+                  <slot />
+                </span>
+              </a>
+            </Host>
           );
         }
         default: {
           return (
-            <button
-              {...commonAttrs()}
-              type={type}
-            >
-              <span class="contents">
-                <slot />
-              </span>
-            </button>
+            <Host shadowRoot shadowRootMode="open" style={[style]}>
+              <button
+                {...commonAttrs()}
+                type={type}
+              >
+                <span class="contents">
+                  <slot />
+                </span>
+              </button>
+            </Host>
           );
         }
       }
-    },
-    options: {
-      shadowRoot: true,
-      shadowRootMode: "open",
-      styles: [ style ],
-      isFormAssociated: true,
-    },
-  }
+    }
 };
 
 class ButtonElement extends functionalCustomElement(Button) {
@@ -130,8 +127,9 @@ button.setAttribute("size", "medium");
 button.setAttribute("width", "auto");
 button.setAttribute("disabled", "false");
 button.innerHTML = "Click Me";
-button.addEventListener("on-click", (e: CustomEvent) => {
-  console.log("Button clicked:", e.detail);
+button.addEventListener("on-click", (e) => {
+  const customEvent = e as CustomEvent;
+  console.log("Button clicked:", customEvent.detail);
 });
 
 setInterval(() => {

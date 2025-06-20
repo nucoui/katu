@@ -30,7 +30,7 @@ function normalizeChildren(input: ChatoraNode): Array<VNode | string> {
   if (typeof input === "object" && input !== null) {
     const vnode = genVNode(input);
     // fragmentの場合は子要素を平坦化（1レベルのみ）
-    if (vnode.tag === "#fragment") {
+    if (vnode.tag === "#fragment" || vnode.tag === "#root") {
       return vnode.children;
     }
     return [vnode];
