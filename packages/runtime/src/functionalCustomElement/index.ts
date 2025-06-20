@@ -13,21 +13,13 @@ import { computed, effect, endBatch, signal, startBatch } from "@chatora/reactiv
  */
 const functionalCustomElement: FunctionalCustomElement = (
   callback,
-  options,
 ) => {
-  const {
-    shadowRoot = true,
-    shadowRootMode,
-    isFormAssociated,
-    styles,
-  } = options || {};
-
   if (typeof window === "undefined") {
     throw new TypeError("functionalCustomElement is not supported in SSR environment.");
   }
 
   return class extends HTMLElement {
-    static formAssociated = isFormAssociated ?? false;
+    static formAssociated: boolean = false;
     /**
      * MutationObserverインスタンス
      * MutationObserver instance for attribute changes
@@ -61,9 +53,17 @@ const functionalCustomElement: FunctionalCustomElement = (
      */
     _effectInitialized = false;
 
+    #shadowRoot?: boolean;
+    #shadowRootMode?: ShadowRootMode;
+    #styles?: string | string[];
+
     constructor() {
       super();
-      const cb = callback({
+
+      const {
+        options,
+        render,
+      } = callback({
         reactivity: {
           signal,
           effect,
@@ -198,8 +198,18 @@ const functionalCustomElement: FunctionalCustomElement = (
         })(),
       });
 
+      const {
+        shadowRoot = true,
+        shadowRootMode,
+        styles,
+      } = options || {};
+
+      this.#shadowRoot = shadowRoot;
+      this.#shadowRootMode = shadowRootMode;
+      this.#styles = styles;
+
       const renderCallback = () => {
-        const node = cb();
+        const node = render();
 
         if (!node && node !== 0) {
           return;
@@ -395,11 +405,11 @@ const functionalCustomElement: FunctionalCustomElement = (
       // 初回のみeffect/renderCallbackを登録
       if (!this._effectInitialized && this._renderCallback) {
         // shadowRootの生成とスタイル適用を1回の処理にまとめる
-        if (shadowRoot) {
-          const shadowRootInstance = this.attachShadow({ mode: shadowRootMode ?? "open" });
+        if (this.#shadowRoot) {
+          const shadowRootInstance = this.attachShadow({ mode: this.#shadowRootMode ?? "open" });
           // スタイルがある場合のみ適用処理を実行
-          if (styles) {
-            applyStyles(shadowRootInstance, styles);
+          if (this.#styles) {
+            applyStyles(shadowRootInstance, this.#styles);
           }
         }
 

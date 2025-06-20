@@ -1,4 +1,4 @@
-import type { AsFunctionType, CC, FunctionalCustomElementOptions } from "@root/types/FunctionalCustomElement";
+import type { AsFunctionType, CC } from "@root/types/FunctionalCustomElement";
 import type { ChatoraNode } from "@root/types/JSX.namespace";
 import type { Element, ElementContent, Root } from "hast";
 import { genVNode } from "../functionalCustomElement/vNode";
@@ -20,12 +20,9 @@ const functionalDeclarativeCustomElement = <
   E extends Record<`on-${string}`, any> = Record<`on-${string}`, never>,
 >(
   callback: CC<P, E>,
-  options?: FunctionalCustomElementOptions & { props?: P },
+  options?: { props?: P },
 ): Root => {
   const {
-    shadowRoot = true,
-    shadowRootMode = "open",
-    styles,
     props: initialProps,
   } = options || {};
 
@@ -44,7 +41,14 @@ const functionalDeclarativeCustomElement = <
   const ssrEffect = () => () => {}; // SSRでは副作用不要
   const noop = () => {};
 
-  const cb = callback({
+  const {
+    options: {
+      shadowRoot,
+      shadowRootMode,
+      styles,
+    },
+    render,
+  } = callback({
     reactivity: {
       signal: ssrSignal,
       effect: ssrEffect,
@@ -113,7 +117,7 @@ const functionalDeclarativeCustomElement = <
     getInternals: () => undefined,
   });
 
-  jsxResult = cb();
+  jsxResult = render();
 
   // VNode化
   const vnode = genVNode(jsxResult);

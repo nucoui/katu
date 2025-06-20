@@ -25,11 +25,6 @@ export type FunctionalCustomElementOptions = {
    */
   shadowRoot?: boolean;
   /**
-   * Form要素として関連付けるかどうか
-   * Whether to associate as a form element or not
-   */
-  isFormAssociated?: boolean;
-  /**
    * ShadowRoot用のスタイル（CSSコード）
    * Style for ShadowRoot (CSS code)
    * 文字列または文字列の配列を指定可能
@@ -129,14 +124,16 @@ export type ChatoraComponent<P extends Record<string, any> = Record<string, neve
    * Returns ElementInternals if formAssociated is enabled
    */
   getInternals: () => ElementInternals | undefined;
-}) => () => ChatoraNode;
+}) => {
+  options: FunctionalCustomElementOptions;
+  render: () => ChatoraNode | ChatoraNode[];
+};
 
 export type FunctionalCustomElement = <
   P extends Record<string, any> = Record<string, never>,
   E extends Record<`on-${string}`, any> = Record<`on-${string}`, never>,
 >(
   component: ChatoraComponent<P, E>,
-  options: FunctionalCustomElementOptions
 ) => {
   new (): HTMLElement;
 };
