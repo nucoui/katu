@@ -134,7 +134,6 @@ button.addEventListener("on-click", (e) => {
 
 setInterval(() => {
   const currentDisabled = button.getAttribute("disabled");
-  const nextVariant = currentDisabled === "true" ? "false" : "true";
-  button.setAttribute("disabled", nextVariant);
+  currentDisabled === "" ? button.removeAttribute("disabled") : button.setAttribute("disabled", "");
   // console.log(`Button variant changed to: ${nextVariant}`);
-}, 1000);
+}, 2000);

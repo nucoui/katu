@@ -68,6 +68,7 @@ npm install chatora
 // MiniElement.tsx
 import { functionalCustomElement, CC } from "chatora";
 import { toString } from "@chatora/util";
+import { Host } from "chatora/jsx-runtime";
 
 type Props = {
   name?: string;
@@ -93,21 +94,17 @@ const Comp: CC<Props, Emits> = ({ reactivity: { signal }, defineProps, defineEmi
       emits("on-click", new Event("click"));
     };
 
-    return () => {
-      return (
-        <div>
-          <h1>Hi {props().name}</h1>
-          <p>Count: {count()}</p>
-          <button onClick={handleClick}>Increment</button>
-          <button onClick={() => setCount((c) => c - 1)}>Decrement</button>
-        </div>
-      );
-    };
+    return () => (
+      <Host shadowRoot shadowRootMode="open" style=["width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;"]>
+        <h1>Hi {props().name}</h1>
+        <p>Count: {count()}</p>
+        <button onClick={handleClick}>Increment</button>
+        <button onClick={() => setCount((c) => c - 1)}>Decrement</button>
+      </Host>
+    );
   }
 
-export const MiniElement = functionalCustomElement(Comp, {
-  shadowRoot: true,
-});
+export const MiniElement = functionalCustomElement(Comp);
 ```
 
 ### 4. Use the custom element
