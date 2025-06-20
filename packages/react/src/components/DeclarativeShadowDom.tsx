@@ -1,5 +1,4 @@
 import type { Props as ChatoraWrapperProps } from "@/components/ChatoraWrapper";
-import type { FunctionalCustomElementOptions } from "chatora";
 import type { useId } from "react";
 import { hastToJsx } from "@/utils/hastToJsx";
 import { functionalDeclarativeCustomElement } from "chatora";
@@ -10,7 +9,7 @@ type Props<P extends Record<string, unknown>> = Omit<
   "element"
 > & {
   id: ReturnType<typeof useId>;
-} & FunctionalCustomElementOptions;
+};
 
 export const DeclarativeShadowDom = <P extends Record<string, unknown>>({
   tag,
@@ -18,11 +17,12 @@ export const DeclarativeShadowDom = <P extends Record<string, unknown>>({
   component,
   children,
   props: _props,
-  ...option
 }: Props<P>) => {
   const hast = functionalDeclarativeCustomElement(
     component,
-    option,
+    {
+      props: _props as P,
+    },
   );
 
   return jsx(tag as any, {

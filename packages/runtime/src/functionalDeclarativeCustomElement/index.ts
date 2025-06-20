@@ -13,6 +13,7 @@ import { genVNode } from "../functionalCustomElement/vNode";
  *
  * @param callback - ライフサイクルフックやレンダリング関数を登録するコールバック
  * @param options - ShadowRootやForm関連のオプション
+ * @param options.props - 初期プロパティ値を指定します (Initial property values)
  * @returns hastオブジェクト (HTML Abstract Syntax Tree)
  */
 const functionalDeclarativeCustomElement = <
@@ -122,9 +123,9 @@ const functionalDeclarativeCustomElement = <
   let shadowRootMode: "open" | "closed" = "open";
 
   if (vnode.tag === "#root") {
-    shadowRoot = vnode.props.shadowRoot;
-    shadowRootMode = vnode.props.shadowRootMode;
-    styles = vnode.props.style;
+    shadowRoot = vnode.props.shadowRoot ?? shadowRoot;
+    shadowRootMode = vnode.props.shadowRootMode ?? shadowRootMode;
+    styles = vnode.props.style ?? styles;
   }
 
   // スタイル要素を事前に生成（存在する場合）
@@ -183,7 +184,7 @@ function vNodeToHast(node: any): ElementContent | ElementContent[] {
     if (node.tag === "#empty") {
       return { type: "text", value: "" };
     }
-    if (node.tag === "#fragment" || node.tag === "root") {
+    if (node.tag === "#fragment" || node.tag === "#root") {
       // fragmentは子要素を平坦化
       return node.children.flatMap(vNodeToHast);
     }

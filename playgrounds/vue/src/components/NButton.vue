@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ToVueEmits } from "@chatora/vue"
-import { Button, ButtonStyle, type Emits, type Props } from "../../chatora/Button"
+import { Button, type Emits, type Props } from "../../chatora/Button"
 import ChatoraWrapper from "@chatora/vue/components/ChatoraWrapper.vue"
 
 const props = defineProps<Props>()
@@ -13,8 +13,6 @@ defineEmits<VueEmits>()
     tag="n-button"
     :component="Button"
     :props
-    :styles="ButtonStyle"
-    :shadow-root="true"
   >
     <slot />
   </ChatoraWrapper>

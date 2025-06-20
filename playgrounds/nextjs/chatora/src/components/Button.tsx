@@ -1,5 +1,6 @@
 import { toMatched } from "@chatora/util";
 import { type CC } from "chatora";
+import { Host } from "chatora/jsx-runtime";
 
 export type Emits = {
   "on-click": { count: number };
@@ -24,18 +25,20 @@ export const Button: CC<Props, Emits> = ({ reactivity: { signal }, defineProps, 
 
   return () => {
     return (
-      <button
-        type={props().type}
-        onClick={() => {
-          setClickCount((count) => count + 1);
-          emits("on-click", { count: clickCount()
-        });
-      }}>
-        aaaa
-        <span>Click count: {clickCount()}</span>
-        <slot />
-        <slot name="slot1" />
-      </button>
+      <Host style={[ButtonStyle]}>
+        <button
+          type={props().type}
+          onClick={() => {
+            setClickCount((count) => count + 1);
+            emits("on-click", { count: clickCount()
+          });
+        }}>
+          aaaa
+          <span>Click count: {clickCount()}</span>
+          <slot />
+          <slot name="slot1" />
+        </button>
+      </Host>
     );
   }
 }

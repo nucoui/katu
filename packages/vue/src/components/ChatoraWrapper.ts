@@ -1,11 +1,11 @@
-import type { FunctionalCustomElementOptions } from "chatora";
 import { functionalCustomElement, functionalDeclarativeCustomElement } from "chatora";
 import { defineComponent, getCurrentInstance, h, onMounted, ref } from "vue";
 import { hastToJsx } from "../utils/hastToJsx";
 
-export type WrapperProps<P extends Record<string, unknown> = Record<string, unknown>, E extends Record<`on-${string}`, any> = Record<`on-${string}`, never>> = FunctionalCustomElementOptions & {
+export type WrapperProps<P extends Record<string, unknown> = Record<string, unknown>, E extends Record<`on-${string}`, any> = Record<`on-${string}`, never>> = {
   props: P & E;
   tag: string;
+  // eslint-disable-next-line ts/no-unsafe-function-type
   component: Function;
 };
 
@@ -39,14 +39,13 @@ export default defineComponent<WrapperProps>({
       return { props: filteredProps, emits };
     };
 
-    const { tag, props: initialProps, component, ...options } = rawProps;
+    const { tag, props: initialProps, component } = rawProps;
     const { props, emits } = splitProps(initialProps);
 
     // SSR用hast生成
     const hast = functionalDeclarativeCustomElement(
       component as any,
       {
-        ...options,
         props,
       },
     );
@@ -54,7 +53,7 @@ export default defineComponent<WrapperProps>({
     onMounted(() => {
       if (!customElements || customElements.get(tag))
         return;
-      const Element = functionalCustomElement(component as any, options);
+      const Element = functionalCustomElement(component as any);
       customElements.define(tag, Element);
       isDefined.value = true;
       if (tagRef.value) {

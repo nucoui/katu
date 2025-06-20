@@ -95,7 +95,7 @@ const Comp: CC<Props, Emits> = ({ reactivity: { signal }, defineProps, defineEmi
     };
 
     return () => (
-      <Host shadowRoot shadowRootMode="open" style=["width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;"]>
+      <Host shadowRoot shadowRootMode="open" style={["width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;"]}>
         <h1>Hi {props().name}</h1>
         <p>Count: {count()}</p>
         <button onClick={handleClick}>Increment</button>

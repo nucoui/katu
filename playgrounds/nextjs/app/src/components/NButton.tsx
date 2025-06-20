@@ -1,7 +1,7 @@
 "use client";
 
 import { PropsWithChildren } from "react";
-import { Button, ButtonStyle } from "@next/chatora"
+import { Button } from "@next/chatora"
 import { ChatoraWrapper } from "@chatora/react/components/ChatoraWrapper";
 import type { Props as ButtonProps, Emits } from "@next/chatora";
 
@@ -15,7 +15,6 @@ export const NButton = ({ children, ...props }: Props) => {
         props={props}
         component={Button}
         children={children}
-        styles={[ButtonStyle]}
       />
     </>
   )

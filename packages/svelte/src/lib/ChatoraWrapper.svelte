@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { CC, FunctionalCustomElementOptions } from "chatora";
+  import type { CC } from "chatora";
   import { functionalCustomElement } from "chatora";
   import { onMount } from "svelte";
   // import { browser } from '$app/environment'; // SvelteKitの場合
@@ -7,7 +7,6 @@
   export let tag: string;
   export let component: CC;
   export let props: Record<string, string | undefined> = {};
-  export let option: FunctionalCustomElementOptions;
 
   let ref: HTMLElement | null = null;
 
@@ -17,7 +16,7 @@
   onMount(() => {
     isClient = true;
 
-    const Element = functionalCustomElement(component, { ...option });
+    const Element = functionalCustomElement(component);
 
     isDefined = customElements.get(tag) !== undefined;
 
@@ -61,7 +60,7 @@
     <slot />
   </svelte:element>
 {:else}
-  <!-- 未実装 -->
+  <!-- TODO: 未実装 -->
   <svelte:element this={tag}>
     <slot />
   </svelte:element>

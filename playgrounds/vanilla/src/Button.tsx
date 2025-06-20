@@ -1,4 +1,4 @@
-import { functionalCustomElement, type CC } from "chatora";
+import { functionalCustomElement, functionalDeclarativeCustomElement, type CC } from "chatora";
 import { toBoolean, toMatched, toString } from "@chatora/util";
 import clsx from "clsx";
 import style from "./Button.scss?raw";
@@ -114,6 +114,8 @@ export const Button: CC<Props, Emits> = ({
 class ButtonElement extends functionalCustomElement(Button) {
   static formAssociated = true;
 }
+
+console.log(functionalDeclarativeCustomElement(Button))
 
 if (customElements.get("n-button") === undefined) {
   customElements.define("n-button", ButtonElement);

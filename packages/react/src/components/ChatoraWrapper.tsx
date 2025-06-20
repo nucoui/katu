@@ -1,5 +1,5 @@
 import { hastToJsx } from "@/utils/hastToJsx";
-import { type CC, functionalCustomElement, type FunctionalCustomElementOptions, functionalDeclarativeCustomElement } from "chatora";
+import { type CC, functionalCustomElement, functionalDeclarativeCustomElement } from "chatora";
 import { type PropsWithChildren, useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { jsx } from "react/jsx-runtime";
 
@@ -7,7 +7,7 @@ export type Props<P extends Record<string, unknown>> = PropsWithChildren<{
   props: P;
   tag: string;
   component: CC<P>;
-} & FunctionalCustomElementOptions>;
+}>;
 
 const splitProps = (props: Record<string, unknown>) => {
   const emits: Record<string, (event: Event) => void> = {};
@@ -23,7 +23,7 @@ const splitProps = (props: Record<string, unknown>) => {
   return { props: filteredProps, emits };
 };
 
-export const ChatoraWrapper = <P extends Record<string, unknown>>({ tag, component, children, props, ...option }: Props<P>) => {
+export const ChatoraWrapper = <P extends Record<string, unknown>>({ tag, component, children, props }: Props<P>) => {
   const id = useId();
 
   const { props: filteredProps, emits } = useMemo(() => splitProps(props || {}), [props]);
@@ -31,7 +31,6 @@ export const ChatoraWrapper = <P extends Record<string, unknown>>({ tag, compone
   const hast = functionalDeclarativeCustomElement<P>(
     component,
     {
-      ...option,
       props: filteredProps as P,
     },
   );
@@ -43,13 +42,10 @@ export const ChatoraWrapper = <P extends Record<string, unknown>>({ tag, compone
     if (!customElements || customElements.get(tag)) {
       return;
     }
-    const element = functionalCustomElement(
-      component,
-      option,
-    );
+    const element = functionalCustomElement(component);
     customElements.define(tag, element);
     setIsDefined(true);
-  }, [tag, component, option]);
+  }, [tag, component]);
 
   useEffect(() => {
     defineElement();
