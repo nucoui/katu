@@ -105,7 +105,8 @@ export function mount(vnode: VNode, parent?: HTMLElement | ShadowRoot | Element 
     if (props && props !== EMPTY_PROPS) {
       for (const k in props) {
         const v = props[k];
-        if (v == null)
+
+        if (v == null || v === undefined)
           continue;
 
         // イベントハンドラの高速チェック
@@ -114,8 +115,7 @@ export function mount(vnode: VNode, parent?: HTMLElement | ShadowRoot | Element 
           el.addEventListener(event, v as EventListenerOrEventListenerObject);
         }
         else if (typeof v === "boolean") {
-          if (v)
-            el.setAttribute(k, "");
+          v ? el.setAttribute(k, "") : el.removeAttribute(k);
         }
         else {
           el.setAttribute(k, String(v));

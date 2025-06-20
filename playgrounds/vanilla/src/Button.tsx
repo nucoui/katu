@@ -133,8 +133,8 @@ button.addEventListener("on-click", (e) => {
 });
 
 setInterval(() => {
-  const currentVariant = button.getAttribute("variant");
-  const nextVariant = currentVariant === "primary" ? "secondary" : "primary";
-  button.setAttribute("variant", nextVariant);
+  const currentDisabled = button.getAttribute("disabled");
+  const nextVariant = currentDisabled === "true" ? "false" : "true";
+  button.setAttribute("disabled", nextVariant);
   // console.log(`Button variant changed to: ${nextVariant}`);
 }, 1000);

@@ -40,6 +40,11 @@ function patchProps(el: HTMLElement, oldProps: Record<string, any>, newProps: Re
     if (newVal === oldVal)
       continue;
 
+    if (newVal == null || newVal === undefined) {
+      el.removeAttribute(k);
+      continue;
+    }
+
     if (k.charCodeAt(0) === 111 && k.charCodeAt(1) === 110 && typeof newVal === "function") { // "on"
       const event = k.slice(2).toLowerCase();
       if (oldVal)
